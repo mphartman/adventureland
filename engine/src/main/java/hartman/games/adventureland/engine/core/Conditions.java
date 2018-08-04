@@ -22,12 +22,7 @@ public final class Conditions {
      * she is in has an exit matching that direction.
      */
     public static final Condition HAS_EXIT = (playerCommand, gameState) -> {
-        try {
-            Direction desiredExit = Direction.valueOf(playerCommand.getNoun().getName());
-            return gameState.getPlayerCurrentPosition().hasExit(desiredExit);
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
+        return gameState.getPlayerCurrentPosition().hasExit(playerCommand.getNoun());
     };
 
     /**

@@ -1,6 +1,6 @@
 package hartman.games.adventureland.engine.core;
 
-import hartman.games.adventureland.engine.Vocabulary;
+import hartman.games.adventureland.engine.Verb;
 
 public final class Verbs {
 
@@ -9,6 +9,6 @@ public final class Verbs {
     }
 
 
-    public static final Vocabulary.Verb GO = new Vocabulary.Verb("GO");
+    public static final Verb GO = new Verb("GO");
 
 }

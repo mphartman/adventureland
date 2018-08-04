@@ -14,21 +14,21 @@ import java.util.stream.Collectors;
 public class Room {
 
     public static final Room NOWHERE = new Room("nowhere", "No where.");
-
+    
     public static class Exit {
-        private Direction direction;
+        private Noun direction;
         private Room room;
 
-        public Exit(Direction direction, Room room) {
+        public Exit(Noun direction, Room room) {
             this.direction = direction;
             this.room = room;
         }
 
-        public Exit(Direction direction) {
+        public Exit(Noun direction) {
             this(direction, NOWHERE);
         }
 
-        public Direction getDirection() {
+        public Noun getDirection() {
             return direction;
         }
 
@@ -37,10 +37,10 @@ public class Room {
         }
 
         public static class Builder {
-            private Direction direction;
+            private Noun direction;
             private Room room;
 
-            public Builder exit(Direction direction) {
+            public Builder exit(Noun direction) {
                 this.direction = direction;
                 return this;
             }
@@ -97,11 +97,11 @@ public class Room {
         return description;
     }
 
-    public boolean hasExit(Direction direction) {
+    public boolean hasExit(Noun direction) {
         return exits.stream().anyMatch(e -> e.getDirection().equals(direction));
     }
 
-    public Room exit(Direction direction) {
+    public Room exit(Noun direction) {
         return exits.stream()
                 .filter(e -> e.getDirection().equals(direction))
                 .findFirst()

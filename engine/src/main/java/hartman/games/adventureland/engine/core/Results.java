@@ -5,8 +5,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import hartman.games.adventureland.engine.Action.Result;
-import hartman.games.adventureland.engine.Direction;
-import hartman.games.adventureland.engine.Room;
 
 public final class Results {
     private Results() {
@@ -18,8 +16,6 @@ public final class Results {
     }
 
     public static final Result GOTO_ROOM = (playerCommand, gameState) -> {
-        Direction desiredExit = Direction.valueOf(playerCommand.getNoun().getName());
-        Room nextRoom = gameState.getPlayerCurrentPosition().exit(desiredExit);
-        gameState.movePlayerTo(nextRoom);
+        gameState.exitTowards(playerCommand.getNoun());
     };
 }

@@ -25,7 +25,7 @@ public class ConditionsTest {
     @Test
     public void hasExitShouldReturnTrueWhenRoomHasRequestedExit() {
         Room end = new Room("end", "end");
-        Room start = new Room("start", "start", new Room.Exit.Builder().exit(Direction.DOWN).towards(end).build());
+        Room start = new Room("start", "start", new Room.Exit.Builder().exit(Nouns.DOWN).towards(end).build());
         Player player = new Player("Archie");
         GameState gameState = new GameState(player, start);
         PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.DOWN);

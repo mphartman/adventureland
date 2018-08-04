@@ -10,8 +10,8 @@ import java.util.function.BiFunction;
  * Things the player can do or which happen to her and that result in changes to the game world.
  */
 public class Action {
-    private final Vocabulary.Verb verb;
-    private final Vocabulary.Noun noun;
+    private final Verb verb;
+    private final Noun noun;
     private final Set<Condition> conditions = new LinkedHashSet<>();
     private final Set<Result> results = new LinkedHashSet<>();
 
@@ -21,19 +21,19 @@ public class Action {
     public interface Result extends BiConsumer<PlayerCommand, GameState> {
     }
 
-    public Action(Vocabulary.Verb verb, Result... results) {
+    public Action(Verb verb, Result... results) {
         this.verb = verb;
-        this.noun = Vocabulary.Noun.UNRECOGNIZED;
+        this.noun = Noun.UNRECOGNIZED;
         this.results.addAll(Arrays.asList(results));
     }
 
-    public Action(Vocabulary.Verb verb, Vocabulary.Noun noun, Set<Result> results) {
+    public Action(Verb verb, Noun noun, Set<Result> results) {
         this.verb = verb;
         this.noun = noun;
         this.results.addAll(results);
     }
 
-    public Action(Vocabulary.Verb verb, Vocabulary.Noun noun, Set<Condition> conditions, Set<Result> results) {
+    public Action(Verb verb, Noun noun, Set<Condition> conditions, Set<Result> results) {
         this.verb = verb;
         this.noun = noun;
         this.conditions.addAll(conditions);
