@@ -1,5 +1,7 @@
 # Adventureland
 
+[![Build Status](https://travis-ci.org/mphartman/adventureland.svg?branch=master)](https://travis-ci.org/mphartman/adventureland)
+
 Run adventure games in Scott Adams format using a Java-based game engine. 
 
 
