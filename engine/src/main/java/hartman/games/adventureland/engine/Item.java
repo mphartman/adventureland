@@ -1,5 +1,7 @@
 package hartman.games.adventureland.engine;
 
+import java.util.Objects;
+
 /**
  * Things in a room, some of which can be picked up, carried around and dropped.
  *
@@ -8,9 +10,45 @@ package hartman.games.adventureland.engine;
  *
  */
 public class Item {
-    private int id;
     private String name;
     private String description;
     private boolean carryable;
 
+    public Item(String name, String description) {
+        this.name = name;
+        this.description = description;
+        this.carryable = false;
+    }
+    
+    public Item(String name, String description, Boolean carryable) {
+        this.name = name;
+        this.description = description;
+        this.carryable = carryable;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public boolean isCarryable() {
+        return carryable;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Item item = (Item) o;
+        return Objects.equals(name, item.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
+    
 }

@@ -53,4 +53,25 @@ public class ConditionsTest {
         Condition inRoom = new Conditions.IN_ROOM(start);
         assertTrue(inRoom.apply(playerCommand));
     }
+
+    @Test
+    public void itemCarriedShouldReturnFalseWhenPlayerInventoryDoesNotHaveItem() {
+        Item dagger = new Item("dagger", "A dull, chipped blade.");
+        Player player = new Player("Archie");
+        GameState gameState = new GameState(player, Room.NOWHERE);
+        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.ANY, gameState);
+        Condition itemCarried = new Conditions.ITEM_CARRIED(dagger);
+        assertFalse(itemCarried.apply(playerCommand));
+    }
+
+    @Test
+    public void itemCarriedShouldReturnTrueWhenPlayerInventoryHasItem() {
+        Item torch = new Item("torch", "An unlit wooden torch dipped in pitch.");
+        Player player = new Player("Archie");
+        player.addToInventory(torch);
+        GameState gameState = new GameState(player, Room.NOWHERE);
+        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.ANY, gameState);
+        Condition itemCarried = new Conditions.ITEM_CARRIED(torch);
+        assertTrue(itemCarried.apply(playerCommand));
+    }
 }
