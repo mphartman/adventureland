@@ -17,17 +17,21 @@ public final class Conditions {
         return new LinkedHashSet<>(Arrays.asList(conditions));
     }
 
-    public static final Condition HAS_EXIT = (pc) -> {
+    /**
+     * True if player's requested noun represents a valid direction and that the current room
+     * she is in has an exit matching that direction.
+     */
+    public static final Condition HAS_EXIT = (playerCommand, gameState) -> {
         try {
-            Direction desiredExit = Direction.valueOf(pc.getNoun().getName());
-            return pc.getGameState().getPlayerCurrentPosition().hasExit(desiredExit);
+            Direction desiredExit = Direction.valueOf(playerCommand.getNoun().getName());
+            return gameState.getPlayerCurrentPosition().hasExit(desiredExit);
         } catch (IllegalArgumentException e) {
             return false;
         }
     };
 
     /**
-     * True if the player's current room is ROOM, which must be the name of this class's room.
+     * True if the player's current room is ROOM.
      */
     public static class IN_ROOM implements Condition {
         private final Room room;
@@ -37,13 +41,13 @@ public final class Conditions {
         }
 
         @Override
-        public Boolean apply(PlayerCommand playerCommand) {
-            return playerCommand.getGameState().getPlayerCurrentPosition().equals(room);
+        public Boolean apply(PlayerCommand playerCommand, GameState gameState) {
+            return gameState.getPlayerCurrentPosition().equals(room);
         }
     }
 
     /**
-     * True if the player is carrying ITEM, which must be the name of an item defined somewhere.
+     * True if the player is carrying ITEM in their inventory.
      */
     public static class ITEM_CARRIED implements Condition {
 
@@ -54,13 +58,13 @@ public final class Conditions {
         }
 
         @Override
-        public Boolean apply(PlayerCommand playerCommand) {
-            return playerCommand.getGameState().getPlayer().hasInInventory(item);
+        public Boolean apply(PlayerCommand playerCommand, GameState gameState) {
+            return gameState.getPlayer().hasInInventory(item);
         }
     }
 
     /**
-     * True if ITEM is in the player's current room
+     * True if ITEM is in the player's current room.
      */
     public static class ITEM_HERE implements Condition {
 
@@ -71,15 +75,14 @@ public final class Conditions {
         }
 
         @Override
-        public Boolean apply(PlayerCommand playerCommand) {
-            return playerCommand.getGameState().getPlayerCurrentPosition().containsItem(item);
+        public Boolean apply(PlayerCommand playerCommand, GameState gameState) {
+            return gameState.getPlayerCurrentPosition().containsItem(item);
         }
     }
 
     /**
      * True if ITEM is either being carried by the player
-     * or in the player's current room
-     * (i.e. if either carried ITEM or here ITEM is true.)
+     * or is in the player's current room.
      */
     public static class IS_PRESENT implements Condition {
         private Condition isItemCarried;
@@ -91,8 +94,8 @@ public final class Conditions {
         }
 
         @Override
-        public Boolean apply(PlayerCommand playerCommand) {
-            return isItemCarried.apply(playerCommand) || isItemHere.apply(playerCommand);
+        public Boolean apply(PlayerCommand playerCommand, GameState gameState) {
+            return isItemCarried.apply(playerCommand, gameState) || isItemHere.apply(playerCommand, gameState);
         }
     }
 

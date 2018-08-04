@@ -6,12 +6,10 @@ package hartman.games.adventureland.engine;
 public class PlayerCommand {
     private final Vocabulary.Verb verb;
     private final Vocabulary.Noun noun;
-    private final GameState gameState;
 
-    public PlayerCommand(Vocabulary.Verb verb, Vocabulary.Noun noun, GameState gameState) {
+    public PlayerCommand(Vocabulary.Verb verb, Vocabulary.Noun noun) {
         this.verb = verb;
         this.noun = noun;
-        this.gameState = gameState;
     }
 
     public Vocabulary.Verb getVerb() {
@@ -20,9 +18,5 @@ public class PlayerCommand {
 
     public Vocabulary.Noun getNoun() {
         return noun;
-    }
-
-    public GameState getGameState() {
-        return gameState;
     }
 }

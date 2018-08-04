@@ -16,10 +16,10 @@ public class ConditionsTest {
         Room start = new Room("start", "start");
         Player player = new Player("Archie");
         GameState gameState = new GameState(player, start);
-        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.DOWN, gameState);
-        assertFalse(Conditions.HAS_EXIT.apply(playerCommand));
-        playerCommand = new PlayerCommand(Verbs.GO, Nouns.UP, gameState);
-        assertFalse(Conditions.HAS_EXIT.apply(playerCommand));
+        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.DOWN);
+        assertFalse(Conditions.HAS_EXIT.apply(playerCommand, gameState));
+        playerCommand = new PlayerCommand(Verbs.GO, Nouns.UP);
+        assertFalse(Conditions.HAS_EXIT.apply(playerCommand, gameState));
     }
 
     @Test
@@ -28,10 +28,10 @@ public class ConditionsTest {
         Room start = new Room("start", "start", new Room.Exit.Builder().exit(Direction.DOWN).towards(end).build());
         Player player = new Player("Archie");
         GameState gameState = new GameState(player, start);
-        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.DOWN, gameState);
-        assertTrue(Conditions.HAS_EXIT.apply(playerCommand));
-        playerCommand = new PlayerCommand(Verbs.GO, Nouns.UP, gameState);
-        assertFalse(Conditions.HAS_EXIT.apply(playerCommand));
+        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.DOWN);
+        assertTrue(Conditions.HAS_EXIT.apply(playerCommand, gameState));
+        playerCommand = new PlayerCommand(Verbs.GO, Nouns.UP);
+        assertFalse(Conditions.HAS_EXIT.apply(playerCommand, gameState));
     }
 
     @Test
@@ -39,9 +39,9 @@ public class ConditionsTest {
         Room start = new Room("start", "start");
         Player player = new Player("Archie");
         GameState gameState = new GameState(player, start);
-        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.ANY, gameState);
+        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.ANY);
         Condition inRoom = new Conditions.IN_ROOM(Room.NOWHERE);
-        assertFalse(inRoom.apply(playerCommand));
+        assertFalse(inRoom.apply(playerCommand, gameState));
     }
 
     @Test
@@ -49,9 +49,9 @@ public class ConditionsTest {
         Room start = new Room("start", "start");
         Player player = new Player("Archie");
         GameState gameState = new GameState(player, start);
-        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.ANY, gameState);
+        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.ANY);
         Condition inRoom = new Conditions.IN_ROOM(start);
-        assertTrue(inRoom.apply(playerCommand));
+        assertTrue(inRoom.apply(playerCommand, gameState));
     }
 
     @Test
@@ -59,9 +59,9 @@ public class ConditionsTest {
         Item dagger = new Item("dagger", "A dull, chipped blade.");
         Player player = new Player("Archie");
         GameState gameState = new GameState(player, Room.NOWHERE);
-        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.ANY, gameState);
+        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.ANY);
         Condition itemCarried = new Conditions.ITEM_CARRIED(dagger);
-        assertFalse(itemCarried.apply(playerCommand));
+        assertFalse(itemCarried.apply(playerCommand, gameState));
     }
 
     @Test
@@ -70,8 +70,8 @@ public class ConditionsTest {
         Player player = new Player("Archie");
         player.addToInventory(torch);
         GameState gameState = new GameState(player, Room.NOWHERE);
-        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.ANY, gameState);
+        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.ANY);
         Condition itemCarried = new Conditions.ITEM_CARRIED(torch);
-        assertTrue(itemCarried.apply(playerCommand));
+        assertTrue(itemCarried.apply(playerCommand, gameState));
     }
 }
