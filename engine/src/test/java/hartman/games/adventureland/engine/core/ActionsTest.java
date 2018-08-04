@@ -1,4 +1,4 @@
-package hartman.games.adventureland.engine;
+package hartman.games.adventureland.engine.core;
 
 import static hartman.games.adventureland.engine.core.Nouns.DOWN;
 import static hartman.games.adventureland.engine.core.Verbs.GO;
@@ -6,7 +6,10 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import hartman.games.adventureland.engine.core.Actions;
+import hartman.games.adventureland.engine.GameState;
+import hartman.games.adventureland.engine.Player;
+import hartman.games.adventureland.engine.PlayerCommand;
+import hartman.games.adventureland.engine.Room;
 
 public class ActionsTest {
 

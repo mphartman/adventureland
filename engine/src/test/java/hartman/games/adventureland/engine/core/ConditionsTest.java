@@ -1,13 +1,16 @@
-package hartman.games.adventureland.engine;
-
-import hartman.games.adventureland.engine.Action.Condition;
-import hartman.games.adventureland.engine.core.Conditions;
-import hartman.games.adventureland.engine.core.Nouns;
-import hartman.games.adventureland.engine.core.Verbs;
-import org.junit.Test;
+package hartman.games.adventureland.engine.core;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
+import hartman.games.adventureland.engine.Action.Condition;
+import hartman.games.adventureland.engine.GameState;
+import hartman.games.adventureland.engine.Item;
+import hartman.games.adventureland.engine.Player;
+import hartman.games.adventureland.engine.PlayerCommand;
+import hartman.games.adventureland.engine.Room;
 
 public class ConditionsTest {
 
