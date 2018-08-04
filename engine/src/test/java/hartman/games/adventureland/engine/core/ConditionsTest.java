@@ -69,9 +69,8 @@ public class ConditionsTest {
 
     @Test
     public void itemCarriedShouldReturnTrueWhenPlayerInventoryHasItem() {
-        Item torch = new Item("torch", "An unlit wooden torch dipped in pitch.");
+        Item torch = new Item("torch", "An unlit wooden torch dipped in pitch.", true);
         Player player = new Player("Archie");
-        player.addToInventory(torch);
         GameState gameState = new GameState(player, Room.NOWHERE);
         PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.ANY);
         Condition itemCarried = new Conditions.ITEM_CARRIED(torch);

@@ -22,17 +22,19 @@ public class Item {
         this.description = description;
         this.carryable = false;
     }
-    
-    public Item(String name, String description, Boolean carryable) {
-        this.name = name;
-        this.description = description;
-        this.carryable = carryable;
-    }
 
     public Item(String name, String description, Room startingLocation) {
         this.name = name;
         this.description = description;
         this.currentRoom = startingLocation;
+    }
+
+    public Item(String name, String description, boolean inInventory) {
+        this.name = name;
+        this.description = description;
+        this.currentRoom = inventory;
+        this.carried = true;
+        this.carryable = true;
     }
 
     public String getName() {
@@ -45,6 +47,10 @@ public class Item {
 
     public boolean isCarryable() {
         return carryable;
+    }
+
+    public boolean isCarried() {
+        return carried;
     }
 
     public boolean isHere(Room room) {
@@ -80,5 +86,5 @@ public class Item {
     public int hashCode() {
         return Objects.hash(name);
     }
-    
+
 }

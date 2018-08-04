@@ -54,7 +54,7 @@ public final class Conditions {
 
         @Override
         public Boolean apply(PlayerCommand playerCommand, GameState gameState) {
-            return gameState.getPlayer().hasInInventory(item);
+            return item.isCarried();
         }
     }
 
