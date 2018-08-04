@@ -1,18 +1,12 @@
 package hartman.games.adventureland.engine;
 
-import hartman.games.adventureland.engine.core.Actions;
-import hartman.games.adventureland.engine.core.Conditions;
-import hartman.games.adventureland.engine.core.Nouns;
-import hartman.games.adventureland.engine.core.Results;
-import org.junit.Test;
-
-import static hartman.games.adventureland.engine.Action.Condition;
-import static hartman.games.adventureland.engine.Action.Result;
-import static hartman.games.adventureland.engine.Vocabulary.Noun;
-import static hartman.games.adventureland.engine.Vocabulary.Verb;
 import static hartman.games.adventureland.engine.core.Nouns.DOWN;
 import static hartman.games.adventureland.engine.core.Verbs.GO;
 import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
+import hartman.games.adventureland.engine.core.Actions;
 
 public class ActionsTest {
 
