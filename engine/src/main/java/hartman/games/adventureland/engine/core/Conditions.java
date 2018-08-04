@@ -71,7 +71,7 @@ public final class Conditions {
 
         @Override
         public Boolean apply(PlayerCommand playerCommand, GameState gameState) {
-            return gameState.getPlayerCurrentPosition().containsItem(item);
+            return item.isHere(gameState.getPlayerCurrentPosition());
         }
     }
 

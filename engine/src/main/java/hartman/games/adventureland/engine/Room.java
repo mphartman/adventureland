@@ -9,12 +9,12 @@ import java.util.stream.Collectors;
 /**
  * Rooms make up a connected network of nodes between which the player may move.
  *
- * A room may also contain {@link Item}s.
  */
 public class Room {
 
     public static final Room NOWHERE = new Room("nowhere", "No where.");
-    
+    public static final Room INVENTORY = new Room("Inventory", "Player's inventory of carried items.");
+
     public static class Exit {
         private Noun direction;
         private Room room;
@@ -68,7 +68,7 @@ public class Room {
     private String name;
     private String description;
     private Set<Exit> exits = new LinkedHashSet<>();
-    private Set<Item> items = new LinkedHashSet<>();
+    //private Set<Item> items = new LinkedHashSet<>();
 
     /**
      * Creates a new empty room with no exits.
@@ -109,9 +109,9 @@ public class Room {
                 .orElseThrow(() -> new IllegalStateException(String.format("Invalid exit. There is no exit %s from this room.", direction)));
     }
 
-    public boolean containsItem(Item item) {
-        return items.contains(item);
-    }
+    // public boolean containsItem(Item item) {
+    //     return items.contains(item);
+    // }
 
     @Override
     public String toString() {

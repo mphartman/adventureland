@@ -77,4 +77,14 @@ public class ConditionsTest {
         Condition itemCarried = new Conditions.ITEM_CARRIED(torch);
         assertTrue(itemCarried.apply(playerCommand, gameState));
     }
+
+    @Test
+    public void itemHereShouldReturnTrueWhenItemIsInRoom() {
+        Room entryway = new Room("entryway", "A dark, narrow entry way into the house.");
+        Item dog = new Item("dog", "A large, rapid dog growls at me.", entryway);
+        GameState gameState = new GameState(new Player("Archie"), entryway);
+        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.ANY);
+        Condition itemHere = new Conditions.ITEM_HERE(dog);
+        assertTrue(itemHere.apply(playerCommand, gameState));
+    }
 }
