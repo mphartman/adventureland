@@ -34,7 +34,7 @@ public class GameTest {
                 new PlayerCommand(Verbs.GO, Nouns.UP)
         );
 
-        GameState gameState = new GameState(new Player("Archie"), chamber);
+        GameState gameState = new GameState(chamber);
 
         Game game = new Game(testAdventure, commandPlayback, gameState);
 

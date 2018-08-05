@@ -8,18 +8,12 @@ import java.util.Map;
  * and a set of flags which the adventure's actions may set and interpret.
  */
 public class GameState {
-    private final Player player;
     private final Map<String, Object> flags = new HashMap<>();
 
     private Room currentRoom;
 
-    public GameState(Player player, Room startRoom) {
-        this.player = player;
+    public GameState(Room startRoom) {
         this.currentRoom = startRoom;
-    }
-
-    public Player getPlayer() {
-        return player;
     }
 
     public Room getCurrentRoom() {

@@ -9,7 +9,7 @@ public class ActionTest {
 
     @Test
     public void shouldApplyResultWhenVerbMatches() {
-        GameState gameState = new GameState(new Player("Archie"), Room.NOWHERE);
+        GameState gameState = new GameState(Room.NOWHERE);
 
         Action action = new Action(new Verb("SLAP"), ((pc, gs) -> gs.setFlag("MESSAGE", "Ouch! That hurts!")));
 
