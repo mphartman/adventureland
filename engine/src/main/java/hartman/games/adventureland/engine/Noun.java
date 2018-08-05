@@ -1,17 +1,21 @@
 
 package hartman.games.adventureland.engine;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class Noun {
     public static final Noun UNRECOGNIZED = new Noun("Unrecognized");
 
     private String name;
-    private List<Noun> synonyms;
+    private Set<String> synonyms = new LinkedHashSet<>();
 
     public Noun(String name) {
         this.name = name;
+    }
+
+    public Noun(String name, String... synonyms) {
+        this.name = name;
+        this.synonyms.addAll(Arrays.asList(synonyms));
     }
 
     public String getName() {
@@ -30,7 +34,11 @@ public class Noun {
         if (o == null || getClass() != o.getClass())
             return false;
         Noun noun = (Noun) o;
-        return Objects.equals(name, noun.name);
+        boolean nameMatches = Objects.equals(name, noun.name);
+        if (!nameMatches) {
+            return this.synonyms.contains(noun.name);
+        }
+        return true;
     }
 
     @Override
