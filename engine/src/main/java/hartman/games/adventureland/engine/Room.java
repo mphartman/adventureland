@@ -27,7 +27,7 @@ public class Room {
         }
 
         public Exit(Noun direction) {
-            this(direction, NOWHERE);
+            this(direction, null);
         }
 
         public Noun getDirection() {
@@ -80,9 +80,9 @@ public class Room {
         }
     }
 
-    private String name;
-    private String description;
-    private Set<Exit> exits = new LinkedHashSet<>();
+    private final String name;
+    private final String description;
+    private final Set<Exit> exits = new LinkedHashSet<>();
 
     /**
      * Creates a new empty room with no exits.
@@ -98,8 +98,9 @@ public class Room {
     public Room(String name, String description, Exit... exits) {
         this.name = name;
         this.description = description;
-        this.exits.addAll(Arrays.asList(exits).stream()
-                .map(x -> x.getRoom().equals(NOWHERE) ? new Exit(x.getDirection(), this) : x)
+        // exits to NULL are replaced with exits back to this room.
+        this.exits.addAll(Arrays.stream(exits)
+                .map(x -> x.getRoom() == null ? new Exit(x.getDirection(), this) : x)
                 .collect(Collectors.toSet()));
     }
 
@@ -109,6 +110,10 @@ public class Room {
 
     public String getDescription() {
         return description;
+    }
+
+    public void setExitTowardsSelf(Noun direction) {
+        setExit(direction, this);
     }
 
     public void setExit(Noun direction, Room towards) {
