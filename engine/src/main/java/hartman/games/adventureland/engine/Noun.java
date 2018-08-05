@@ -5,6 +5,7 @@ import java.util.*;
 
 public class Noun {
     public static final Noun UNRECOGNIZED = new Noun("Unrecognized");
+    public static final Noun ANY = new Noun("ANY");
 
     private String name;
     private Set<String> synonyms = new LinkedHashSet<>();

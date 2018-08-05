@@ -39,7 +39,7 @@ public class ConditionsTest {
         Room start = new Room("start", "start");
         Player player = new Player("Archie");
         GameState gameState = new GameState(player, start);
-        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.ANY);
+        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Noun.ANY);
         Condition inRoom = new Conditions.IN_ROOM(Room.NOWHERE);
         assertFalse(inRoom.apply(playerCommand, gameState));
     }
@@ -49,7 +49,7 @@ public class ConditionsTest {
         Room start = new Room("start", "start");
         Player player = new Player("Archie");
         GameState gameState = new GameState(player, start);
-        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.ANY);
+        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Noun.ANY);
         Condition inRoom = new Conditions.IN_ROOM(start);
         assertTrue(inRoom.apply(playerCommand, gameState));
     }
@@ -59,7 +59,7 @@ public class ConditionsTest {
         Item dagger = Item.newPortableObjectItem("dagger", "A dull, chipped blade.");
         Player player = new Player("Archie");
         GameState gameState = new GameState(player, Room.NOWHERE);
-        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.ANY);
+        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Noun.ANY);
         Condition itemCarried = new Conditions.ITEM_CARRIED(dagger);
         assertFalse(itemCarried.apply(playerCommand, gameState));
     }
@@ -69,7 +69,7 @@ public class ConditionsTest {
         Item torch = Item.newInventoryItem("torch", "An unlit wooden torch dipped in pitch.");
         Player player = new Player("Archie");
         GameState gameState = new GameState(player, Room.NOWHERE);
-        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.ANY);
+        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Noun.ANY);
         Condition itemCarried = new Conditions.ITEM_CARRIED(torch);
         assertTrue(itemCarried.apply(playerCommand, gameState));
     }
@@ -79,7 +79,7 @@ public class ConditionsTest {
         Room entryway = new Room("entryway", "A dark, narrow entry way into the house.");
         Item dog = Item.newSceneryRoomItem("dog", "A large, rapid dog growls at me.", entryway);
         GameState gameState = new GameState(new Player("Archie"), entryway);
-        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.ANY);
+        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Noun.ANY);
         Condition itemHere = new Conditions.ITEM_HERE(dog);
         assertTrue(itemHere.apply(playerCommand, gameState));
     }
@@ -89,7 +89,7 @@ public class ConditionsTest {
         Room bathroom = new Room("bathroom", "A luxurious master bathroom with a claw-foot tub.");
         Item microwave = Item.newSceneryRoomItem("microwave", "A 1200-watt microwave.");
         GameState gameState = new GameState(new Player("Archie"), bathroom);
-        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.ANY);
+        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Noun.ANY);
         Condition itemHere = new Conditions.ITEM_HERE(microwave);
         assertFalse(itemHere.apply(playerCommand, gameState));
     }
@@ -99,7 +99,7 @@ public class ConditionsTest {
         Room doghouse = new Room("doghouse", "A cozy, warm kennel.");
         Item dog = Item.newSceneryRoomItem("dog", "A small sleeps here.", doghouse);
         GameState gameState = new GameState(new Player("Archie"), doghouse);
-        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.ANY);
+        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Noun.ANY);
         Condition isPresent = new Conditions.IS_PRESENT(dog);
         assertTrue(isPresent.apply(playerCommand, gameState));
     }
@@ -108,7 +108,7 @@ public class ConditionsTest {
     public void isPresentShouldReturnTrueWhenItemIsInInventory() {
         Item key = Item.newInventoryItem("key", "A tarnished brass skeleton key.");
         GameState gameState = new GameState(new Player("Archie"), Room.NOWHERE);
-        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.ANY);
+        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Noun.ANY);
         Condition isPresent = new Conditions.IS_PRESENT(key);
         assertTrue(isPresent.apply(playerCommand, gameState));
     }

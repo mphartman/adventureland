@@ -11,29 +11,29 @@ public class GameState {
     private final Player player;
     private final Map<String, Object> flags = new HashMap<>();
 
-    private Room playerCurrentPosition;
+    private Room currentRoom;
 
     public GameState(Player player, Room startRoom) {
         this.player = player;
-        this.playerCurrentPosition = startRoom;
+        this.currentRoom = startRoom;
     }
 
     public Player getPlayer() {
         return player;
     }
 
-    public Room getPlayerCurrentPosition() {
-        return playerCurrentPosition;
+    public Room getCurrentRoom() {
+        return currentRoom;
     }
 
     public Room exitTowards(Noun direction) {
-        Room nextRoom = playerCurrentPosition.exit(direction);
-        return movePlayerTo(nextRoom);
+        Room nextRoom = currentRoom.exit(direction);
+        return moveTo(nextRoom);
     }
 
-    public Room movePlayerTo(Room room) {
-        Room previousRoom = playerCurrentPosition;
-        playerCurrentPosition = room;
+    public Room moveTo(Room room) {
+        Room previousRoom = currentRoom;
+        currentRoom = room;
         return previousRoom;
     }
 

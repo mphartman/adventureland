@@ -24,7 +24,7 @@ public class ActionsTest {
         
         Actions.GO_ACTION.run(playerCommand, gameState);
 
-        assertEquals(dungeon, gameState.getPlayerCurrentPosition());
+        assertEquals(dungeon, gameState.getCurrentRoom());
     }
 
 }

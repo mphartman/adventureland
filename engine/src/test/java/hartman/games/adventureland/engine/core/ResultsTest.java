@@ -18,7 +18,7 @@ public class ResultsTest {
         PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.UP);
         Results.GOTO_ROOM.accept(playerCommand, gameState);
 
-        Assert.assertEquals(tower_second_floor, gameState.getPlayerCurrentPosition());
+        Assert.assertEquals(tower_second_floor, gameState.getCurrentRoom());
     }
 
     @Test(expected = IllegalStateException.class)

@@ -9,6 +9,9 @@ import java.util.stream.Collectors;
 /**
  * Rooms make up a connected network of nodes between which the player may move.
  *
+ * A Room may have no more than one exit per direction but each exit may point to the same room.
+ *
+ * E.g. A room can only have one North exit but the North and Up exits can point reference the same destination.
  */
 public class Room {
 
@@ -33,6 +36,19 @@ public class Room {
 
         public Room getRoom() {
             return room;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Exit exit = (Exit) o;
+            return Objects.equals(direction, exit.direction);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(direction);
         }
 
         public static class Builder {
@@ -67,7 +83,6 @@ public class Room {
     private String name;
     private String description;
     private Set<Exit> exits = new LinkedHashSet<>();
-    //private Set<Item> items = new LinkedHashSet<>();
 
     /**
      * Creates a new empty room with no exits.
@@ -96,6 +111,17 @@ public class Room {
         return description;
     }
 
+    public void setExit(Noun direction, Room towards) {
+        setExit(new Exit(direction, towards));
+    }
+
+    public void setExit(Exit exit) {
+        if (!exits.add(exit)) {
+            exits.remove(exit);
+            exits.add(exit);
+        }
+    }
+
     public boolean hasExit(Noun direction) {
         return exits.stream().anyMatch(e -> e.getDirection().equals(direction));
     }
@@ -107,10 +133,6 @@ public class Room {
                 .map(Exit::getRoom)
                 .orElseThrow(() -> new IllegalStateException(String.format("Invalid exit. There is no exit %s from this room.", direction)));
     }
-
-    // public boolean containsItem(Item item) {
-    //     return items.contains(item);
-    // }
 
     @Override
     public String toString() {

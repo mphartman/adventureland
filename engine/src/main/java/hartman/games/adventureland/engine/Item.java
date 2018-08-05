@@ -17,6 +17,7 @@ public class Item {
     private final Room startingRoom;
 
     private Room currentRoom;
+    private Noun noun;
 
     protected Item(String name, String description, boolean portable, Room startingRoom) {
         this.name = name;
@@ -24,6 +25,7 @@ public class Item {
         this.portable = portable;
         this.startingRoom = startingRoom;
         this.currentRoom = startingRoom;
+        this.noun = new Noun(name);
     }
 
     public static Item newSceneryRoomItem(String name, String description, Room startingRoom) {
@@ -68,6 +70,10 @@ public class Item {
 
     public Boolean hasMoved() {
         return !currentRoom.equals(startingRoom);
+    }
+
+    public Noun asNoun() {
+        return noun;
     }
 
     public Room drop(Room room) {

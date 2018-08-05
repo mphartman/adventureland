@@ -23,7 +23,7 @@ public class Action {
 
     public Action(Verb verb, Result... results) {
         this.verb = verb;
-        this.noun = Noun.UNRECOGNIZED;
+        this.noun = Noun.ANY;
         this.results.addAll(Arrays.asList(results));
     }
 
@@ -42,8 +42,10 @@ public class Action {
 
     public void run(PlayerCommand playerCommand, GameState gameState) {
         if (playerCommand.getVerb().equals(verb)) {
-            if (conditions.stream().allMatch(condition -> condition.apply(playerCommand, gameState))) {
-                results.forEach(result -> result.accept(playerCommand, gameState));
+            if (noun.equals(Noun.ANY) || playerCommand.getNoun().equals(noun)) {
+                if (conditions.stream().allMatch(condition -> condition.apply(playerCommand, gameState))) {
+                    results.forEach(result -> result.accept(playerCommand, gameState));
+                }
             }
         }
     }

@@ -56,9 +56,7 @@ public final class Conditions {
      * True if player's requested noun represents a valid direction and that the current room
      * she is in has an exit matching that direction.
      */
-    public static final Condition HAS_EXIT = (playerCommand, gameState) -> {
-        return gameState.getPlayerCurrentPosition().hasExit(playerCommand.getNoun());
-    };
+    public static final Condition HAS_EXIT = (playerCommand, gameState) -> gameState.getCurrentRoom().hasExit(playerCommand.getNoun());
 
     /**
      * True if the player's current room is ROOM.
@@ -72,7 +70,7 @@ public final class Conditions {
 
         @Override
         public Boolean apply(PlayerCommand playerCommand, GameState gameState) {
-            return gameState.getPlayerCurrentPosition().equals(room);
+            return gameState.getCurrentRoom().equals(room);
         }
     }
 
@@ -106,7 +104,7 @@ public final class Conditions {
 
         @Override
         public Boolean apply(PlayerCommand playerCommand, GameState gameState) {
-            return item.isHere(gameState.getPlayerCurrentPosition());
+            return item.isHere(gameState.getCurrentRoom());
         }
     }
 
