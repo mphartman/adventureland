@@ -8,6 +8,6 @@ public interface Interpreter {
 
     void setVocabulary(Vocabulary vocabulary);
 
-    PlayerCommand parse();
+    PlayerCommand nextCommand();
 
 }

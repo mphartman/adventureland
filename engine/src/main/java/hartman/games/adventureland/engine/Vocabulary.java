@@ -1,6 +1,7 @@
 package hartman.games.adventureland.engine;
 
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -11,16 +12,17 @@ public class Vocabulary {
 
     private final Set<Verb> verbs = new LinkedHashSet<>();
     private final Set<Noun> nouns = new LinkedHashSet<>();
-    private final Set<Action> actions = new LinkedHashSet<>();
 
     public Vocabulary(Set<Verb> verbs, Set<Noun> nouns) {
         this.verbs.addAll(verbs);
         this.nouns.addAll(nouns);
     }
 
-    public Vocabulary(Set<Verb> verbs, Set<Noun> nouns, Set<Action> actions) {
-        this.verbs.addAll(verbs);
-        this.nouns.addAll(nouns);
-        this.actions.addAll(actions);
+    public Optional<Verb> toVerb(String name) {
+        return verbs.stream().filter(verb -> verb.equals(new Verb(name))).findFirst();
+    }
+
+    public Optional<Noun> toNoun(String name) {
+        return nouns.stream().filter(noun -> noun.equals(new Noun(name))).findFirst();
     }
 }
