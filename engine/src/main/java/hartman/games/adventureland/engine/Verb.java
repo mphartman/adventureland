@@ -1,16 +1,23 @@
 package hartman.games.adventureland.engine;
 
-import java.util.List;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public class Verb {
     public static final Verb UNRECOGNIZED = new Verb("Unrecognized");
 
-    private String name;
-    private List<Verb> synonyms;
+    private final String name;
+    private final Set<String> synonyms = new LinkedHashSet<>();
 
     public Verb(String name) {
         this.name = name;
+    }
+
+    public Verb(String name, String... synonyms) {
+        this.name = name;
+        this.synonyms.addAll(Arrays.asList(synonyms));
     }
 
     public String getName() {
@@ -29,7 +36,11 @@ public class Verb {
         if (o == null || getClass() != o.getClass())
             return false;
         Verb verb = (Verb) o;
-        return Objects.equals(name, verb.name);
+        boolean nameMatches = Objects.equals(name, verb.name);
+        if (!nameMatches) {
+            return this.synonyms.contains(verb.name);
+        }
+        return true;
     }
 
     @Override
