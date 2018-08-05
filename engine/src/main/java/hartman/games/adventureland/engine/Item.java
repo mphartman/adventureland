@@ -33,7 +33,7 @@ public class Item {
         this.name = name;
         this.description = description;
         this.currentRoom = inventory;
-        this.carried = true;
+        this.carried = inInventory;
         this.carryable = true;
     }
 

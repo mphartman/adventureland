@@ -86,4 +86,43 @@ public class ConditionsTest {
         Condition itemHere = new Conditions.ITEM_HERE(dog);
         assertTrue(itemHere.apply(playerCommand, gameState));
     }
+
+    @Test
+    public void itemHereShouldReturnFalseWhenItemIsNotInRoom() {
+        Room bathroom = new Room("bathroom", "A luxurious master bathroom with a claw-foot tub.");
+        Item microwave = new Item("microwave", "A 1200-watt microwave.");
+        GameState gameState = new GameState(new Player("Archie"), bathroom);
+        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.ANY);
+        Condition itemHere = new Conditions.ITEM_HERE(microwave);
+        assertFalse(itemHere.apply(playerCommand, gameState));
+    }
+
+    @Test
+    public void isPresentShouldReturnTrueWhenItemIsInRoom() {
+        Room doghouse = new Room("doghouse", "A cozy, warm kennel.");
+        Item dog = new Item("dog", "A small sleeps here.", doghouse);
+        GameState gameState = new GameState(new Player("Archie"), doghouse);
+        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.ANY);
+        Condition isPresent = new Conditions.IS_PRESENT(dog);
+        assertTrue(isPresent.apply(playerCommand, gameState));
+    }
+
+    @Test
+    public void isPresentShouldReturnTrueWhenItemIsInInventory() {
+        Item key = new Item("key", "A tarnished brass skeleton key.", true);
+        GameState gameState = new GameState(new Player("Archie"), Room.NOWHERE);
+        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.ANY);
+        Condition isPresent = new Conditions.IS_PRESENT(key);
+        assertTrue(isPresent.apply(playerCommand, gameState));
+    }
+
+    @Test
+    public void isPresentShouldReturnFalseWhenItemIsNeitherInInventoryOrInRoom() {
+        Room cell = new Room("cell", "A filthy, tiny prison cell.");
+        Item key = new Item("key", "A small key.", false);
+        GameState gameState = new GameState(new Player("Archie"), cell);
+        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.NORTH);
+        Condition isPresent = new Conditions.IS_PRESENT(key);
+        assertFalse(isPresent.apply(playerCommand, gameState));
+    }
 }
