@@ -144,4 +144,20 @@ public final class Conditions {
             return !operand.apply(playerCommand, gameState);
         }
     }
+
+    /**
+     * True if ITEM has moved from its original starting location.
+     */
+    public static class ITEM_MOVED implements Condition {
+        private final Item item;
+
+        public ITEM_MOVED(Item item) {
+            this.item = item;
+        }
+
+        @Override
+        public Boolean apply(PlayerCommand playerCommand, GameState gameState) {
+            return item.hasMoved();
+        }
+    }
 }

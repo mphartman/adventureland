@@ -4,37 +4,46 @@ import java.util.Objects;
 
 /**
  * Things in a room, some of which can be picked up, carried around and dropped.
- *
+ * <p>
  * Items are either "objects" like keys, swords, lamps, and mud while other items
  * are "scenery" like trees, signs, crypts, tables, altars, donkeys, etc.
- *
  */
 public class Item {
-    private String name;
-    private String description;
-    private boolean carryable;
-    private boolean carried;
-    private Room currentRoom = Room.NOWHERE;
-    private Room inventory = Room.INVENTORY;
+    private static final Room INVENTORY = new Room("Inventory", "Player's inventory of carried items.");
 
-    public Item(String name, String description) {
+    private final String name;
+    private final String description;
+    private final boolean portable;
+    private final Room startingRoom;
+
+    private Room currentRoom;
+
+    protected Item(String name, String description, boolean portable, Room startingRoom) {
         this.name = name;
         this.description = description;
-        this.carryable = false;
+        this.portable = portable;
+        this.startingRoom = startingRoom;
+        this.currentRoom = startingRoom;
     }
 
-    public Item(String name, String description, Room startingLocation) {
-        this.name = name;
-        this.description = description;
-        this.currentRoom = startingLocation;
+    public static Item newSceneryRoomItem(String name, String description, Room startingRoom) {
+        return new Item(name, description, false, startingRoom);
     }
 
-    public Item(String name, String description, boolean inInventory) {
-        this.name = name;
-        this.description = description;
-        this.currentRoom = inventory;
-        this.carried = inInventory;
-        this.carryable = true;
+    public static Item newSceneryRoomItem(String name, String description) {
+        return newSceneryRoomItem(name, description, Room.NOWHERE);
+    }
+
+    public static Item newPortableObjectItem(String name, String description, Room startingRoom) {
+        return new Item(name, description, true, startingRoom);
+    }
+
+    public static Item newPortableObjectItem(String name, String description) {
+        return newPortableObjectItem(name, description, Room.NOWHERE);
+    }
+
+    public static Item newInventoryItem(String name, String description) {
+        return newPortableObjectItem(name, description, INVENTORY);
     }
 
     public String getName() {
@@ -45,33 +54,35 @@ public class Item {
         return description;
     }
 
-    public boolean isCarryable() {
-        return carryable;
+    public boolean isPortable() {
+        return portable;
     }
 
     public boolean isCarried() {
-        return carried;
+        return currentRoom.equals(INVENTORY);
     }
 
     public boolean isHere(Room room) {
         return currentRoom.equals(room);
     }
 
+    public Boolean hasMoved() {
+        return !currentRoom.equals(startingRoom);
+    }
+
     public Room drop(Room room) {
         Room formerLocation = currentRoom;
         currentRoom = room;
-        carried = false;
         return formerLocation;
     }
 
     public Room stow() {
-        if (carryable) {            
+        if (portable) {
             Room formerRoom = currentRoom;
-            currentRoom = inventory;
-            carried = true;
+            currentRoom = INVENTORY;
             return formerRoom;
         }
-        throw new IllegalStateException(String.format("Item %s cannot be put into inventory. Cannot stow a non-carryable item.", name));
+        throw new IllegalStateException(String.format("Item %s cannot be put into inventory. Cannot stow a non-portable item.", name));
     }
 
     @Override

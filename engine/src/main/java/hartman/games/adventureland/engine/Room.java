@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 public class Room {
 
     public static final Room NOWHERE = new Room("nowhere", "No where.");
-    public static final Room INVENTORY = new Room("Inventory", "Player's inventory of carried items.");
 
     public static class Exit {
         private Noun direction;
