@@ -4,14 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import hartman.games.adventureland.engine.*;
 import org.junit.Test;
 
 import hartman.games.adventureland.engine.Action.Condition;
-import hartman.games.adventureland.engine.GameState;
-import hartman.games.adventureland.engine.Item;
-import hartman.games.adventureland.engine.Player;
-import hartman.games.adventureland.engine.PlayerCommand;
-import hartman.games.adventureland.engine.Room;
 
 public class ConditionsTest {
 
@@ -137,4 +133,59 @@ public class ConditionsTest {
         Condition isNotPresent = new Conditions.NOT(isPresent);
         assertEquals(!isPresent.apply(playerCommand, gameState), isNotPresent.apply(playerCommand, gameState));
     }
+
+    @Test
+    public void occursRandomlyShouldReturnTrueGiven100PercentProbability() {
+        GameState gameState = new GameState(new Player("Archie"), Room.NOWHERE);
+        PlayerCommand playerCommand = new PlayerCommand(Verbs.OCCURS, Noun.UNRECOGNIZED);
+        Condition occurs = new Conditions.OCCURS_RANDOMLY(100);
+        assertTrue(occurs.apply(playerCommand, gameState));
+        occurs = new Conditions.OCCURS_RANDOMLY(100, () -> 0);
+        assertTrue(occurs.apply(playerCommand, gameState));
+        occurs = new Conditions.OCCURS_RANDOMLY(100, () -> 50);
+        assertTrue(occurs.apply(playerCommand, gameState));
+        occurs = new Conditions.OCCURS_RANDOMLY(100, () -> 100);
+        assertTrue(occurs.apply(playerCommand, gameState));
+        occurs = new Conditions.OCCURS_RANDOMLY(100, () -> -1);
+        assertTrue(occurs.apply(playerCommand, gameState));
+        occurs = new Conditions.OCCURS_RANDOMLY(100, () -> 101);
+        assertTrue(occurs.apply(playerCommand, gameState));
+    }
+
+    @Test
+    public void occursRandomlyShouldReturnFalseGivenZeroPercentProbability() {
+        GameState gameState = new GameState(new Player("Archie"), Room.NOWHERE);
+        PlayerCommand playerCommand = new PlayerCommand(Verbs.OCCURS, Noun.UNRECOGNIZED);
+        Condition occurs = new Conditions.OCCURS_RANDOMLY(0);
+        assertFalse(occurs.apply(playerCommand, gameState));
+        occurs = new Conditions.OCCURS_RANDOMLY(0, () -> 0);
+        assertFalse(occurs.apply(playerCommand, gameState));
+        occurs = new Conditions.OCCURS_RANDOMLY(0, () -> 50);
+        assertFalse(occurs.apply(playerCommand, gameState));
+        occurs = new Conditions.OCCURS_RANDOMLY(0, () -> 100);
+        assertFalse(occurs.apply(playerCommand, gameState));
+        occurs = new Conditions.OCCURS_RANDOMLY(0, () -> -1);
+        assertFalse(occurs.apply(playerCommand, gameState));
+        occurs = new Conditions.OCCURS_RANDOMLY(0, () -> 101);
+        assertFalse(occurs.apply(playerCommand, gameState));
+    }
+
+    @Test
+    public void occursRandomlyShouldReturnTrueGivenSuppliedNumberIsLessThenProbability() {
+        GameState gameState = new GameState(new Player("Archie"), Room.NOWHERE);
+        PlayerCommand playerCommand = new PlayerCommand(Verbs.OCCURS, Noun.UNRECOGNIZED);
+        Condition occurs = new Conditions.OCCURS_RANDOMLY(25, () -> 24);
+        assertTrue(occurs.apply(playerCommand, gameState));
+        occurs = new Conditions.OCCURS_RANDOMLY(25, () -> 0);
+        assertTrue(occurs.apply(playerCommand, gameState));
+        occurs = new Conditions.OCCURS_RANDOMLY(25, () -> 50);
+        assertFalse(occurs.apply(playerCommand, gameState));
+        occurs = new Conditions.OCCURS_RANDOMLY(25, () -> 100);
+        assertFalse(occurs.apply(playerCommand, gameState));
+        occurs = new Conditions.OCCURS_RANDOMLY(25, () -> -1);
+        assertTrue(occurs.apply(playerCommand, gameState));
+        occurs = new Conditions.OCCURS_RANDOMLY(25, () -> 101);
+        assertFalse(occurs.apply(playerCommand, gameState));
+    }
+
 }

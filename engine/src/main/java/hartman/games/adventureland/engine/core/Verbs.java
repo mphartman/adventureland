@@ -8,6 +8,7 @@ public final class Verbs {
         throw new IllegalStateException();
     }
 
+    public static final Verb OCCURS = new Verb("OCCURS");
 
     public static final Verb GO = new Verb("GO");
 
