@@ -1,5 +1,6 @@
 package hartman.games.adventureland.engine.core;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -124,5 +125,16 @@ public class ConditionsTest {
         PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.NORTH);
         Condition isPresent = new Conditions.IS_PRESENT(key);
         assertFalse(isPresent.apply(playerCommand, gameState));
+    }
+
+    @Test
+    public void notShouldReturnLogicalComplementOfGivenCondition() {
+        Room cell = new Room("cell", "A filthy, tiny prison cell.");
+        Item key = new Item("key", "A small key.", false);
+        GameState gameState = new GameState(new Player("Archie"), cell);
+        PlayerCommand playerCommand = new PlayerCommand(Verbs.GO, Nouns.NORTH);
+        Condition isPresent = new Conditions.IS_PRESENT(key);
+        Condition isNotPresent = new Conditions.NOT(isPresent);
+        assertEquals(!isPresent.apply(playerCommand, gameState), isNotPresent.apply(playerCommand, gameState));
     }
 }

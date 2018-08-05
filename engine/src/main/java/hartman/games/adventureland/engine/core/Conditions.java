@@ -94,4 +94,19 @@ public final class Conditions {
         }
     }
 
+    /**
+     * Returns the inverse of the wrapped condition.
+     */
+    public static class NOT implements Condition {
+        private final Condition operand;
+
+        public NOT(Condition operand) {
+            this.operand = operand;
+        }
+
+        @Override
+        public Boolean apply(PlayerCommand playerCommand, GameState gameState) {
+            return !operand.apply(playerCommand, gameState);
+        }
+    }
 }
