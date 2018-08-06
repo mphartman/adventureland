@@ -13,11 +13,11 @@ import java.util.stream.Collectors;
  *
  * E.g. A room can only have one North exit but the North and Up exits can point reference the same destination.
  */
-public class Room {
+public class Room implements GameElement {
 
-    public static final Room NOWHERE = new Room("nowhere", "No where.");
+    public static final Room NOWHERE = new Room("nowhere", "I am no where.  It's dark and I am alone.");
 
-    public static class Exit {
+    public static class Exit implements GameElement {
         private Noun direction;
         private Room room;
 
@@ -36,6 +36,15 @@ public class Room {
 
         public Room getRoom() {
             return room;
+        }
+
+        public String getDescription() {
+            return direction.getName();
+        }
+
+        @Override
+        public void accept(GameElementVisitor visitor) {
+            visitor.visit(this);
         }
 
         @Override
@@ -131,12 +140,22 @@ public class Room {
         return exits.stream().anyMatch(e -> e.getDirection().equals(direction));
     }
 
+    public int numberOfExits() {
+        return exits.size();
+    }
+
     public Room exit(Noun direction) {
         return exits.stream()
                 .filter(e -> e.getDirection().equals(direction))
                 .findFirst()
                 .map(Exit::getRoom)
                 .orElseThrow(() -> new IllegalStateException(String.format("Invalid exit. There is no exit %s from this room.", direction)));
+    }
+
+    @Override
+    public void accept(GameElementVisitor visitor) {
+        visitor.visit(this);
+        exits.forEach(exit -> visitor.visit(exit));
     }
 
     @Override

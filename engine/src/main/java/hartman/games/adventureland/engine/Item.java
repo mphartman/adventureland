@@ -8,7 +8,7 @@ import java.util.Objects;
  * Items are either "objects" like keys, swords, lamps, and mud while other items
  * are "scenery" like trees, signs, crypts, tables, altars, donkeys, etc.
  */
-public class Item {
+public class Item implements GameElement {
     private static final Room INVENTORY = new Room("Inventory", "Player's inventory of carried items.");
 
     private final String name;
@@ -89,6 +89,11 @@ public class Item {
             return formerRoom;
         }
         throw new IllegalStateException(String.format("Item %s cannot be put into inventory. Cannot stow a non-portable item.", name));
+    }
+
+    @Override
+    public void accept(GameElementVisitor visitor) {
+        visitor.visit(this);
     }
 
     @Override

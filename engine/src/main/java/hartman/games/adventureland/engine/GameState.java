@@ -31,6 +31,10 @@ public class GameState {
         return previousRoom;
     }
 
+    public void look(GameElementVisitor visitor) {
+        currentRoom.accept(visitor);
+    }
+
     public void setFlag(String key, Object value) {
         flags.put(key, value);
     }
