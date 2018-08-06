@@ -30,20 +30,19 @@ public class Noun {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
         Noun noun = (Noun) o;
-        boolean nameMatches = Objects.equals(name, noun.name);
-        if (!nameMatches) {
-            return this.synonyms.contains(noun.name);
+
+        if (!name.equalsIgnoreCase(noun.name)) {
+            return synonyms.stream().anyMatch(s -> s.equalsIgnoreCase(noun.name));
         }
         return true;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return name.hashCode();
     }
 }

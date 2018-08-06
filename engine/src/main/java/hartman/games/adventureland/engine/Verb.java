@@ -2,11 +2,11 @@ package hartman.games.adventureland.engine;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
-import java.util.Objects;
 import java.util.Set;
 
 public class Verb {
     public static final Verb UNRECOGNIZED = new Verb("Unrecognized");
+    public static final Verb ANY = new Verb("ANY");
 
     private final String name;
     private final Set<String> synonyms = new LinkedHashSet<>();
@@ -31,20 +31,19 @@ public class Verb {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
         Verb verb = (Verb) o;
-        boolean nameMatches = Objects.equals(name, verb.name);
-        if (!nameMatches) {
-            return this.synonyms.contains(verb.name);
+
+        if (!name.equalsIgnoreCase(verb.name)) {
+            return synonyms.stream().anyMatch(s -> s.equalsIgnoreCase(verb.name));
         }
         return true;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return name.hashCode();
     }
 }
