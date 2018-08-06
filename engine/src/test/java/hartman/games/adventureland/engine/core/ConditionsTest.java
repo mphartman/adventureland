@@ -132,17 +132,17 @@ public class ConditionsTest {
     public void occursRandomlyShouldReturnTrueGiven100PercentProbability() {
         GameState gameState = new GameState(Room.NOWHERE);
         PlayerCommand playerCommand = new PlayerCommand(Verbs.OCCURS, Noun.UNRECOGNIZED);
-        Condition occurs = new Conditions.OCCURS_RANDOMLY(100);
+        Condition occurs = new Conditions.OCCURS(100);
         assertTrue(occurs.apply(playerCommand, gameState));
-        occurs = new Conditions.OCCURS_RANDOMLY(100, () -> 0);
+        occurs = new Conditions.OCCURS(100, () -> 0);
         assertTrue(occurs.apply(playerCommand, gameState));
-        occurs = new Conditions.OCCURS_RANDOMLY(100, () -> 50);
+        occurs = new Conditions.OCCURS(100, () -> 50);
         assertTrue(occurs.apply(playerCommand, gameState));
-        occurs = new Conditions.OCCURS_RANDOMLY(100, () -> 100);
+        occurs = new Conditions.OCCURS(100, () -> 100);
         assertTrue(occurs.apply(playerCommand, gameState));
-        occurs = new Conditions.OCCURS_RANDOMLY(100, () -> -1);
+        occurs = new Conditions.OCCURS(100, () -> -1);
         assertTrue(occurs.apply(playerCommand, gameState));
-        occurs = new Conditions.OCCURS_RANDOMLY(100, () -> 101);
+        occurs = new Conditions.OCCURS(100, () -> 101);
         assertTrue(occurs.apply(playerCommand, gameState));
     }
 
@@ -150,17 +150,17 @@ public class ConditionsTest {
     public void occursRandomlyShouldReturnFalseGivenZeroPercentProbability() {
         GameState gameState = new GameState(Room.NOWHERE);
         PlayerCommand playerCommand = new PlayerCommand(Verbs.OCCURS, Noun.UNRECOGNIZED);
-        Condition occurs = new Conditions.OCCURS_RANDOMLY(0);
+        Condition occurs = new Conditions.OCCURS(0);
         assertFalse(occurs.apply(playerCommand, gameState));
-        occurs = new Conditions.OCCURS_RANDOMLY(0, () -> 0);
+        occurs = new Conditions.OCCURS(0, () -> 0);
         assertFalse(occurs.apply(playerCommand, gameState));
-        occurs = new Conditions.OCCURS_RANDOMLY(0, () -> 50);
+        occurs = new Conditions.OCCURS(0, () -> 50);
         assertFalse(occurs.apply(playerCommand, gameState));
-        occurs = new Conditions.OCCURS_RANDOMLY(0, () -> 100);
+        occurs = new Conditions.OCCURS(0, () -> 100);
         assertFalse(occurs.apply(playerCommand, gameState));
-        occurs = new Conditions.OCCURS_RANDOMLY(0, () -> -1);
+        occurs = new Conditions.OCCURS(0, () -> -1);
         assertFalse(occurs.apply(playerCommand, gameState));
-        occurs = new Conditions.OCCURS_RANDOMLY(0, () -> 101);
+        occurs = new Conditions.OCCURS(0, () -> 101);
         assertFalse(occurs.apply(playerCommand, gameState));
     }
 
@@ -168,17 +168,17 @@ public class ConditionsTest {
     public void occursRandomlyShouldReturnTrueGivenSuppliedNumberIsLessThenProbability() {
         GameState gameState = new GameState(Room.NOWHERE);
         PlayerCommand playerCommand = new PlayerCommand(Verbs.OCCURS, Noun.UNRECOGNIZED);
-        Condition occurs = new Conditions.OCCURS_RANDOMLY(25, () -> 24);
+        Condition occurs = new Conditions.OCCURS(25, () -> 24);
         assertTrue(occurs.apply(playerCommand, gameState));
-        occurs = new Conditions.OCCURS_RANDOMLY(25, () -> 0);
+        occurs = new Conditions.OCCURS(25, () -> 0);
         assertTrue(occurs.apply(playerCommand, gameState));
-        occurs = new Conditions.OCCURS_RANDOMLY(25, () -> 50);
+        occurs = new Conditions.OCCURS(25, () -> 50);
         assertFalse(occurs.apply(playerCommand, gameState));
-        occurs = new Conditions.OCCURS_RANDOMLY(25, () -> 100);
+        occurs = new Conditions.OCCURS(25, () -> 100);
         assertFalse(occurs.apply(playerCommand, gameState));
-        occurs = new Conditions.OCCURS_RANDOMLY(25, () -> -1);
+        occurs = new Conditions.OCCURS(25, () -> -1);
         assertTrue(occurs.apply(playerCommand, gameState));
-        occurs = new Conditions.OCCURS_RANDOMLY(25, () -> 101);
+        occurs = new Conditions.OCCURS(25, () -> 101);
         assertFalse(occurs.apply(playerCommand, gameState));
     }
 

@@ -24,15 +24,15 @@ public final class Conditions {
      * <p>
      * E.g. given a probability of 10, this condition should evaluate to true, 10% of the time.
      */
-    public static class OCCURS_RANDOMLY implements Condition {
+    public static class OCCURS implements Condition {
         private Integer probability;
         private Supplier<Integer> randomIntFn;
 
-        public OCCURS_RANDOMLY(Integer probability) {
+        public OCCURS(Integer probability) {
             this(probability, () -> new Random().nextInt(100) + 1 /* 1 - 100 */);
         }
 
-        public OCCURS_RANDOMLY(Integer probability, Supplier<Integer> randomIntFn) {
+        public OCCURS(Integer probability, Supplier<Integer> randomIntFn) {
             if (probability < 0 || probability > 100) {
                 throw new IllegalArgumentException("Invalid value. Probability must be between 0 and 100 inclusive.");
             }
