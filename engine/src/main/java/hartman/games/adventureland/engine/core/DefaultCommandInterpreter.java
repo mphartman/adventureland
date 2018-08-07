@@ -4,12 +4,12 @@ import hartman.games.adventureland.engine.*;
 
 import java.util.Scanner;
 
-public class DefaultInterpreter implements Interpreter {
+public class DefaultCommandInterpreter implements CommandInterpreter {
 
     private final Scanner scanner;
     private final Vocabulary vocabulary;
 
-    public DefaultInterpreter(Scanner scanner, Vocabulary vocabulary) {
+    public DefaultCommandInterpreter(Scanner scanner, Vocabulary vocabulary) {
         this.scanner = scanner;
         this.vocabulary = vocabulary;
     }

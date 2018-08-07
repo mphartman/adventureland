@@ -7,11 +7,11 @@ import hartman.games.adventureland.engine.core.Actions;
  */
 public class Game {
     private final Adventure adventure;
-    private final Interpreter interpreter;
+    private final CommandInterpreter interpreter;
     private final GameState gameState;
     private final Display display;
 
-    public Game(Adventure adventure, Interpreter interpreter, GameState gameState, Display display) {
+    public Game(Adventure adventure, CommandInterpreter interpreter, GameState gameState, Display display) {
         this.adventure = adventure;
         this.interpreter = interpreter;
         this.gameState = gameState;

@@ -1,20 +1,9 @@
 package hartman.games.adventureland.app;
 
-import hartman.games.adventureland.engine.Action;
-import hartman.games.adventureland.engine.Adventure;
-import hartman.games.adventureland.engine.Display;
-import hartman.games.adventureland.engine.Game;
-import hartman.games.adventureland.engine.GameState;
-import hartman.games.adventureland.engine.Interpreter;
-import hartman.games.adventureland.engine.Noun;
-import hartman.games.adventureland.engine.Room;
-import hartman.games.adventureland.engine.Verb;
-import hartman.games.adventureland.engine.Vocabulary;
-import hartman.games.adventureland.engine.core.Actions;
-import hartman.games.adventureland.engine.core.DefaultInterpreter;
-import hartman.games.adventureland.engine.core.Nouns;
-import hartman.games.adventureland.engine.core.Results;
-import hartman.games.adventureland.engine.core.Verbs;
+import hartman.games.adventureland.engine.*;
+import hartman.games.adventureland.engine.CommandInterpreter;
+import hartman.games.adventureland.engine.core.*;
+import hartman.games.adventureland.engine.core.DefaultCommandInterpreter;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -43,7 +32,7 @@ public class AdventurelandApplication implements CommandLineRunner {
     @Override
     public void run(String... args) {
         Adventure adventure = MyAdventures.House_Escape();
-        Interpreter interpreter = new ConsoleInterpreter(adventure.getVocabulary());
+        CommandInterpreter interpreter = new ConsoleCommandInterpreter(adventure.getVocabulary());
         GameState gameState = new GameState(adventure.getStartRoom());
         ConsoleDisplay display = new ConsoleDisplay();
         display.print(introduction);
@@ -84,8 +73,8 @@ class MyAdventures {
     }
 }
 
-class ConsoleInterpreter extends DefaultInterpreter {
-    public ConsoleInterpreter(Vocabulary vocabulary) {
+class ConsoleCommandInterpreter extends DefaultCommandInterpreter {
+    public ConsoleCommandInterpreter(Vocabulary vocabulary) {
         super(new Scanner(System.in), vocabulary);
     }
 }

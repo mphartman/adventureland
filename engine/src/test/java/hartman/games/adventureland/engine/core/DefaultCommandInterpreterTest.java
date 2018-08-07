@@ -12,12 +12,12 @@ import java.util.Scanner;
 
 import static org.junit.Assert.assertTrue;
 
-public class DefaultInterpreterTest {
+public class DefaultCommandInterpreterTest {
 
     @Test
     public void nextCommandShouldReturnPlayerCommandGivenValidVerbAndNoun() {
         Vocabulary vocabulary = new Vocabulary(new HashSet<>(Arrays.asList(new Verb("JUMP"))), new HashSet<>(Arrays.asList(new Noun("UP"))));
-        DefaultInterpreter interpreter = new DefaultInterpreter(new Scanner("JUMP UP"), vocabulary);
+        DefaultCommandInterpreter interpreter = new DefaultCommandInterpreter(new Scanner("JUMP UP"), vocabulary);
         Command command = interpreter.nextCommand();
         assertTrue(command.getVerb().equals(new Verb("JUMP")));
         assertTrue(command.getNoun().equals(new Noun("UP")));
@@ -26,7 +26,7 @@ public class DefaultInterpreterTest {
     @Test
     public void nextCommandShouldReturnUnrecognizedGivenVerbOrNounNotInVocabulary() {
         Vocabulary vocabulary = new Vocabulary(new HashSet<>(Arrays.asList(new Verb("JUMP"))), new HashSet<>(Arrays.asList(new Noun("UP"))));
-        DefaultInterpreter interpreter = new DefaultInterpreter(new Scanner("KILL TROLL"), vocabulary);
+        DefaultCommandInterpreter interpreter = new DefaultCommandInterpreter(new Scanner("KILL TROLL"), vocabulary);
         Command command = interpreter.nextCommand();
         assertTrue(command.getVerb().equals(Verb.UNRECOGNIZED));
         assertTrue(command.getNoun().equals(Noun.UNRECOGNIZED));

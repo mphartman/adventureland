@@ -8,9 +8,9 @@ import org.junit.Test;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Arrays.asList;
-import static java.util.Arrays.copyOf;
 import static org.junit.Assert.assertEquals;
 
 public class GameTest {
@@ -29,12 +29,14 @@ public class GameTest {
 
         Adventure adventure = new Adventure(vocabulary, Collections.emptySet(), actions, chamber);
 
-        SequencePlaybackInterpreter interpreter = new SequencePlaybackInterpreter(
+        Command[] commands = {
                 new Command(Verbs.GO, Nouns.DOWN),
                 new Command(Verbs.GO, Nouns.UP),
                 new Command(Verbs.GO, Nouns.DOWN),
                 new Command(Verbs.QUIT)
-        );
+        };
+        AtomicInteger i = new AtomicInteger(0);
+        CommandInterpreter interpreter = () -> commands[i.getAndIncrement()];
 
         GameState gameState = new GameState(chamber);
 
@@ -45,21 +47,4 @@ public class GameTest {
     }
 
 
-}
-
-/**
- * Holds a sequence of player commands. Each call to nextCommand returns next command in sequence.
- */
-class SequencePlaybackInterpreter implements Interpreter {
-    private final Command[] commands;
-    private int i;
-
-    SequencePlaybackInterpreter(Command... commands) {
-        this.commands = copyOf(commands, commands.length);
-    }
-
-    @Override
-    public Command nextCommand() {
-        return commands[i++];
-    }
 }
