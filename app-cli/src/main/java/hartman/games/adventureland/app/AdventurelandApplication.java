@@ -64,38 +64,9 @@ class ConsoleInterpreter extends DefaultInterpreter {
     }
 }
 
-class ConsoleDisplay implements Display, GameElementVisitor {
+class ConsoleDisplay implements Display {
     @Override
     public void print(String message) {
         System.out.print(message);
-    }
-
-    private void printf(String message, Object... args) {
-        print(String.format(message, args));
-    }
-
-    @Override
-    public void visit(Item item) {
-        printf(item.getDescription());
-    }
-
-    @Override
-    public void visit(Room room) {
-        printf("%n%s%n", room.getDescription());
-        int numberOfExits = room.numberOfExits();
-        if (numberOfExits > 0) {
-            if (numberOfExits == 1) {
-                printf("There is a single visible exit ");
-            } else {
-                printf("There are %d visible exits:%n", numberOfExits);
-            }
-        } else {
-            printf("There are no visible exits.%n");
-        }
-    }
-
-    @Override
-    public void visit(Room.Exit exit) {
-        printf("%s%n", exit.getDescription());
     }
 }
