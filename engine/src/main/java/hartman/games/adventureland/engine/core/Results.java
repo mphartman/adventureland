@@ -1,8 +1,11 @@
 package hartman.games.adventureland.engine.core;
 
 import hartman.games.adventureland.engine.Action.Result;
+import hartman.games.adventureland.engine.Display;
 import hartman.games.adventureland.engine.GameElementVisitor;
+import hartman.games.adventureland.engine.GameState;
 import hartman.games.adventureland.engine.Item;
+import hartman.games.adventureland.engine.PlayerCommand;
 import hartman.games.adventureland.engine.Room;
 
 public final class Results {
@@ -34,7 +37,7 @@ public final class Results {
                     if (numberOfExits == 1) {
                         printf("There is a single visible exit ");
                     } else {
-                        printf("There are %d visible exits:%n", numberOfExits);
+                        printf("There are %d visible exits: ", numberOfExits);
                     }
                 } else {
                     printf("There are no visible exits.%n");
@@ -43,10 +46,23 @@ public final class Results {
 
             @Override
             public void visit(Room.Exit exit) {
-                printf("%s%n", exit.getDescription());
+                printf("%s, ", exit.getDescription());
             }
         });
+        buf.append(System.getProperty("line.separator"));
         display.print(buf.toString());
     };
 
+    public static class PRINT implements Result {
+        private final String message;
+
+        public PRINT(String message) {
+            this.message = message;
+        }
+
+        @Override
+        public void execute(PlayerCommand playerCommand, GameState gameState, Display display) {
+            display.print(message);
+        }
+    }
 }
