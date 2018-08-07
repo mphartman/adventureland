@@ -20,10 +20,10 @@ public final class Nouns {
         return asSet(NORTH, SOUTH, UP, DOWN, EAST, WEST);
     }
 
-    public static final Noun NORTH = new Noun("NORTH");
-    public static final Noun SOUTH = new Noun("SOUTH");
-    public static final Noun UP = new Noun("UP");
-    public static final Noun DOWN = new Noun("DOWN");
-    public static final Noun EAST = new Noun("EAST");
-    public static final Noun WEST = new Noun("WEST");
+    public static final Noun NORTH = new Noun("North");
+    public static final Noun SOUTH = new Noun("South");
+    public static final Noun UP = new Noun("Up");
+    public static final Noun DOWN = new Noun("Down");
+    public static final Noun EAST = new Noun("East");
+    public static final Noun WEST = new Noun("West");
 }
