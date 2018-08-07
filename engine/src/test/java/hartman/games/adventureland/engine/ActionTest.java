@@ -15,10 +15,10 @@ public class ActionTest {
 
         Display noop = msg -> {};
 
-        action.run(new ActionContext(gameState, noop, new PlayerCommand(new Verb("SHOUT"), Noun.NONE)));
+        action.run(new ActionContext(gameState, noop, new Command(new Verb("SHOUT"), Noun.NONE)));
         assertNull(gameState.getFlag("MESSAGE"));
 
-        action.run(new ActionContext(gameState, noop, new PlayerCommand(new Verb("SLAP"), Noun.NONE)));
+        action.run(new ActionContext(gameState, noop, new Command(new Verb("SLAP"), Noun.NONE)));
         assertEquals("Ouch! That hurts!", gameState.getFlag("MESSAGE"));
     }
 }

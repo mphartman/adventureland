@@ -22,8 +22,8 @@ public class Game {
         /* HACK */ Actions.LOOK_OCCURS.run(new ActionContext(gameState, display));
         while (gameState.isRunning()) {
             runOccurs();
-            PlayerCommand playerCommand = interpreter.nextCommand();
-            runActions(playerCommand);
+            Command command = interpreter.nextCommand();
+            runActions(command);
         }
     }
 
@@ -31,7 +31,7 @@ public class Game {
         adventure.getOccurs().forEach(occur -> occur.run(new ActionContext(gameState, display)));
     }
 
-    private void runActions(PlayerCommand playerCommand) {
-        adventure.getActions().forEach(action -> action.run(new ActionContext(gameState, display, playerCommand)));
+    private void runActions(Command command) {
+        adventure.getActions().forEach(action -> action.run(new ActionContext(gameState, display, command)));
     }
 }

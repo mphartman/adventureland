@@ -1,9 +1,9 @@
 package hartman.games.adventureland.engine.core;
 
 import hartman.games.adventureland.engine.Action.Condition;
+import hartman.games.adventureland.engine.Command;
 import hartman.games.adventureland.engine.GameState;
 import hartman.games.adventureland.engine.Item;
-import hartman.games.adventureland.engine.PlayerCommand;
 import hartman.games.adventureland.engine.Room;
 
 import java.util.Random;
@@ -35,7 +35,7 @@ public final class Conditions {
         }
 
         @Override
-        public boolean matches(PlayerCommand playerCommand, GameState gameState) {
+        public boolean matches(Command command, GameState gameState) {
             if (probability == 0) {
                 return false;
             } else if (probability == 100) {
@@ -50,7 +50,7 @@ public final class Conditions {
      * True if player's requested noun represents a valid direction and that the current room
      * she is in has an exit matching that direction.
      */
-    public static final Condition HAS_EXIT = (playerCommand, gameState) -> gameState.getCurrentRoom().hasExit(playerCommand.getNoun());
+    public static final Condition HAS_EXIT = (command, gameState) -> gameState.getCurrentRoom().hasExit(command.getNoun());
 
     /**
      * True if the player's current room is ROOM.
@@ -63,7 +63,7 @@ public final class Conditions {
         }
 
         @Override
-        public boolean matches(PlayerCommand playerCommand, GameState gameState) {
+        public boolean matches(Command command, GameState gameState) {
             return gameState.getCurrentRoom().equals(room);
         }
     }
@@ -80,7 +80,7 @@ public final class Conditions {
         }
 
         @Override
-        public boolean matches(PlayerCommand playerCommand, GameState gameState) {
+        public boolean matches(Command command, GameState gameState) {
             return item.isCarried();
         }
     }
@@ -97,7 +97,7 @@ public final class Conditions {
         }
 
         @Override
-        public boolean matches(PlayerCommand playerCommand, GameState gameState) {
+        public boolean matches(Command command, GameState gameState) {
             return item.isHere(gameState.getCurrentRoom());
         }
     }
@@ -116,8 +116,8 @@ public final class Conditions {
         }
 
         @Override
-        public boolean matches(PlayerCommand playerCommand, GameState gameState) {
-            return isItemCarried.matches(playerCommand, gameState) || isItemHere.matches(playerCommand, gameState);
+        public boolean matches(Command command, GameState gameState) {
+            return isItemCarried.matches(command, gameState) || isItemHere.matches(command, gameState);
         }
     }
 
@@ -132,8 +132,8 @@ public final class Conditions {
         }
 
         @Override
-        public boolean matches(PlayerCommand playerCommand, GameState gameState) {
-            return !operand.matches(playerCommand, gameState);
+        public boolean matches(Command command, GameState gameState) {
+            return !operand.matches(command, gameState);
         }
     }
 
@@ -148,7 +148,7 @@ public final class Conditions {
         }
 
         @Override
-        public boolean matches(PlayerCommand playerCommand, GameState gameState) {
+        public boolean matches(Command command, GameState gameState) {
             return item.hasMoved();
         }
     }

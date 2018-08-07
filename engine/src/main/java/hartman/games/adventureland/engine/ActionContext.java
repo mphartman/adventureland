@@ -1,24 +1,24 @@
 package hartman.games.adventureland.engine;
 
 public class ActionContext {
-    private final PlayerCommand playerCommand;
+    private final Command command;
     private final Display display;
     private final GameState gameState;
 
     public ActionContext(GameState gameState, Display display) {
         this.gameState = gameState;
         this.display = display;
-        this.playerCommand = PlayerCommand.NONE;
+        this.command = Command.NONE;
     }
 
-    public ActionContext(GameState gameState, Display display, PlayerCommand playerCommand) {
+    public ActionContext(GameState gameState, Display display, Command command) {
         this.gameState = gameState;
         this.display = display;
-        this.playerCommand = playerCommand;
+        this.command = command;
     }
 
-    public PlayerCommand getPlayerCommand() {
-        return playerCommand;
+    public Command getCommand() {
+        return command;
     }
 
     public Display getDisplay() {

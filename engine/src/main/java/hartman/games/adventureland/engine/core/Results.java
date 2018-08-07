@@ -1,23 +1,19 @@
 package hartman.games.adventureland.engine.core;
 
+import hartman.games.adventureland.engine.*;
 import hartman.games.adventureland.engine.Action.Result;
-import hartman.games.adventureland.engine.Display;
-import hartman.games.adventureland.engine.GameElementVisitor;
-import hartman.games.adventureland.engine.GameState;
-import hartman.games.adventureland.engine.Item;
-import hartman.games.adventureland.engine.PlayerCommand;
-import hartman.games.adventureland.engine.Room;
+import hartman.games.adventureland.engine.Command;
 
 public final class Results {
     private Results() {
         throw new IllegalStateException();
     }
 
-    public static final Result QUIT = (playerCommand, gameState, display) -> gameState.quit();
+    public static final Result QUIT = (command, gameState, display) -> gameState.quit();
 
-    public static final Result GOTO = (playerCommand, gameState, display) -> gameState.exitTowards(playerCommand.getNoun());
+    public static final Result GOTO = (command, gameState, display) -> gameState.exitTowards(command.getNoun());
 
-    public static final Result LOOK = (playerCommand, gameState, display) -> {
+    public static final Result LOOK = (command, gameState, display) -> {
         StringBuffer buf = new StringBuffer();
         gameState.describe(new GameElementVisitor() {
             private void printf(String message, Object... args) {
@@ -61,7 +57,7 @@ public final class Results {
         }
 
         @Override
-        public void execute(PlayerCommand playerCommand, GameState gameState, Display display) {
+        public void execute(Command command, GameState gameState, Display display) {
             display.print(message);
         }
     }

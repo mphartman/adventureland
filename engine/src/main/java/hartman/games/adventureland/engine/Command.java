@@ -3,18 +3,18 @@ package hartman.games.adventureland.engine;
 /**
  * The player's desired action represented by a two-word phrase made up of a verb and noun.
  */
-public class PlayerCommand {
-    public static final PlayerCommand NONE = new PlayerCommand(Verb.NONE, Noun.NONE);
+public class Command {
+    public static final Command NONE = new Command(Verb.NONE, Noun.NONE);
 
     private final Verb verb;
     private final Noun noun;
 
-    public PlayerCommand(Verb verb, Noun noun) {
+    public Command(Verb verb, Noun noun) {
         this.verb = verb;
         this.noun = noun;
     }
 
-    public PlayerCommand(Verb verb) {
+    public Command(Verb verb) {
         this.verb = verb;
         this.noun = Noun.NONE;
     }
@@ -29,7 +29,7 @@ public class PlayerCommand {
 
     @Override
     public String toString() {
-        return "PlayerCommand{" +
+        return "Command{" +
                 verb.getName() +
                 ", " + noun.getName() +
                 '}';

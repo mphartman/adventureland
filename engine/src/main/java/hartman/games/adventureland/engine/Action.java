@@ -2,7 +2,6 @@ package hartman.games.adventureland.engine;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -16,12 +15,12 @@ public class Action {
 
     @FunctionalInterface
     public interface Condition {
-        boolean matches(PlayerCommand playerCommand, GameState gameState);
+        boolean matches(Command command, GameState gameState);
     }
 
     @FunctionalInterface
     public interface Result {
-        void execute(PlayerCommand playerCommand, GameState gameState, Display display);
+        void execute(Command command, GameState gameState, Display display);
     }
 
     public Action(Set<Result> results) {
@@ -70,13 +69,13 @@ public class Action {
 
     public void run(ActionContext context) {
 
-        PlayerCommand playerCommand = context.getPlayerCommand();
+        Command command = context.getCommand();
         Display display = context.getDisplay();
         GameState gameState = context.getGameState();
 
-        if (verb.equals(playerCommand.getVerb()) && noun.equals(playerCommand.getNoun())) {
-            if (conditions.stream().allMatch(condition -> condition.matches(playerCommand, gameState))) {
-                results.forEach(result -> result.execute(playerCommand, gameState, display));
+        if (verb.equals(command.getVerb()) && noun.equals(command.getNoun())) {
+            if (conditions.stream().allMatch(condition -> condition.matches(command, gameState))) {
+                results.forEach(result -> result.execute(command, gameState, display));
             }
         }
 

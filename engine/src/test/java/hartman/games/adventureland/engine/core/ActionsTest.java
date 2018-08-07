@@ -19,9 +19,9 @@ public class ActionsTest {
         chamber.setExit(DOWN, dungeon);
 
         GameState gameState = new GameState(chamber);
-        PlayerCommand playerCommand = new PlayerCommand(GO, DOWN);
+        Command command = new Command(GO, DOWN);
 
-        Actions.GO_ACTION.run(new ActionContext(gameState, msg -> {}, playerCommand));
+        Actions.GO_ACTION.run(new ActionContext(gameState, msg -> {}, command));
 
         assertEquals(dungeon, gameState.getCurrentRoom());
     }
@@ -32,9 +32,9 @@ public class ActionsTest {
         dungeon.setExit(DOWN, dungeon);
 
         GameState gameState = new GameState(dungeon);
-        PlayerCommand playerCommand = new PlayerCommand(GO, UP);
+        Command command = new Command(GO, UP);
 
-        Actions.GO_ACTION.run(new ActionContext(gameState, msg -> {}, playerCommand));
+        Actions.GO_ACTION.run(new ActionContext(gameState, msg -> {}, command));
 
         assertEquals(dungeon, gameState.getCurrentRoom());
     }
@@ -43,9 +43,9 @@ public class ActionsTest {
     public void quitActionShouldQuitGivenQuitVerb() {
         GameState gameState = new GameState(Room.NOWHERE);
         assertTrue(gameState.isRunning());
-        Actions.QUIT_ACTION.run(new ActionContext(gameState, msg -> {}, new PlayerCommand(new Verb("stop"), Noun.NONE)));
+        Actions.QUIT_ACTION.run(new ActionContext(gameState, msg -> {}, new Command(new Verb("stop"), Noun.NONE)));
         assertTrue(gameState.isRunning());
-        Actions.QUIT_ACTION.run(new ActionContext(gameState, msg -> {}, new PlayerCommand(Verbs.QUIT, Noun.NONE)));
+        Actions.QUIT_ACTION.run(new ActionContext(gameState, msg -> {}, new Command(Verbs.QUIT, Noun.NONE)));
         assertFalse(gameState.isRunning());
     }
 
@@ -54,9 +54,9 @@ public class ActionsTest {
         Room atrium = new Room("atrium", "I'm in a bright, airy space filled with ghosts.");
         GameState gameState = new GameState(atrium);
         StringBuffer display = new StringBuffer();
-        Actions.LOOK_ACTION.run(new ActionContext(gameState, msg -> display.append(msg), new PlayerCommand(new Verb("SCAN"), Noun.NONE)));
+        Actions.LOOK_ACTION.run(new ActionContext(gameState, msg -> display.append(msg), new Command(new Verb("SCAN"), Noun.NONE)));
         assertEquals(0, display.length());
-        Actions.LOOK_ACTION.run(new ActionContext(gameState, msg -> display.append(msg), new PlayerCommand(Verbs.LOOK, new Noun("AROUND"))));
+        Actions.LOOK_ACTION.run(new ActionContext(gameState, msg -> display.append(msg), new Command(Verbs.LOOK, new Noun("AROUND"))));
         assertTrue(display.toString().trim().startsWith(atrium.getDescription()));
     }
 }

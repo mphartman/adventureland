@@ -3,7 +3,6 @@ package hartman.games.adventureland.engine.core;
 import hartman.games.adventureland.engine.*;
 
 import java.util.Scanner;
-import java.util.StringTokenizer;
 
 public class DefaultInterpreter implements Interpreter {
 
@@ -16,7 +15,7 @@ public class DefaultInterpreter implements Interpreter {
     }
 
     @Override
-    public PlayerCommand nextCommand() {
+    public Command nextCommand() {
 
         String line = scanner.nextLine();
         Scanner lineScanner = new Scanner(line);
@@ -34,11 +33,11 @@ public class DefaultInterpreter implements Interpreter {
             }
         }
 
-        PlayerCommand playerCommand = new PlayerCommand(verb, noun);
+        Command command = new Command(verb, noun);
 
 //        System.out.printf("I heard you say: \"%s\"%n", line);
-//        System.out.printf("And I understood it as  %s%n", playerCommand);
+//        System.out.printf("And I understood it as  %s%n", command);
 
-        return playerCommand;
+        return command;
     }
 }

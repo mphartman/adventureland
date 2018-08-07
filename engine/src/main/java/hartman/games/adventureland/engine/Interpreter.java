@@ -1,11 +1,11 @@
 package hartman.games.adventureland.engine;
 
 /**
- * An Interpreter parses player input from some device into a {@link PlayerCommand}.
+ * An Interpreter parses player input from some device into a {@link Command}.
  */
 @FunctionalInterface
 public interface Interpreter {
 
-    PlayerCommand nextCommand();
+    Command nextCommand();
 
 }

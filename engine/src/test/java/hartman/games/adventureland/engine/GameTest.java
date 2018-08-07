@@ -30,10 +30,10 @@ public class GameTest {
         Adventure adventure = new Adventure(vocabulary, Collections.emptySet(), actions, chamber);
 
         SequencePlaybackInterpreter interpreter = new SequencePlaybackInterpreter(
-                new PlayerCommand(Verbs.GO, Nouns.DOWN),
-                new PlayerCommand(Verbs.GO, Nouns.UP),
-                new PlayerCommand(Verbs.GO, Nouns.DOWN),
-                new PlayerCommand(Verbs.QUIT)
+                new Command(Verbs.GO, Nouns.DOWN),
+                new Command(Verbs.GO, Nouns.UP),
+                new Command(Verbs.GO, Nouns.DOWN),
+                new Command(Verbs.QUIT)
         );
 
         GameState gameState = new GameState(chamber);
@@ -51,15 +51,15 @@ public class GameTest {
  * Holds a sequence of player commands. Each call to nextCommand returns next command in sequence.
  */
 class SequencePlaybackInterpreter implements Interpreter {
-    private final PlayerCommand[] commands;
+    private final Command[] commands;
     private int i;
 
-    SequencePlaybackInterpreter(PlayerCommand... commands) {
+    SequencePlaybackInterpreter(Command... commands) {
         this.commands = copyOf(commands, commands.length);
     }
 
     @Override
-    public PlayerCommand nextCommand() {
+    public Command nextCommand() {
         return commands[i++];
     }
 }
