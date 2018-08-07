@@ -49,14 +49,4 @@ public class ActionsTest {
         assertFalse(gameState.isRunning());
     }
 
-    @Test
-    public void lookActionShouldDescribeRoomGivenLookVerb() {
-        Room atrium = new Room("atrium", "I'm in a bright, airy space filled with ghosts.");
-        GameState gameState = new GameState(atrium);
-        StringBuffer display = new StringBuffer();
-        Actions.LOOK_ACTION.run(new ActionContext(gameState, msg -> display.append(msg), new Command(new Verb("SCAN"), Noun.NONE)));
-        assertEquals(0, display.length());
-        Actions.LOOK_ACTION.run(new ActionContext(gameState, msg -> display.append(msg), new Command(Verbs.LOOK, new Noun("AROUND"))));
-        assertTrue(display.toString().trim().startsWith(atrium.getDescription()));
-    }
 }

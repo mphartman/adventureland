@@ -4,6 +4,10 @@ import hartman.games.adventureland.engine.*;
 import hartman.games.adventureland.engine.Action.Result;
 import hartman.games.adventureland.engine.Command;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public final class Results {
     private Results() {
         throw new IllegalStateException();
@@ -13,41 +17,50 @@ public final class Results {
 
     public static final Result GOTO = (command, gameState, display) -> gameState.exitTowards(command.getNoun());
 
-    public static final Result LOOK = (command, gameState, display) -> {
-        StringBuffer buf = new StringBuffer();
-        gameState.describe(new GameElementVisitor() {
-            private void printf(String message, Object... args) {
-                buf.append(String.format(message, args));
-            }
+    public static class LOOK implements Result {
 
-            @Override
-            public void visit(Item item) {
-                printf(item.getDescription());
-            }
+        @FunctionalInterface
+        public interface LookCallback {
+            String execute(Room room, List<Room.Exit> exits, List<Item> items);
+        }
 
-            @Override
-            public void visit(Room room) {
-                printf("%n%s%n", room.getDescription());
-                int numberOfExits = room.numberOfExits();
-                if (numberOfExits > 0) {
-                    if (numberOfExits == 1) {
-                        printf("There is a single visible exit ");
-                    } else {
-                        printf("There are %d visible exits: ", numberOfExits);
-                    }
-                } else {
-                    printf("There are no visible exits.%n");
+        private final LookCallback callback;
+
+        public LOOK(LookCallback callback) {
+            this.callback = callback;
+        }
+
+        @Override
+        public void execute(Command command, GameState gameState, Display display) {
+            List<Room> rooms = new ArrayList<>();
+            List<Room.Exit> exits = new ArrayList<>();
+            List<Item> items = new ArrayList<>();
+
+            gameState.describe(new GameElementVisitor() {
+                @Override
+                public void visit(Item item) {
+                    items.add(item);
                 }
-            }
 
-            @Override
-            public void visit(Room.Exit exit) {
-                printf("%s, ", exit.getDescription());
-            }
-        });
-        buf.append(System.getProperty("line.separator"));
-        display.print(buf.toString());
-    };
+                @Override
+                public void visit(Room room) {
+                    rooms.add(room);
+                }
+
+                @Override
+                public void visit(Room.Exit exit) {
+                    exits.add(exit);
+                }
+            });
+
+            String description = callback.execute(
+                    rooms.stream().findFirst().orElse(Room.NOWHERE),
+                    Collections.unmodifiableList(exits),
+                    Collections.unmodifiableList(items));
+
+            display.print(description);
+        }
+    }
 
     public static class PRINT implements Result {
         private final String message;

@@ -25,9 +25,5 @@ public final class Actions {
 
     public static final Action QUIT_ACTION = new Action(Verbs.QUIT, Results.QUIT);
 
-    public static final Action GO_ACTION = new Action(Verbs.GO, Noun.ANY, setOf(Conditions.HAS_EXIT), setOf(Results.GOTO, Results.LOOK));
-
-    public static final Action LOOK_ACTION = new Action(Verbs.LOOK, Noun.ANY, Results.LOOK);
-
-    public static final Action LOOK_OCCURS = new Action(Results.LOOK);
+    public static final Action GO_ACTION = new Action(Verbs.GO, Noun.ANY, setOf(Conditions.HAS_EXIT), setOf(Results.GOTO));
 }

@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @SpringBootApplication
 public class AdventurelandApplication implements CommandLineRunner {
@@ -25,7 +26,8 @@ public class AdventurelandApplication implements CommandLineRunner {
                     "Copyright © 2018, Michael Hartman%n" +
                     "Distributed under the Apache License, version 2.%n%n" +
                     "A voice BOOMS out:%n%n" +
-                    "In this adventure you're to escape from the haunted house.  Good luck.%n"
+                    "In this adventure you're to escape from the haunted house.  Good luck.%n" +
+                    "Type 'LOOK' to start.%n"
     );
 
 
@@ -38,7 +40,7 @@ public class AdventurelandApplication implements CommandLineRunner {
         display.print(introduction);
         Game game = new Game(adventure, interpreter, gameState, display);
         game.run();
-        display.print("Goodbye. Thank you for playing. Have a nice day!");
+        display.print(String.format("Goodbye. Thank you for playing. Have a nice day!%n"));
     }
 }
 
@@ -64,13 +66,33 @@ class MyAdventures {
         kitchen.setExit(Nouns.WEST, living_room);
         living_room.setExit(Nouns.EAST, kitchen);
 
-        Action promptAction = new Action(new Results.PRINT("What should I do?  "));
-        Set<Action> occurs = new HashSet<>(Arrays.asList(promptAction));
+        Action promptOccurs = new Action(new Results.PRINT(String.format("%nWhat should I do? ")));
+        Set<Action> occurs = new HashSet<>(Arrays.asList(promptOccurs));
 
-        Set<Action> actions = new HashSet<>(Arrays.asList(Actions.QUIT_ACTION, Actions.GO_ACTION, Actions.LOOK_ACTION));
+        Action lookAction = new Action(Verbs.LOOK, Noun.ANY, LOOK);
+        Set<Action> actions = new HashSet<>(Arrays.asList(Actions.QUIT_ACTION, Actions.GO_ACTION, lookAction));
 
         return new Adventure(vocabulary, occurs, actions, hallway);
     }
+
+    private static Action.Result LOOK = new Results.LOOK((room, exits, items) -> {
+        StringBuilder buf = new StringBuilder();
+        buf.append(String.format("%s%n", room.getDescription()));
+        if (exits.size() == 0) {
+            buf.append(String.format("There are no obvious exits from here.%n"));
+        }
+        else {
+            if (exits.size() == 1) {
+                buf.append(String.format("There is a single exit which goes %s%n", exits.get(0).getDescription()));
+            }
+            else {
+                String exitsString = String.join(", ", exits.stream().map(Room.Exit::getDescription).collect(Collectors.toList()));
+                buf.append(String.format("There are %d exits: %s%n", exits.size(), exitsString));
+            }
+        }
+        return buf.toString();
+    });
+
 }
 
 class ConsoleCommandInterpreter extends DefaultCommandInterpreter {

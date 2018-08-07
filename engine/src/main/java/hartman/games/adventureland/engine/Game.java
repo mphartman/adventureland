@@ -1,7 +1,5 @@
 package hartman.games.adventureland.engine;
 
-import hartman.games.adventureland.engine.core.Actions;
-
 /**
  * A running game session with a player and an adventure.
  */
@@ -19,7 +17,6 @@ public class Game {
     }
 
     public void run() {
-        /* HACK */ Actions.LOOK_OCCURS.run(new ActionContext(gameState, display));
         while (gameState.isRunning()) {
             runOccurs();
             Command command = interpreter.nextCommand();

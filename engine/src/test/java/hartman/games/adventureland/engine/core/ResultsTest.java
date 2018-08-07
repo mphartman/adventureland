@@ -39,12 +39,4 @@ public class ResultsTest {
         assertFalse(gameState.isRunning());
     }
 
-    @Test
-    public void lookShouldPrintCurrentRoomToDisplay() {
-        Room office = new Room("office", "I'm in a dreary, soulless office.");
-        GameState gameState = new GameState(office);
-        StringBuffer buf = new StringBuffer();
-        Results.LOOK.execute(Command.NONE, gameState, msg -> buf.append(msg));
-        assertEquals("I'm in a dreary, soulless office." + System.getProperty("line.separator") + "There are no visible exits.", buf.toString().trim());
-    }
 }
