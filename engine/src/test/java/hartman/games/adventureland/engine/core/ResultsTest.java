@@ -29,4 +29,12 @@ public class ResultsTest {
 
         Results.GOTO.execute(playerCommand, gameState, msg -> {});
     }
+
+    @Test
+    public void quitShouldChangeGameStateRunning() {
+        GameState gameState = new GameState(Room.NOWHERE);
+        Assert.assertTrue(gameState.isRunning());
+        Results.QUIT.execute(PlayerCommand.NONE, gameState, msg -> {});
+        Assert.assertFalse(gameState.isRunning());
+    }
 }
