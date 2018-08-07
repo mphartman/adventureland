@@ -1,5 +1,7 @@
 package hartman.games.adventureland.engine;
 
+import hartman.games.adventureland.engine.core.Results;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,5 +49,9 @@ public class GameState {
 
     public Object getFlag(String key) {
         return flags.get(key);
+    }
+
+    public void describe(GameElementVisitor visitor) {
+        currentRoom.accept(visitor);
     }
 }

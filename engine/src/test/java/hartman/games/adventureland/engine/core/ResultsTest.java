@@ -7,6 +7,8 @@ import hartman.games.adventureland.engine.PlayerCommand;
 import hartman.games.adventureland.engine.Room;
 import org.junit.Assert;
 
+import static org.junit.Assert.*;
+
 public class ResultsTest {
     
     @Test
@@ -18,7 +20,7 @@ public class ResultsTest {
 
         Results.GOTO.execute(playerCommand, gameState, msg -> {});
 
-        Assert.assertEquals(tower_second_floor, gameState.getCurrentRoom());
+        assertEquals(tower_second_floor, gameState.getCurrentRoom());
     }
 
     @Test(expected = IllegalStateException.class)
@@ -33,8 +35,17 @@ public class ResultsTest {
     @Test
     public void quitShouldChangeGameStateRunning() {
         GameState gameState = new GameState(Room.NOWHERE);
-        Assert.assertTrue(gameState.isRunning());
+        assertTrue(gameState.isRunning());
         Results.QUIT.execute(PlayerCommand.NONE, gameState, msg -> {});
-        Assert.assertFalse(gameState.isRunning());
+        assertFalse(gameState.isRunning());
+    }
+
+    @Test
+    public void lookShouldPrintCurrentRoomToDisplay() {
+        Room office = new Room("office", "I'm in a dreary, soulless office.");
+        GameState gameState = new GameState(office);
+        StringBuffer buf = new StringBuffer();
+        Results.LOOK.execute(PlayerCommand.NONE, gameState, msg -> buf.append(msg));
+        assertEquals("I'm in a dreary, soulless office." + System.getProperty("line.separator") + "There are no visible exits.", buf.toString().trim());
     }
 }
