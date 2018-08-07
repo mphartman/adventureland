@@ -1,9 +1,5 @@
 package hartman.games.adventureland.engine.core;
 
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import hartman.games.adventureland.engine.Action.Result;
 
 public final class Results {
@@ -11,11 +7,7 @@ public final class Results {
         throw new IllegalStateException();
     }
 
-    public static Set<Result> asSet(Result... results) {
-        return new LinkedHashSet<>(Arrays.asList(results));
-    }
+    public static final Result QUIT = (playerCommand, gameState, display) -> gameState.quit();
 
-    public static final Result GOTO_ROOM = (playerCommand, gameState) -> {
-        gameState.exitTowards(playerCommand.getNoun());
-    };
+    public static final Result GOTO = (playerCommand, gameState, display) -> gameState.exitTowards(playerCommand.getNoun());
 }

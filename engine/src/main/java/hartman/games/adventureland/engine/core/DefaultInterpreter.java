@@ -3,28 +3,42 @@ package hartman.games.adventureland.engine.core;
 import hartman.games.adventureland.engine.*;
 
 import java.util.Scanner;
+import java.util.StringTokenizer;
 
 public class DefaultInterpreter implements Interpreter {
 
     private final Scanner scanner;
+    private final Vocabulary vocabulary;
 
-    private Vocabulary vocabulary;
-
-    public DefaultInterpreter(Scanner scanner) {
+    public DefaultInterpreter(Scanner scanner, Vocabulary vocabulary) {
         this.scanner = scanner;
-    }
-
-    @Override
-    public void setVocabulary(Vocabulary vocabulary) {
         this.vocabulary = vocabulary;
     }
 
     @Override
     public PlayerCommand nextCommand() {
-        String possibleVerb = scanner.next();
-        String possibleNoun = scanner.next();
-        return new PlayerCommand(
-                vocabulary.toVerb(possibleVerb).orElse(Verb.UNRECOGNIZED),
-                vocabulary.toNoun(possibleNoun).orElse(Noun.UNRECOGNIZED));
+
+        String line = scanner.nextLine();
+        Scanner lineScanner = new Scanner(line);
+
+        Verb verb = Verb.NONE;
+        Noun noun = Noun.NONE;
+
+        if (lineScanner.hasNext()) {
+            String firstTerm = lineScanner.next();
+            verb = vocabulary.toVerb(firstTerm).orElse(Verb.UNRECOGNIZED);
+
+            if (lineScanner.hasNext()) {
+                String secondTerm = lineScanner.next();
+                noun = vocabulary.toNoun(secondTerm).orElse(Noun.UNRECOGNIZED);
+            }
+        }
+
+        PlayerCommand playerCommand = new PlayerCommand(verb, noun);
+
+//        System.out.printf("I heard you say: \"%s\"%n", line);
+//        System.out.printf("And I understood it as  %s%n", playerCommand);
+
+        return playerCommand;
     }
 }

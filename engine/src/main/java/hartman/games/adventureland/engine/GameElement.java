@@ -1,5 +1,6 @@
 package hartman.games.adventureland.engine;
 
-public interface GameElement {
-    void accept(GameElementVisitor visitor);
+import java.util.function.Consumer;
+
+public interface GameElement extends Consumer<GameElementVisitor> {
 }

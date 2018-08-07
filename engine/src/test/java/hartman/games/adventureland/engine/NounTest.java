@@ -11,6 +11,8 @@ public class NounTest {
         Noun north = new Noun("north", "n");
         assertTrue(north.equals(new Noun("north")));
         assertTrue(north.equals(new Noun("n")));
+        assertTrue(north.equals(Noun.ANY));
+        assertTrue(Noun.ANY.equals(north));
     }
 
 }

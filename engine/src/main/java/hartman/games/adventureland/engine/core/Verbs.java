@@ -16,7 +16,9 @@ public final class Verbs {
         return new LinkedHashSet<>(Arrays.asList(verbs));
     }
 
-    public static final Verb OCCURS = new Verb("OCCURS");
+    public static final Verb QUIT = new Verb("QUIT", "Q");
+
+    public static final Verb LOOK = new Verb("LOOK", "L");
 
     public static final Verb GO = new Verb("GO", "G", "ENTER", "WALK", "RUN" );
 

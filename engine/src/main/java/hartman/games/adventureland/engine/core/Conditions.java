@@ -1,38 +1,32 @@
 package hartman.games.adventureland.engine.core;
 
-import hartman.games.adventureland.engine.*;
+import hartman.games.adventureland.engine.Action.Condition;
+import hartman.games.adventureland.engine.GameState;
+import hartman.games.adventureland.engine.Item;
+import hartman.games.adventureland.engine.PlayerCommand;
+import hartman.games.adventureland.engine.Room;
 
-import java.util.Arrays;
-import java.util.LinkedHashSet;
 import java.util.Random;
-import java.util.Set;
 import java.util.function.Supplier;
-
-import static hartman.games.adventureland.engine.Action.*;
 
 public final class Conditions {
     private Conditions() {
         throw new IllegalStateException();
     }
 
-    public static Set<Condition> asSet(Condition... conditions) {
-        return new LinkedHashSet<>(Arrays.asList(conditions));
-    }
-
     /**
      * A condition which returns true based on a desired probability and a random number.
-     * <p>
      * E.g. given a probability of 10, this condition should evaluate to true, 10% of the time.
      */
-    public static class OCCURS implements Condition {
+    public static class OCCURS_RANDOMLY implements Condition {
         private Integer probability;
         private Supplier<Integer> randomIntFn;
 
-        public OCCURS(Integer probability) {
+        public OCCURS_RANDOMLY(Integer probability) {
             this(probability, () -> new Random().nextInt(100) + 1 /* 1 - 100 */);
         }
 
-        public OCCURS(Integer probability, Supplier<Integer> randomIntFn) {
+        public OCCURS_RANDOMLY(Integer probability, Supplier<Integer> randomIntFn) {
             if (probability < 0 || probability > 100) {
                 throw new IllegalArgumentException("Invalid value. Probability must be between 0 and 100 inclusive.");
             }
@@ -41,7 +35,7 @@ public final class Conditions {
         }
 
         @Override
-        public Boolean apply(PlayerCommand playerCommand, GameState gameState) {
+        public boolean matches(PlayerCommand playerCommand, GameState gameState) {
             if (probability == 0) {
                 return false;
             } else if (probability == 100) {
@@ -69,7 +63,7 @@ public final class Conditions {
         }
 
         @Override
-        public Boolean apply(PlayerCommand playerCommand, GameState gameState) {
+        public boolean matches(PlayerCommand playerCommand, GameState gameState) {
             return gameState.getCurrentRoom().equals(room);
         }
     }
@@ -86,7 +80,7 @@ public final class Conditions {
         }
 
         @Override
-        public Boolean apply(PlayerCommand playerCommand, GameState gameState) {
+        public boolean matches(PlayerCommand playerCommand, GameState gameState) {
             return item.isCarried();
         }
     }
@@ -103,7 +97,7 @@ public final class Conditions {
         }
 
         @Override
-        public Boolean apply(PlayerCommand playerCommand, GameState gameState) {
+        public boolean matches(PlayerCommand playerCommand, GameState gameState) {
             return item.isHere(gameState.getCurrentRoom());
         }
     }
@@ -122,8 +116,8 @@ public final class Conditions {
         }
 
         @Override
-        public Boolean apply(PlayerCommand playerCommand, GameState gameState) {
-            return isItemCarried.apply(playerCommand, gameState) || isItemHere.apply(playerCommand, gameState);
+        public boolean matches(PlayerCommand playerCommand, GameState gameState) {
+            return isItemCarried.matches(playerCommand, gameState) || isItemHere.matches(playerCommand, gameState);
         }
     }
 
@@ -138,8 +132,8 @@ public final class Conditions {
         }
 
         @Override
-        public Boolean apply(PlayerCommand playerCommand, GameState gameState) {
-            return !operand.apply(playerCommand, gameState);
+        public boolean matches(PlayerCommand playerCommand, GameState gameState) {
+            return !operand.matches(playerCommand, gameState);
         }
     }
 
@@ -154,7 +148,7 @@ public final class Conditions {
         }
 
         @Override
-        public Boolean apply(PlayerCommand playerCommand, GameState gameState) {
+        public boolean matches(PlayerCommand playerCommand, GameState gameState) {
             return item.hasMoved();
         }
     }

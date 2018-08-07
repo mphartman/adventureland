@@ -5,6 +5,7 @@ import hartman.games.adventureland.engine.core.Nouns;
 import hartman.games.adventureland.engine.core.Verbs;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,34 +16,32 @@ import static org.junit.Assert.assertEquals;
 public class GameTest {
 
     @Test
-    public void gameTickShouldInvokeActionsGivenPlayerCommandsWhichChangeGameState() {
+    public void gameShouldInvokeActionsGivenPlayerCommandsWhichChangeGameState() {
+
+        Vocabulary vocabulary = new Vocabulary(Verbs.asSet(Verbs.GO), Nouns.directions());
 
         Room dungeon = new Room("dungeon", "A miserable, dark place with cold stone floors and cracked walls.");
         Room chamber = new Room("chamber", "A clean, bright chamber with red carpet and floral drapes.");
         chamber.setExit(Nouns.DOWN, dungeon);
         dungeon.setExit(Nouns.UP, chamber);
-        Set<Room> rooms = new HashSet<>(asList(chamber, dungeon));
 
-        Vocabulary vocabulary = new Vocabulary(Verbs.asSet(Verbs.GO), Nouns.directions());
+        Set<Action> actions = new HashSet<>(asList(Actions.QUIT_ACTION, Actions.GO_ACTION));
 
-        Set<Action> actions = new HashSet<>(asList(Actions.GO_ACTION));
+        Adventure adventure = new Adventure(vocabulary, Collections.emptySet(), actions, chamber);
 
-        Adventure testAdventure = new Adventure(vocabulary, rooms, actions);
-
-        SequencePlaybackInterpreter commandPlayback = new SequencePlaybackInterpreter(
+        SequencePlaybackInterpreter interpreter = new SequencePlaybackInterpreter(
                 new PlayerCommand(Verbs.GO, Nouns.DOWN),
-                new PlayerCommand(Verbs.GO, Nouns.UP)
+                new PlayerCommand(Verbs.GO, Nouns.UP),
+                new PlayerCommand(Verbs.GO, Nouns.DOWN),
+                new PlayerCommand(Verbs.QUIT)
         );
 
         GameState gameState = new GameState(chamber);
 
-        Game game = new Game(testAdventure, commandPlayback, gameState);
+        Game game = new Game(adventure, interpreter, gameState, msg -> {});
 
-        game.tick();
+        game.run();
         assertEquals(dungeon, gameState.getCurrentRoom());
-
-        game.tick();
-        assertEquals(chamber, gameState.getCurrentRoom());
     }
 
 
@@ -57,11 +56,6 @@ class SequencePlaybackInterpreter implements Interpreter {
 
     SequencePlaybackInterpreter(PlayerCommand... commands) {
         this.commands = copyOf(commands, commands.length);
-    }
-
-    @Override
-    public void setVocabulary(Vocabulary vocabulary) {
-        // ignored
     }
 
     @Override

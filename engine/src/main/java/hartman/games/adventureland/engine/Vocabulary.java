@@ -19,10 +19,10 @@ public class Vocabulary {
     }
 
     public Optional<Verb> toVerb(String name) {
-        return verbs.stream().filter(verb -> verb.equals(new Verb(name))).findFirst();
+        return verbs.stream().filter(v -> v.equals(new Verb(name))).findFirst();
     }
 
     public Optional<Noun> toNoun(String name) {
-        return nouns.stream().filter(noun -> noun.equals(new Noun(name))).findFirst();
+        return nouns.stream().filter(n -> n.equals(new Noun(name))).findFirst();
     }
 }

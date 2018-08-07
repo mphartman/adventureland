@@ -9,13 +9,27 @@ import java.util.Set;
  */
 public class Adventure {
     private final Vocabulary vocabulary;
-    private final Set<Room> rooms = new LinkedHashSet<>();
+    private final Set<Action> occurs = new LinkedHashSet<>();
     private final Set<Action> actions = new LinkedHashSet<>();
+    private final Room startRoom;
 
-    public Adventure(Vocabulary vocabulary, Set<Room> rooms, Set<Action> actions) {
+    public Adventure(Vocabulary vocabulary, Set<Action> occurs, Set<Action> actions, Room startRoom) {
         this.vocabulary = vocabulary;
-        this.rooms.addAll(rooms);
         this.actions.addAll(actions);
+        this.occurs.addAll(occurs);
+        this.startRoom = startRoom;
+    }
+
+    public Vocabulary getVocabulary() {
+        return vocabulary;
+    }
+
+    public Room getStartRoom() {
+        return startRoom;
+    }
+
+    public Set<Action> getOccurs() {
+        return Collections.unmodifiableSet(occurs);
     }
 
     public Set<Action> getActions() {

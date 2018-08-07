@@ -15,5 +15,7 @@ public class VerbTest {
         assertTrue(go.equals(new Verb("enter")));
         assertTrue(go.equals(new Verb("walk")));
         assertFalse(go.equals(new Verb("stroll")));
+        assertTrue(Verb.ANY.equals(go));
+        assertTrue(go.equals(Verb.ANY));
     }
 }

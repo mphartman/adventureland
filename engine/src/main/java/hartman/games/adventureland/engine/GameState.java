@@ -10,10 +10,16 @@ import java.util.Map;
 public class GameState {
     private final Map<String, Object> flags = new HashMap<>();
 
+    private boolean running;
     private Room currentRoom;
 
     public GameState(Room startRoom) {
         this.currentRoom = startRoom;
+        this.running = true;
+    }
+
+    public boolean isRunning() {
+        return running;
     }
 
     public Room getCurrentRoom() {
@@ -31,8 +37,8 @@ public class GameState {
         return previousRoom;
     }
 
-    public void look(GameElementVisitor visitor) {
-        currentRoom.accept(visitor);
+    public void quit() {
+        running = false;
     }
 
     public void setFlag(String key, Object value) {
