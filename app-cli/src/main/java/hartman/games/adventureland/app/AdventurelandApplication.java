@@ -92,26 +92,26 @@ class MyAdventures {
         living_room.setExit(EAST, kitchen);
         kitchen.setExit(SOUTH, outside);
 
-        Action initialLookOccurs = new Action(setOf(new Conditions.TIMES(1)), setOf(DO_LOOK));
-        Action promptOccurs = new Action(setOf(new Conditions.NOT(new Conditions.IN_ROOM(outside))), setOf(new Results.PRINT(String.format("%nWhat should I do? "))));
-        Action gameOverOccurs = new Action(setOf(new Conditions.IN_ROOM(outside)), setOf(new Results.PRINT(String.format("%n*** Congratulations, you've escaped!***")), Results.QUIT));
+        Action initialLookOccurs = new Action(setOf(new Conditions.Times(1)), setOf(Look));
+        Action promptOccurs = new Action(setOf(new Conditions.Not(new Conditions.InRoom(outside))), setOf(new Results.Print(String.format("%nWhat should I do? "))));
+        Action gameOverOccurs = new Action(setOf(new Conditions.InRoom(outside)), setOf(new Results.Print(String.format("%n*** Congratulations, you've escaped!***")), Results.Quit));
         Set<Action> occurs = new LinkedHashSet<>(Arrays.asList(initialLookOccurs, promptOccurs, gameOverOccurs));
 
-        Action goAction = new Action(GO, Noun.ANY, setOf(Conditions.HAS_EXIT), setOf(Results.GOTO, DO_LOOK));
-        Action lookAction = new Action(LOOK, Noun.ANY, DO_LOOK);
-        Action badVerbAlone = new Action(Verb.UNRECOGNIZED, new Results.PRINT("Sorry, I don't know how to do that. "));
-        Action badVerbAnyNoun = new Action(Verb.UNRECOGNIZED, Noun.ANY, new Results.PRINT("Nope, I don't understand. "));
-        Action badVerbAndNoun = new Action(Verb.UNRECOGNIZED, Noun.UNRECOGNIZED, new Results.PRINT("I don't know how to do that with that. "));
-        Action badNoun = new Action(Verb.ANY, Noun.UNRECOGNIZED, new Results.PRINT("I don't recognize that noun. "));
-        Action missingNoun = new Action(Verb.ANY, Noun.NONE, new Results.PRINT("I need more information. "));
-        Set<Action> actions = new LinkedHashSet<>(Arrays.asList(Actions.QUIT_ACTION, goAction, lookAction, badVerbAlone, badVerbAndNoun, badNoun, missingNoun, badVerbAnyNoun));
+        Action goAction = new Action(GO, Noun.ANY, setOf(Conditions.HasExit), setOf(Results.Goto, Look));
+        Action lookAction = new Action(LOOK, Noun.ANY, Look);
+        Action badVerbAlone = new Action(Verb.UNRECOGNIZED, new Results.Print("Sorry, I don't know how to do that. "));
+        Action badVerbAnyNoun = new Action(Verb.UNRECOGNIZED, Noun.ANY, new Results.Print("Nope, I don't understand. "));
+        Action badVerbAndNoun = new Action(Verb.UNRECOGNIZED, Noun.UNRECOGNIZED, new Results.Print("I don't know how to do that with that. "));
+        Action badNoun = new Action(Verb.ANY, Noun.UNRECOGNIZED, new Results.Print("I don't recognize that noun. "));
+        Action missingNoun = new Action(Verb.ANY, Noun.NONE, new Results.Print("I need more information. "));
+        Set<Action> actions = new LinkedHashSet<>(Arrays.asList(Actions.QuitAction, goAction, lookAction, badVerbAlone, badVerbAndNoun, badNoun, missingNoun, badVerbAnyNoun));
 
         Set<Item> items = Collections.emptySet();
 
         return new Adventure(vocabulary, occurs, actions, items, hallway);
     }
 
-    private static Result DO_LOOK = new Results.LOOK((room, exits, items) -> {
+    private static Result Look = new Results.Look((room, exits, items) -> {
         StringBuilder buf = new StringBuilder();
         buf.append(String.format("%n%s%n", room.getDescription()));
         if (exits.size() == 0) {

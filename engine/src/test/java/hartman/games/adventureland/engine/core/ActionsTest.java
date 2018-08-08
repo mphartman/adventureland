@@ -17,9 +17,9 @@ public class ActionsTest {
     public void quitActionShouldQuitGivenQuitVerb() {
         GameState gameState = new GameState(Room.NOWHERE);
         assertTrue(gameState.isRunning());
-        Actions.QUIT_ACTION.run(new ActionContext(gameState, msg -> {}, new Command(new Verb("stop"), Noun.NONE)));
+        Actions.QuitAction.run(new ActionContext(gameState, msg -> {}, new Command(new Verb("stop"), Noun.NONE)));
         assertTrue(gameState.isRunning());
-        Actions.QUIT_ACTION.run(new ActionContext(gameState, msg -> {}, new Command(Verbs.QUIT, Noun.NONE)));
+        Actions.QuitAction.run(new ActionContext(gameState, msg -> {}, new Command(Verbs.QUIT, Noun.NONE)));
         assertFalse(gameState.isRunning());
     }
 

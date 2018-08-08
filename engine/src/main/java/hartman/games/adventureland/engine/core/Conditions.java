@@ -6,7 +6,6 @@ import hartman.games.adventureland.engine.GameState;
 import hartman.games.adventureland.engine.Item;
 import hartman.games.adventureland.engine.Room;
 
-import java.util.Random;
 import java.util.function.Supplier;
 
 public final class Conditions {
@@ -17,11 +16,11 @@ public final class Conditions {
     /**
      * Returns true for the given number of times.
      */
-    public static class TIMES implements Condition {
+    public static class Times implements Condition {
         private int counter;
         private final int maxTimes;
 
-        public TIMES(int times) {
+        public Times(int times) {
             this.maxTimes = times;
         }
 
@@ -38,15 +37,15 @@ public final class Conditions {
      * A condition which returns true based on a desired probability and a random number.
      * E.g. given a probability of 10, this condition should evaluate to true, 10% of the time.
      */
-    public static class OCCURS_RANDOMLY implements Condition {
+    public static class Random implements Condition {
         private Integer probability;
         private Supplier<Integer> randomIntFn;
 
-        public OCCURS_RANDOMLY(Integer probability) {
-            this(probability, () -> new Random().nextInt(100) + 1 /* 1 - 100 */);
+        public Random(Integer probability) {
+            this(probability, () -> new java.util.Random().nextInt(100) + 1 /* 1 - 100 */);
         }
 
-        public OCCURS_RANDOMLY(Integer probability, Supplier<Integer> randomIntFn) {
+        public Random(Integer probability, Supplier<Integer> randomIntFn) {
             if (probability < 0 || probability > 100) {
                 throw new IllegalArgumentException("Invalid value. Probability must be between 0 and 100 inclusive.");
             }
@@ -70,15 +69,15 @@ public final class Conditions {
      * True if player's requested noun represents a valid direction and that the current room
      * she is in has an exit matching that direction.
      */
-    public static final Condition HAS_EXIT = (command, gameState) -> gameState.getCurrentRoom().hasExit(command.getNoun());
+    public static final Condition HasExit = (command, gameState) -> gameState.getCurrentRoom().hasExit(command.getNoun());
 
     /**
      * True if the player's current room is ROOM.
      */
-    public static class IN_ROOM implements Condition {
+    public static class InRoom implements Condition {
         private final Room room;
 
-        public IN_ROOM(Room room) {
+        public InRoom(Room room) {
             this.room = room;
         }
 
@@ -91,11 +90,11 @@ public final class Conditions {
     /**
      * True if the player is carrying ITEM in their inventory.
      */
-    public static class ITEM_CARRIED implements Condition {
+    public static class ItemCarried implements Condition {
 
         private final Item item;
 
-        public ITEM_CARRIED(Item item) {
+        public ItemCarried(Item item) {
             this.item = item;
         }
 
@@ -108,11 +107,11 @@ public final class Conditions {
     /**
      * True if ITEM is in the player's current room.
      */
-    public static class ITEM_HERE implements Condition {
+    public static class ItemHere implements Condition {
 
         private final Item item;
 
-        public ITEM_HERE(Item item) {
+        public ItemHere(Item item) {
             this.item = item;
         }
 
@@ -126,13 +125,13 @@ public final class Conditions {
      * True if ITEM is either being carried by the player
      * or is in the player's current room.
      */
-    public static class IS_PRESENT implements Condition {
+    public static class IsPresent implements Condition {
         private Condition isItemCarried;
         private Condition isItemHere;
 
-        public IS_PRESENT(Item item) {
-            isItemCarried = new ITEM_CARRIED(item);
-            isItemHere = new ITEM_HERE(item);
+        public IsPresent(Item item) {
+            isItemCarried = new ItemCarried(item);
+            isItemHere = new ItemHere(item);
         }
 
         @Override
@@ -144,10 +143,10 @@ public final class Conditions {
     /**
      * Returns the inverse of the wrapped condition.
      */
-    public static class NOT implements Condition {
+    public static class Not implements Condition {
         private final Condition operand;
 
-        public NOT(Condition operand) {
+        public Not(Condition operand) {
             this.operand = operand;
         }
 
@@ -160,10 +159,10 @@ public final class Conditions {
     /**
      * True if ITEM has moved from its original starting location.
      */
-    public static class ITEM_MOVED implements Condition {
+    public static class ItemMoved implements Condition {
         private final Item item;
 
-        public ITEM_MOVED(Item item) {
+        public ItemMoved(Item item) {
             this.item = item;
         }
 

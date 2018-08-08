@@ -11,11 +11,11 @@ public final class Results {
         throw new IllegalStateException();
     }
 
-    public static final Result QUIT = (command, gameState, display) -> gameState.quit();
+    public static final Result Quit = (command, gameState, display) -> gameState.quit();
 
-    public static final Result GOTO = (command, gameState, display) -> gameState.exitTowards(command.getNoun());
+    public static final Result Goto = (command, gameState, display) -> gameState.exitTowards(command.getNoun());
 
-    public static class LOOK implements Result {
+    public static class Look implements Result {
 
         @FunctionalInterface
         public interface LookCallback {
@@ -24,7 +24,7 @@ public final class Results {
 
         private final LookCallback callback;
 
-        public LOOK(LookCallback callback) {
+        public Look(LookCallback callback) {
             this.callback = callback;
         }
 
@@ -60,10 +60,10 @@ public final class Results {
         }
     }
 
-    public static class PRINT implements Result {
+    public static class Print implements Result {
         private final String message;
 
-        public PRINT(String message) {
+        public Print(String message) {
             this.message = message;
         }
 

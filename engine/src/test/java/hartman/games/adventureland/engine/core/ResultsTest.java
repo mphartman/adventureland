@@ -17,7 +17,7 @@ public class ResultsTest {
         GameState gameState = new GameState(tower_first_floor);
         Command command = new Command(Verbs.GO, Nouns.UP);
 
-        Results.GOTO.execute(command, gameState, msg -> {});
+        Results.Goto.execute(command, gameState, msg -> {});
 
         assertEquals(tower_second_floor, gameState.getCurrentRoom());
     }
@@ -28,14 +28,14 @@ public class ResultsTest {
         GameState gameState = new GameState(sealed_tomb);
         Command command = new Command(Verbs.GO, Nouns.UP);
 
-        Results.GOTO.execute(command, gameState, msg -> {});
+        Results.Goto.execute(command, gameState, msg -> {});
     }
 
     @Test
     public void quitShouldChangeGameStateRunning() {
         GameState gameState = new GameState(Room.NOWHERE);
         assertTrue(gameState.isRunning());
-        Results.QUIT.execute(Command.NONE, gameState, msg -> {});
+        Results.Quit.execute(Command.NONE, gameState, msg -> {});
         assertFalse(gameState.isRunning());
     }
 
