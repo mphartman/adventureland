@@ -11,21 +11,19 @@ public class Adventure {
     private final Vocabulary vocabulary;
     private final Set<Action> occurs = new LinkedHashSet<>();
     private final Set<Action> actions = new LinkedHashSet<>();
+    private final Set<Item> items = new LinkedHashSet<>();
     private final Room startRoom;
 
-    public Adventure(Vocabulary vocabulary, Set<Action> occurs, Set<Action> actions, Room startRoom) {
+    public Adventure(Vocabulary vocabulary, Set<Action> occurs, Set<Action> actions, Set<Item> items, Room startRoom) {
         this.vocabulary = vocabulary;
-        this.actions.addAll(actions);
         this.occurs.addAll(occurs);
+        this.actions.addAll(actions);
+        this.items.addAll(items);
         this.startRoom = startRoom;
     }
 
     public Vocabulary getVocabulary() {
         return vocabulary;
-    }
-
-    public Room getStartRoom() {
-        return startRoom;
     }
 
     public Set<Action> getOccurs() {
@@ -34,5 +32,13 @@ public class Adventure {
 
     public Set<Action> getActions() {
         return Collections.unmodifiableSet(actions);
+    }
+
+    public Set<Item> getItems() {
+        return Collections.unmodifiableSet(items);
+    }
+
+    public Room getStartRoom() {
+        return startRoom;
     }
 }

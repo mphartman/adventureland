@@ -6,6 +6,7 @@ import hartman.games.adventureland.engine.CommandInterpreter;
 import hartman.games.adventureland.engine.Display;
 import hartman.games.adventureland.engine.Game;
 import hartman.games.adventureland.engine.GameState;
+import hartman.games.adventureland.engine.Item;
 import hartman.games.adventureland.engine.Noun;
 import hartman.games.adventureland.engine.Room;
 import hartman.games.adventureland.engine.Verb;
@@ -19,6 +20,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Scanner;
 import java.util.Set;
@@ -36,7 +38,6 @@ import static hartman.games.adventureland.engine.core.Nouns.directions;
 import static hartman.games.adventureland.engine.core.Verbs.GO;
 import static hartman.games.adventureland.engine.core.Verbs.LOOK;
 import static hartman.games.adventureland.engine.core.Verbs.QUIT;
-import static hartman.games.adventureland.engine.Vocabulary.setOf;
 
 @SpringBootApplication
 public class AdventurelandApplication implements CommandLineRunner {
@@ -58,7 +59,7 @@ public class AdventurelandApplication implements CommandLineRunner {
     public void run(String... args) {
         Adventure adventure = MyAdventures.House_Escape();
         CommandInterpreter interpreter = new ConsoleInterpreter(adventure.getVocabulary());
-        GameState gameState = new GameState(adventure.getStartRoom());
+        GameState gameState = new GameState(adventure.getStartRoom(), adventure.getItems());
         ConsoleDisplay display = new ConsoleDisplay();
         display.print(introduction);
         Game game = new Game(adventure, interpreter, gameState, display);
@@ -102,7 +103,9 @@ class MyAdventures {
         Action unrecognizedVerbAndNounAction = new Action(Verb.UNRECOGNIZED, Noun.UNRECOGNIZED, new Results.PRINT("I don't know how to do that with that. "));
         Set<Action> actions = new LinkedHashSet<>(Arrays.asList(Actions.QUIT_ACTION, goAction, lookAction, unrecognizedVerbAction, unrecognizedVerbAndNounAction));
 
-        return new Adventure(vocabulary, occurs, actions, hallway);
+        Set<Item> items = Collections.emptySet();
+
+        return new Adventure(vocabulary, occurs, actions, items, hallway);
     }
 
     private static Result DO_LOOK = new Results.LOOK((room, exits, items) -> {

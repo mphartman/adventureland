@@ -31,7 +31,7 @@ public class GameTest {
         Action goAction = new Action(Verbs.GO, Noun.ANY, setOf(Conditions.HAS_EXIT), setOf(Results.GOTO));
         Set<Action> actions = new HashSet<>(asList(Actions.QUIT_ACTION, goAction));
 
-        Adventure adventure = new Adventure(vocabulary, Collections.emptySet(), actions, chamber);
+        Adventure adventure = new Adventure(vocabulary, Collections.emptySet(), actions, Collections.emptySet(), chamber);
 
         Command[] commands = {
                 new Command(Verbs.GO, Nouns.DOWN),

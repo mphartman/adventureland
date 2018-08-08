@@ -2,8 +2,11 @@ package hartman.games.adventureland.engine;
 
 import hartman.games.adventureland.engine.core.Results;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The state of the game world which consists of the player's current position
@@ -11,13 +14,18 @@ import java.util.Map;
  */
 public class GameState {
     private final Map<String, Object> flags = new HashMap<>();
-
+    private final Set<Item> items = new LinkedHashSet<>();
     private boolean running;
     private Room currentRoom;
 
-    public GameState(Room startRoom) {
-        this.currentRoom = startRoom;
+    public GameState(Room startingRoom, Set<Item> items) {
+        this.currentRoom = startingRoom;
+        this.items.addAll(items);
         this.running = true;
+    }
+
+    public GameState(Room startRoom) {
+        this(startRoom, Collections.emptySet());
     }
 
     public boolean isRunning() {
