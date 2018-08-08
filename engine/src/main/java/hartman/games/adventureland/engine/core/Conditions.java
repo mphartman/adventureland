@@ -15,6 +15,26 @@ public final class Conditions {
     }
 
     /**
+     * Returns true for the given number of times.
+     */
+    public static class TIMES implements Condition {
+        private int counter;
+        private final int maxTimes;
+
+        public TIMES(int times) {
+            this.maxTimes = times;
+        }
+
+        @Override
+        public boolean matches(Command command, GameState gameState) {
+            if (counter++ < maxTimes) {
+                return true;
+            }
+            return false;
+        }
+    }
+
+    /**
      * A condition which returns true based on a desired probability and a random number.
      * E.g. given a probability of 10, this condition should evaluate to true, 10% of the time.
      */

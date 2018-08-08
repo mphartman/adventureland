@@ -19,8 +19,9 @@ public class Game {
     public void run() {
         while (gameState.isRunning()) {
             runOccurs();
-            Command command = interpreter.nextCommand();
-            runActions(command);
+            if (gameState.isRunning()) {
+                runActions(interpreter.nextCommand());
+            }
         }
     }
 

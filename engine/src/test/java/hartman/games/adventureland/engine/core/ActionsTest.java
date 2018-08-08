@@ -1,43 +1,17 @@
 package hartman.games.adventureland.engine.core;
 
-import hartman.games.adventureland.engine.*;
+import hartman.games.adventureland.engine.ActionContext;
+import hartman.games.adventureland.engine.Command;
+import hartman.games.adventureland.engine.GameState;
+import hartman.games.adventureland.engine.Noun;
+import hartman.games.adventureland.engine.Room;
+import hartman.games.adventureland.engine.Verb;
 import org.junit.Test;
 
-import static hartman.games.adventureland.engine.core.Nouns.DOWN;
-import static hartman.games.adventureland.engine.core.Nouns.UP;
-import static hartman.games.adventureland.engine.core.Verbs.GO;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class ActionsTest {
-
-    @Test
-    public void goActionShouldMovePlayerToRoom() {
-        Room dungeon = new Room("dungeon", "A dimly lit, cold space. It smells.");
-        Room chamber = new Room("chamber", "A small, round chamber with stone walls and floor.");
-        chamber.setExit(DOWN, dungeon);
-
-        GameState gameState = new GameState(chamber);
-        Command command = new Command(GO, DOWN);
-
-        Actions.GO_ACTION.run(new ActionContext(gameState, msg -> {}, command));
-
-        assertEquals(dungeon, gameState.getCurrentRoom());
-    }
-
-    @Test
-    public void goActionShouldNotFailGivenAnInvalidExit() {
-        Room dungeon = new Room("dungeon", "A dimly lit, cold space. It smells.");
-        dungeon.setExit(DOWN, dungeon);
-
-        GameState gameState = new GameState(dungeon);
-        Command command = new Command(GO, UP);
-
-        Actions.GO_ACTION.run(new ActionContext(gameState, msg -> {}, command));
-
-        assertEquals(dungeon, gameState.getCurrentRoom());
-    }
 
     @Test
     public void quitActionShouldQuitGivenQuitVerb() {

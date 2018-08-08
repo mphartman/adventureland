@@ -8,10 +8,14 @@ import java.util.Set;
  * Things the player can do or which happen to her and that result in changes to the game world.
  */
 public class Action {
-    private final Verb verb;
-    private final Noun noun;
-    private final Set<Condition> conditions = new LinkedHashSet<>();
-    private final Set<Result> results = new LinkedHashSet<>();
+
+    public static Set<Condition> setOf(Condition... conditions) {
+        return new LinkedHashSet<>(Arrays.asList(conditions));
+    }
+
+    public static Set<Result> setOf(Result... results) {
+        return new LinkedHashSet<>(Arrays.asList(results));
+    }
 
     @FunctionalInterface
     public interface Condition {
@@ -22,6 +26,11 @@ public class Action {
     public interface Result {
         void execute(Command command, GameState gameState, Display display);
     }
+
+    private final Verb verb;
+    private final Noun noun;
+    private final Set<Condition> conditions = new LinkedHashSet<>();
+    private final Set<Result> results = new LinkedHashSet<>();
 
     public Action(Set<Result> results) {
         this.verb = Verb.NONE;

@@ -1,18 +1,42 @@
 package hartman.games.adventureland.app;
 
-import hartman.games.adventureland.engine.*;
+import hartman.games.adventureland.engine.Action;
+import hartman.games.adventureland.engine.Adventure;
 import hartman.games.adventureland.engine.CommandInterpreter;
-import hartman.games.adventureland.engine.core.*;
+import hartman.games.adventureland.engine.Display;
+import hartman.games.adventureland.engine.Game;
+import hartman.games.adventureland.engine.GameState;
+import hartman.games.adventureland.engine.Noun;
+import hartman.games.adventureland.engine.Room;
+import hartman.games.adventureland.engine.Verb;
+import hartman.games.adventureland.engine.Vocabulary;
+import hartman.games.adventureland.engine.core.Actions;
+import hartman.games.adventureland.engine.core.Conditions;
 import hartman.games.adventureland.engine.core.DefaultCommandInterpreter;
+import hartman.games.adventureland.engine.core.Results;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static hartman.games.adventureland.engine.Action.Result;
+import static hartman.games.adventureland.engine.Action.setOf;
+import static hartman.games.adventureland.engine.core.Nouns.DOWN;
+import static hartman.games.adventureland.engine.core.Nouns.EAST;
+import static hartman.games.adventureland.engine.core.Nouns.NORTH;
+import static hartman.games.adventureland.engine.core.Nouns.SOUTH;
+import static hartman.games.adventureland.engine.core.Nouns.UP;
+import static hartman.games.adventureland.engine.core.Nouns.WEST;
+import static hartman.games.adventureland.engine.core.Nouns.directions;
+import static hartman.games.adventureland.engine.core.Verbs.GO;
+import static hartman.games.adventureland.engine.core.Verbs.LOOK;
+import static hartman.games.adventureland.engine.core.Verbs.QUIT;
+import static hartman.games.adventureland.engine.Vocabulary.setOf;
 
 @SpringBootApplication
 public class AdventurelandApplication implements CommandLineRunner {
@@ -25,22 +49,21 @@ public class AdventurelandApplication implements CommandLineRunner {
             "House Escape, a text-based adventure.%n" +
                     "Copyright © 2018, Michael Hartman%n" +
                     "Distributed under the Apache License, version 2.%n%n" +
-                    "A voice BOOMS out:%n%n" +
-                    "In this adventure you're to escape from the haunted house.  Good luck.%n" +
-                    "Type 'LOOK' to start.%n"
+                    "A voice BOOMS out:%n" +
+                    "\"In this adventure you're to escape from the haunted house.  Good luck.\"%n%n"
     );
 
 
     @Override
     public void run(String... args) {
         Adventure adventure = MyAdventures.House_Escape();
-        CommandInterpreter interpreter = new ConsoleCommandInterpreter(adventure.getVocabulary());
+        CommandInterpreter interpreter = new ConsoleInterpreter(adventure.getVocabulary());
         GameState gameState = new GameState(adventure.getStartRoom());
         ConsoleDisplay display = new ConsoleDisplay();
         display.print(introduction);
         Game game = new Game(adventure, interpreter, gameState, display);
         game.run();
-        display.print(String.format("Goodbye. Thank you for playing. Have a nice day!%n"));
+        display.print(String.format("%n%nGoodbye. Thank you for playing. Have a nice day!%n"));
     }
 }
 
@@ -48,44 +71,49 @@ class MyAdventures {
 
     static Adventure House_Escape() {
 
-        Set<Verb> verbs = Verbs.asSet(Verbs.QUIT, Verbs.GO, Verbs.LOOK);
-        Set<Noun> nouns = Nouns.directions();
+        Set<Verb> verbs = Vocabulary.setOf(QUIT, GO, LOOK);
+        Set<Noun> nouns = directions();
         Vocabulary vocabulary = new Vocabulary(verbs, nouns);
 
-        Room hallway = new Room("hallway", "I'm in a short, narrow hallway.");
-        Room upper_stairs = new Room("upper_stairs", "I'm on a set of stairs leading to the upper floor.");
+        Room hallway = new Room("hallway", String.format("I'm in a short, narrow hallway.%nThere's a short flight of stairs going up.%nThe hallway continues to the south."));
+        Room upper_stairs = new Room("upper_stairs", "I'm on the top of the stairs.");
         Room bedroom = new Room("bedroom", "I'm in the master bedroom.");
-        Room kitchen = new Room("kitchen", "I'm the kitchen.");
+        Room kitchen = new Room("kitchen", "I'm the kitchen. The way south appears to be the way!");
         Room living_room = new Room("living_room", "I'm in a living room with old couches.");
-        hallway.setExit(Nouns.UP, upper_stairs);
-        hallway.setExit(Nouns.SOUTH, kitchen);
-        upper_stairs.setExit(Nouns.DOWN, hallway);
-        upper_stairs.setExit(Nouns.SOUTH, bedroom);
-        bedroom.setExit(Nouns.NORTH, upper_stairs);
-        kitchen.setExit(Nouns.NORTH, hallway);
-        kitchen.setExit(Nouns.WEST, living_room);
-        living_room.setExit(Nouns.EAST, kitchen);
+        Room outside = new Room("outside", "I'm outside the house.");
+        hallway.setExit(UP, upper_stairs);
+        hallway.setExit(SOUTH, kitchen);
+        upper_stairs.setExit(DOWN, hallway);
+        upper_stairs.setExit(SOUTH, bedroom);
+        bedroom.setExit(NORTH, upper_stairs);
+        kitchen.setExit(NORTH, hallway);
+        kitchen.setExit(WEST, living_room);
+        living_room.setExit(EAST, kitchen);
+        kitchen.setExit(SOUTH, outside);
 
-        Action promptOccurs = new Action(new Results.PRINT(String.format("%nWhat should I do? ")));
-        Set<Action> occurs = new HashSet<>(Arrays.asList(promptOccurs));
+        Action introOccurs = new Action(setOf(new Conditions.TIMES(1)), setOf(DO_LOOK));
+        Action promptOccurs = new Action(setOf(new Conditions.NOT(new Conditions.IN_ROOM(outside))), setOf(new Results.PRINT(String.format("%nWhat should I do? "))));
+        Action gameOverOccurs = new Action(setOf(new Conditions.IN_ROOM(outside)), setOf(new Results.PRINT(String.format("%n*** Congratulations, you've escaped!***")), Results.QUIT));
+        Set<Action> occurs = new LinkedHashSet<>(Arrays.asList(introOccurs, promptOccurs, gameOverOccurs));
 
-        Action lookAction = new Action(Verbs.LOOK, Noun.ANY, LOOK);
-        Set<Action> actions = new HashSet<>(Arrays.asList(Actions.QUIT_ACTION, Actions.GO_ACTION, lookAction));
+        Action goAction = new Action(GO, Noun.ANY, setOf(Conditions.HAS_EXIT), setOf(Results.GOTO, DO_LOOK));
+        Action lookAction = new Action(LOOK, Noun.ANY, DO_LOOK);
+        Action unrecognizedVerbAction = new Action(Verb.UNRECOGNIZED, new Results.PRINT("Huh? I don't know how to do that. "));
+        Action unrecognizedVerbAndNounAction = new Action(Verb.UNRECOGNIZED, Noun.UNRECOGNIZED, new Results.PRINT("I don't know how to do that with that. "));
+        Set<Action> actions = new LinkedHashSet<>(Arrays.asList(Actions.QUIT_ACTION, goAction, lookAction, unrecognizedVerbAction, unrecognizedVerbAndNounAction));
 
         return new Adventure(vocabulary, occurs, actions, hallway);
     }
 
-    private static Action.Result LOOK = new Results.LOOK((room, exits, items) -> {
+    private static Result DO_LOOK = new Results.LOOK((room, exits, items) -> {
         StringBuilder buf = new StringBuilder();
-        buf.append(String.format("%s%n", room.getDescription()));
+        buf.append(String.format("%n%s%n", room.getDescription()));
         if (exits.size() == 0) {
             buf.append(String.format("There are no obvious exits from here.%n"));
-        }
-        else {
+        } else {
             if (exits.size() == 1) {
                 buf.append(String.format("There is a single exit which goes %s%n", exits.get(0).getDescription()));
-            }
-            else {
+            } else {
                 String exitsString = String.join(", ", exits.stream().map(Room.Exit::getDescription).collect(Collectors.toList()));
                 buf.append(String.format("There are %d exits: %s%n", exits.size(), exitsString));
             }
@@ -95,8 +123,8 @@ class MyAdventures {
 
 }
 
-class ConsoleCommandInterpreter extends DefaultCommandInterpreter {
-    public ConsoleCommandInterpreter(Vocabulary vocabulary) {
+class ConsoleInterpreter extends DefaultCommandInterpreter {
+    public ConsoleInterpreter(Vocabulary vocabulary) {
         super(new Scanner(System.in), vocabulary);
     }
 }

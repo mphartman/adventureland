@@ -4,9 +4,7 @@ import hartman.games.adventureland.engine.*;
 import hartman.games.adventureland.engine.Action.Result;
 import hartman.games.adventureland.engine.Command;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public final class Results {
     private Results() {

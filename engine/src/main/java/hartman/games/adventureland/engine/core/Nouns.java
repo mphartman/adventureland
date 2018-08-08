@@ -12,12 +12,8 @@ public final class Nouns {
         throw new IllegalStateException();
     }
 
-    public static Set<Noun> asSet(Noun... nouns) {
-        return new LinkedHashSet<>(Arrays.asList(nouns));
-    }
-
     public static Set<Noun> directions() {
-        return asSet(NORTH, SOUTH, UP, DOWN, EAST, WEST);
+        return new LinkedHashSet<>(Arrays.asList(NORTH, SOUTH, UP, DOWN, EAST, WEST));
     }
 
     public static final Noun NORTH = new Noun("North");
