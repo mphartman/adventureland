@@ -59,7 +59,11 @@ public class GameState {
         return flags.get(key);
     }
 
+    /**
+     * Visits the current room and the items in that room.
+     */
     public void describe(GameElementVisitor visitor) {
         currentRoom.accept(visitor);
+        items.stream().filter(item -> item.isHere(currentRoom)).forEach(item -> item.accept(visitor));
     }
 }
