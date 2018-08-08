@@ -8,20 +8,22 @@ import hartman.games.adventureland.engine.core.Verbs;
 import org.junit.Test;
 
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static hartman.games.adventureland.engine.Action.setOf;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 
 public class GameTest {
 
     @Test
     public void gameShouldInvokeActionsGivenPlayerCommandsWhichChangeGameState() {
 
-        Vocabulary vocabulary = new Vocabulary(Vocabulary.setOf(Verbs.GO), Nouns.directions());
+        Vocabulary vocabulary = new Vocabulary(Vocabulary.setOf(Verbs.GO, Verbs.QUIT), Nouns.directions());
 
         Room dungeon = new Room("dungeon", "A miserable, dark place with cold stone floors and cracked walls.");
         Room chamber = new Room("chamber", "A clean, bright chamber with red carpet and floral drapes.");
@@ -29,7 +31,7 @@ public class GameTest {
         dungeon.setExit(Nouns.UP, chamber);
 
         Action goAction = new Action(Verbs.GO, Noun.ANY, setOf(Conditions.HAS_EXIT), setOf(Results.GOTO));
-        Set<Action> actions = new HashSet<>(asList(Actions.QUIT_ACTION, goAction));
+        Set<Action> actions = new LinkedHashSet<>(asList(Actions.QUIT_ACTION, goAction));
 
         Adventure adventure = new Adventure(vocabulary, Collections.emptySet(), actions, Collections.emptySet(), chamber);
 
@@ -42,13 +44,42 @@ public class GameTest {
         AtomicInteger i = new AtomicInteger(0);
         CommandInterpreter interpreter = () -> commands[i.getAndIncrement()];
 
-        GameState gameState = new GameState(chamber);
+        GameState gameState = new GameState(adventure.getStartRoom());
 
         Game game = new Game(adventure, interpreter, gameState, msg -> {});
-
         game.run();
+
         assertEquals(dungeon, gameState.getCurrentRoom());
     }
 
+    @Test
+    public void gameShouldStopRunActionsAfterFirstOneWhichReturnsTrue() {
 
+        Vocabulary vocabulary = new Vocabulary(Vocabulary.setOf(Verbs.GO, Verbs.QUIT), Nouns.directions());
+
+        Action.Result noOpResult = (command, gameState, display) -> {};
+        Action action1 = new Action(Verbs.GO, Noun.ANY, setOf((command, gameState) -> { gameState.setFlag("action1", "called"); return false; } ), setOf(noOpResult));
+        Action action2 = new Action(Verbs.GO, Noun.ANY, setOf((command, gameState) -> { gameState.setFlag("action2", "called"); return true; }), setOf(noOpResult));
+        Action action3 = new Action(Verbs.GO, Noun.ANY, setOf((command, gameState) -> { gameState.setFlag("action3", "called"); return true; }), setOf(noOpResult));
+        Set<Action> actions = new LinkedHashSet<>(asList(action1, action2, action3, Actions.QUIT_ACTION));
+
+        Adventure adventure = new Adventure(vocabulary, Collections.emptySet(), actions, Collections.emptySet(), Room.NOWHERE);
+
+        Command[] commands = {
+                new Command(Verbs.GO, Nouns.DOWN),
+                new Command(Verbs.QUIT)
+        };
+        AtomicInteger i = new AtomicInteger(0);
+        CommandInterpreter interpreter = () -> commands[i.getAndIncrement()];
+
+        GameState gameState = new GameState(adventure.getStartRoom());
+
+        Game game = new Game(adventure, interpreter, gameState, msg -> {});
+        game.run();
+
+        assertEquals("called", gameState.getFlag("action1"));
+        assertEquals("called", gameState.getFlag("action2"));
+        assertNull(gameState.getFlag("action3"));
+        assertFalse(gameState.isRunning());
+    }
 }

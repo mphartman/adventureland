@@ -30,6 +30,7 @@ public class Game {
     }
 
     private void runActions(Command command) {
-        adventure.getActions().forEach(action -> action.run(new ActionContext(gameState, display, command)));
+        for (Action action : adventure.getActions())
+            if (action.run(new ActionContext(gameState, display, command))) return;
     }
 }

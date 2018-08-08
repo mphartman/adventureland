@@ -76,7 +76,13 @@ public class Action {
         this.results.addAll(results);
     }
 
-    public void run(ActionContext context) {
+    /**
+     * Runs this Action if the command matches and all conditions are met.
+     *
+     * @param context
+     * @return true if this action is applicable to the given command and all conditions are met, otherwise returns false.
+     */
+    public boolean run(ActionContext context) {
 
         Command command = context.getCommand();
         Display display = context.getDisplay();
@@ -85,9 +91,10 @@ public class Action {
         if (verb.equals(command.getVerb()) && noun.equals(command.getNoun())) {
             if (conditions.stream().allMatch(condition -> condition.matches(command, gameState))) {
                 results.forEach(result -> result.execute(command, gameState, display));
+                return true;
             }
         }
-
+        return false;
     }
 
 }
