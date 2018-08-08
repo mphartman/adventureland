@@ -64,7 +64,7 @@ public class AdventurelandApplication implements CommandLineRunner {
         display.print(introduction);
         Game game = new Game(adventure, interpreter, gameState, display);
         game.run();
-        display.print(String.format("%n%nGoodbye. Thank you for playing. Have a nice day!%n"));
+        display.print(String.format("%n%nThank you for playing. Have a nice day!%n"));
     }
 }
 
@@ -92,16 +92,19 @@ class MyAdventures {
         living_room.setExit(EAST, kitchen);
         kitchen.setExit(SOUTH, outside);
 
-        Action introOccurs = new Action(setOf(new Conditions.TIMES(1)), setOf(DO_LOOK));
+        Action initialLookOccurs = new Action(setOf(new Conditions.TIMES(1)), setOf(DO_LOOK));
         Action promptOccurs = new Action(setOf(new Conditions.NOT(new Conditions.IN_ROOM(outside))), setOf(new Results.PRINT(String.format("%nWhat should I do? "))));
         Action gameOverOccurs = new Action(setOf(new Conditions.IN_ROOM(outside)), setOf(new Results.PRINT(String.format("%n*** Congratulations, you've escaped!***")), Results.QUIT));
-        Set<Action> occurs = new LinkedHashSet<>(Arrays.asList(introOccurs, promptOccurs, gameOverOccurs));
+        Set<Action> occurs = new LinkedHashSet<>(Arrays.asList(initialLookOccurs, promptOccurs, gameOverOccurs));
 
         Action goAction = new Action(GO, Noun.ANY, setOf(Conditions.HAS_EXIT), setOf(Results.GOTO, DO_LOOK));
         Action lookAction = new Action(LOOK, Noun.ANY, DO_LOOK);
-        Action unrecognizedVerbAction = new Action(Verb.UNRECOGNIZED, new Results.PRINT("Huh? I don't know how to do that. "));
-        Action unrecognizedVerbAndNounAction = new Action(Verb.UNRECOGNIZED, Noun.UNRECOGNIZED, new Results.PRINT("I don't know how to do that with that. "));
-        Set<Action> actions = new LinkedHashSet<>(Arrays.asList(Actions.QUIT_ACTION, goAction, lookAction, unrecognizedVerbAction, unrecognizedVerbAndNounAction));
+        Action badVerbAlone = new Action(Verb.UNRECOGNIZED, new Results.PRINT("Sorry, I don't know how to do that. "));
+        Action badVerbAnyNoun = new Action(Verb.UNRECOGNIZED, Noun.ANY, new Results.PRINT("Nope, I don't understand. "));
+        Action badVerbAndNoun = new Action(Verb.UNRECOGNIZED, Noun.UNRECOGNIZED, new Results.PRINT("I don't know how to do that with that. "));
+        Action badNoun = new Action(Verb.ANY, Noun.UNRECOGNIZED, new Results.PRINT("I don't recognize that noun. "));
+        Action missingNoun = new Action(Verb.ANY, Noun.NONE, new Results.PRINT("I need more information. "));
+        Set<Action> actions = new LinkedHashSet<>(Arrays.asList(Actions.QUIT_ACTION, goAction, lookAction, badVerbAlone, badVerbAndNoun, badNoun, missingNoun, badVerbAnyNoun));
 
         Set<Item> items = Collections.emptySet();
 
