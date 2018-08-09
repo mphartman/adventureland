@@ -14,11 +14,13 @@ public final class Verbs {
 
     public static final Verb LOOK = new Verb("LOOK", "L");
 
-    public static final Verb GO = new Verb("GO", "G", "ENTER", "WALK", "RUN" );
+    public static final Verb GO = new Verb("GO", "G", "ENTER", "WALK", "RUN", "EXIT", "LEAVE" );
 
     public static final Verb OPEN = new Verb("OPEN", "UNLOCK");
 
-    public static final Verb GET = new Verb("GET", "PICKUP", "GRAB");
+    public static final Verb GET = new Verb("GET", "PICKUP", "GRAB", "TAKE");
 
     public static final Verb DROP = new Verb("DROP", "DISCARD");
+
+    public static final Verb USE = new Verb("USE");
 }

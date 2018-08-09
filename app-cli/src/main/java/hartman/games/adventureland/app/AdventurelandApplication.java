@@ -58,6 +58,7 @@ import static hartman.games.adventureland.engine.core.Verbs.INVENTORY;
 import static hartman.games.adventureland.engine.core.Verbs.LOOK;
 import static hartman.games.adventureland.engine.core.Verbs.OPEN;
 import static hartman.games.adventureland.engine.core.Verbs.QUIT;
+import static hartman.games.adventureland.engine.core.Verbs.USE;
 import static java.lang.String.format;
 import static java.lang.String.join;
 
@@ -94,6 +95,9 @@ class MyAdventures {
 
     static Adventure House_Escape() {
 
+        Verb kill = new Verb("KILL", "SWAT", "HIT");
+        Noun fly = new Noun("FLY", "BUG", "INSECT", "PEST");
+
         Room hallway = new Room("hallway", format("I'm in a short, narrow hallway.%nThere's a short flight of stairs going up.%nThe hallway continues to the south."));
         Room upper_stairs = new Room("upper_stairs", "I'm on the top of the stairs.");
         Room bedroom = new Room("bedroom", "I'm in the master bedroom.");
@@ -112,7 +116,8 @@ class MyAdventures {
         Item key = Item.newPortableObjectItem("key", "A brass key.", bedroom);
         Item lockedDoor = Item.newSceneryRoomItem("locked_door", "Locked door.", kitchen);
         Item openDoor = Item.newSceneryRoomItem("open_door", "An unlocked door.");
-        Set<Item> items = new LinkedHashSet<>(Arrays.asList(key, lockedDoor, openDoor));
+        Item flyswatter = Item.newPortableObjectItem("flyswatter", "A messy, green flyswatter", living_room);
+        Set<Item> items = new LinkedHashSet<>(Arrays.asList(key, lockedDoor, openDoor, flyswatter));
 
         Action initialLookOccurs = new Action(setOf(new Times(1)), setOf(Look));
         Action promptOccurs = new Action(setOf(new Not(new InRoom(outside))), setOf(new Print(format("%nWhat should I do? "))));
@@ -142,15 +147,18 @@ class MyAdventures {
         Action getKey = new Action(GET, key.asNoun(), setOf(ItemHere.of(key)), setOf(Get, Print.of(format("Okay. I got the key. Type INVENTORY to see what I'm carrying.%n"))));
         Action dropKey = new Action(DROP, key.asNoun(), setOf(ItemCarried.of(key)), setOf(Drop, Print.of(format("I dropped the key.%n"))));
         Action openLockedDoorWithKey = new Action(OPEN, DOOR, setOf(ItemHere.of(lockedDoor), IsPresent.of(key)), setOf(Swap.of(lockedDoor, openDoor), Print.of(format("<CLICK> That did it. It's unlocked.%n")), Look));
+        Action useKeyOnLockedDoor = new Action(USE, key.asNoun(), setOf(ItemHere.of(lockedDoor), IsPresent.of(key)), setOf(Swap.of(lockedDoor, openDoor), Print.of(format("<CLICK> That did it. It's unlocked.%n")), Look));
         Action goDoor = new Action(GO, DOOR, setOf(ItemHere.of(openDoor)), setOf(Goto.of(outside), Print.of(format("Yeah! I've made it outside!%n"))));
-        Set<Action> adventureActions = new LinkedHashSet<>(Arrays.asList(openLockedDoorWithKey, openLockedDoorWithoutKey, goLockedDoor, goDoor, getKey, dropKey));
+        Action getFlySwatter = new Action(GET, flyswatter.asNoun(), setOf(ItemHere.of(flyswatter)), setOf(Get, Print.of(format("Gross, but okay, I got it.%n"))));
+        Action killFly = new Action(kill, fly, setOf(ItemCarried.of(flyswatter)), setOf(Print.of(format("I got 'em.%n"))));
+        Set<Action> adventureActions = new LinkedHashSet<>(Arrays.asList(openLockedDoorWithKey, useKeyOnLockedDoor, openLockedDoorWithoutKey, goLockedDoor, goDoor, getKey, dropKey, killFly, getFlySwatter));
 
         Set<Action> actions = new LinkedHashSet<>();
         actions.addAll(adventureActions);
         actions.addAll(standardActions);
 
-        Set<Verb> verbs = Vocabulary.setOf(QUIT, INVENTORY, GO, LOOK, OPEN, GET, DROP);
-        Set<Noun> nouns = Vocabulary.setOf(DOOR, key.asNoun());
+        Set<Verb> verbs = Vocabulary.setOf(QUIT, INVENTORY, GO, LOOK, OPEN, GET, DROP, kill, USE);
+        Set<Noun> nouns = Vocabulary.setOf(DOOR, key.asNoun(), flyswatter.asNoun(), fly);
         nouns.addAll(directions());
         Vocabulary vocabulary = new Vocabulary(verbs, nouns);
 
@@ -182,7 +190,7 @@ class MyAdventures {
             buf.append(format("I ain't got nothing.%n"));
         }
         else {
-            buf.append(format("I'm carrying %s%n", join(", ", items.stream().map(Item::getDescription).collect(Collectors.toSet()))));
+            buf.append(format("I'm carrying %d items.%n %s%n", items.size(), join(System.getProperty("line.separator"), items.stream().map(Item::getDescription).collect(Collectors.toSet()))));
         }
         return buf.toString();
     });
