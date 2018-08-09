@@ -96,6 +96,7 @@ class MyAdventures {
     static Adventure House_Escape() {
 
         Verb kill = new Verb("KILL", "SWAT", "HIT");
+        Verb yell = new Verb("YELL", "SHOUT", "SCREAM");
         Noun fly = new Noun("FLY", "BUG", "INSECT", "PEST");
 
         Room hallway = new Room("hallway", format("I'm in a short, narrow hallway.%nThere's a short flight of stairs going up.%nThe hallway continues to the south."));
@@ -151,13 +152,14 @@ class MyAdventures {
         Action goDoor = new Action(GO, DOOR, setOf(ItemHere.of(openDoor)), setOf(Goto.of(outside), Print.of(format("Yeah! I've made it outside!%n"))));
         Action getFlySwatter = new Action(GET, flyswatter.asNoun(), setOf(ItemHere.of(flyswatter)), setOf(Get, Print.of(format("Gross, but okay, I got it.%n"))));
         Action killFly = new Action(kill, fly, setOf(ItemCarried.of(flyswatter)), setOf(Print.of(format("I got 'em.%n"))));
-        Set<Action> adventureActions = new LinkedHashSet<>(Arrays.asList(openLockedDoorWithKey, useKeyOnLockedDoor, openLockedDoorWithoutKey, goLockedDoor, goDoor, getKey, dropKey, killFly, getFlySwatter));
+        Action yellAction = Action.Builder.newBuilder().verb(yell).then(Print.of("You don't have to yell. I can hear you.")).build();
+        Set<Action> adventureActions = new LinkedHashSet<>(Arrays.asList(openLockedDoorWithKey, useKeyOnLockedDoor, openLockedDoorWithoutKey, goLockedDoor, goDoor, getKey, dropKey, killFly, getFlySwatter, yellAction));
 
         Set<Action> actions = new LinkedHashSet<>();
         actions.addAll(adventureActions);
         actions.addAll(standardActions);
 
-        Set<Verb> verbs = Vocabulary.setOf(QUIT, INVENTORY, GO, LOOK, OPEN, GET, DROP, kill, USE);
+        Set<Verb> verbs = Vocabulary.setOf(QUIT, INVENTORY, GO, LOOK, OPEN, GET, DROP, kill, USE, yell);
         Set<Noun> nouns = Vocabulary.setOf(DOOR, key.asNoun(), flyswatter.asNoun(), fly);
         nouns.addAll(directions());
         Vocabulary vocabulary = new Vocabulary(verbs, nouns);

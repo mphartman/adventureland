@@ -9,6 +9,52 @@ import java.util.Set;
  */
 public class Action {
 
+    public static class Builder {
+
+        public static Builder newBuilder() {
+            return new Builder();
+        }
+
+        private Verb verb = Verb.NONE;
+        private Noun noun = Noun.NONE;
+        private Set<Result> results = new LinkedHashSet<>();
+        private Set<Condition> conditions = new LinkedHashSet<>();
+
+        public Builder verb(Verb verb) {
+            this.verb = verb;
+            return this;
+        }
+
+        public Builder noun(Noun noun) {
+            this.noun = noun;
+            return this;
+        }
+
+        public Builder when(Condition condition) {
+            this.conditions.add(condition);
+            return this;
+        }
+
+        public Builder and(Condition condition) {
+            this.conditions.add(condition);
+            return this;
+        }
+
+        public Builder then(Result result) {
+            this.results.add(result);
+            return this;
+        }
+
+        public Builder andThen(Result result) {
+            this.results.add(result);
+            return this;
+        }
+
+        public Action build() {
+            return new Action(verb, noun, conditions, results);
+        }
+    }
+
     public static Set<Condition> setOf(Condition... conditions) {
         return new LinkedHashSet<>(Arrays.asList(conditions));
     }
