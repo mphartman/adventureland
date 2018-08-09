@@ -2,7 +2,9 @@ package hartman.games.adventureland.engine;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -58,5 +60,44 @@ public class GameStateTest {
         });
         assertEquals(forest, roomRef.get());
         assertEquals(tree, itemRef.get());
+    }
+
+    @Test
+    public void inventoryShouldVisitItems() {
+        Item tree = Item.newSceneryRoomItem("tree", "An American Sycamore tree.");
+        Item key = Item.newSceneryRoomItem("key", "A skeleton key.");
+        Item sandwich = Item.newInventoryItem("sandwich", "A ham and cheese sandwich on rye bread.");
+        Set<Item> items = new LinkedHashSet<>();
+        items.add(tree);
+        items.add(key);
+        items.add(sandwich);
+
+        GameState gameState = new GameState(Room.NOWHERE, items);
+
+        List<Item> itemList = new ArrayList<>();
+        gameState.inventory(new GameElementVisitor() {
+            @Override
+            public void visit(Item item) {
+                assertEquals(sandwich, item); // checks that we only see carried items
+                itemList.add(item);
+            }
+
+            @Override
+            public void visit(Room room) {
+                fail("Inventory should not visit rooms");
+            }
+
+            @Override
+            public void visit(Room.Exit exit) {
+                fail("There are no exits. Should not have visited any.");
+            }
+        });
+        assertEquals(1, itemList.size());
+        assertEquals(sandwich, itemList.get(0));
+    }
+
+    @Test
+    public void dropShouldPlaceCarriedItemInCurrentRoom() {
+        // TODO
     }
 }

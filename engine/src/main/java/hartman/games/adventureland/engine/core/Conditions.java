@@ -38,6 +38,11 @@ public final class Conditions {
      * E.g. given a probability of 10, this condition should evaluate to true, 10% of the time.
      */
     public static class Random implements Condition {
+
+        public static Random of(Integer probability) {
+            return new Random(probability);
+        }
+
         private Integer probability;
         private Supplier<Integer> randomIntFn;
 
@@ -75,6 +80,11 @@ public final class Conditions {
      * True if the player's current room is ROOM.
      */
     public static class InRoom implements Condition {
+
+        public static InRoom of(Room room) {
+            return new InRoom(room);
+        }
+
         private final Room room;
 
         public InRoom(Room room) {
@@ -91,6 +101,10 @@ public final class Conditions {
      * True if the player is carrying ITEM in their inventory.
      */
     public static class ItemCarried implements Condition {
+
+        public static ItemCarried of(Item item) {
+            return new ItemCarried(item);
+        }
 
         private final Item item;
 
@@ -109,6 +123,10 @@ public final class Conditions {
      */
     public static class ItemHere implements Condition {
 
+        public static ItemHere of(Item item) {
+            return new ItemHere(item);
+        }
+
         private final Item item;
 
         public ItemHere(Item item) {
@@ -126,6 +144,11 @@ public final class Conditions {
      * or is in the player's current room.
      */
     public static class IsPresent implements Condition {
+
+        public static IsPresent of(Item item) {
+            return new IsPresent(item);
+        }
+
         private Condition isItemCarried;
         private Condition isItemHere;
 
@@ -144,6 +167,11 @@ public final class Conditions {
      * Returns the inverse of the wrapped condition.
      */
     public static class Not implements Condition {
+
+        public static Not of(Condition operand) {
+            return new Not(operand);
+        }
+
         private final Condition operand;
 
         public Not(Condition operand) {

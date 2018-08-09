@@ -16,10 +16,12 @@ public final class Nouns {
         return new LinkedHashSet<>(Arrays.asList(NORTH, SOUTH, UP, DOWN, EAST, WEST));
     }
 
-    public static final Noun NORTH = new Noun("North");
-    public static final Noun SOUTH = new Noun("South");
-    public static final Noun UP = new Noun("Up");
-    public static final Noun DOWN = new Noun("Down");
-    public static final Noun EAST = new Noun("East");
-    public static final Noun WEST = new Noun("West");
+    public static final Noun NORTH = new Noun("North", "N");
+    public static final Noun SOUTH = new Noun("South", "S");
+    public static final Noun UP = new Noun("Up", "U");
+    public static final Noun DOWN = new Noun("Down", "D");
+    public static final Noun EAST = new Noun("East", "E");
+    public static final Noun WEST = new Noun("West", "W");
+
+    public static final Noun DOOR = new Noun("Door");
 }

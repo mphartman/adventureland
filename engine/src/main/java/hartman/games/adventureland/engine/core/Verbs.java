@@ -10,8 +10,15 @@ public final class Verbs {
 
     public static final Verb QUIT = new Verb("QUIT", "Q");
 
+    public static final Verb INVENTORY = new Verb("INVENTORY", "I");
+
     public static final Verb LOOK = new Verb("LOOK", "L");
 
     public static final Verb GO = new Verb("GO", "G", "ENTER", "WALK", "RUN" );
 
+    public static final Verb OPEN = new Verb("OPEN", "UNLOCK");
+
+    public static final Verb GET = new Verb("GET", "PICKUP", "GRAB");
+
+    public static final Verb DROP = new Verb("DROP", "DISCARD");
 }

@@ -1,7 +1,5 @@
 package hartman.games.adventureland.engine;
 
-import hartman.games.adventureland.engine.core.Results;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -51,6 +49,10 @@ public class GameState {
         running = false;
     }
 
+    public void get(Noun noun) {
+        items.stream().filter(i -> i.asNoun().equals(noun)).findFirst().ifPresent(Item::stow);
+    }
+
     public void setFlag(String key, Object value) {
         flags.put(key, value);
     }
@@ -65,5 +67,20 @@ public class GameState {
     public void describe(GameElementVisitor visitor) {
         currentRoom.accept(visitor);
         items.stream().filter(item -> item.isHere(currentRoom)).forEach(item -> item.accept(visitor));
+    }
+
+    /**
+     * Visits only those items currently held in player's inventory.
+     */
+    public void inventory(GameElementVisitor visitor) {
+        items.stream().filter(Item::isCarried).forEach(item -> item.accept(visitor));
+    }
+
+    public void drop(Noun noun) {
+        items.stream()
+                .filter(Item::isCarried)
+                .filter(item -> item.asNoun().equals(noun))
+                .findFirst()
+                .ifPresent(item -> item.drop(currentRoom));
     }
 }

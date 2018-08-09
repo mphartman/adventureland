@@ -61,7 +61,7 @@ public class Item implements GameElement {
     }
 
     public boolean isCarried() {
-        return currentRoom.equals(INVENTORY);
+        return isHere(INVENTORY);
     }
 
     public boolean isHere(Room room) {
@@ -94,6 +94,17 @@ public class Item implements GameElement {
     @Override
     public void accept(GameElementVisitor visitor) {
         visitor.visit(this);
+    }
+
+    @Override
+    public String toString() {
+        return "Item{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", portable=" + portable +
+                ", startingRoom=" + startingRoom +
+                ", currentRoom=" + currentRoom +
+                '}';
     }
 
     @Override

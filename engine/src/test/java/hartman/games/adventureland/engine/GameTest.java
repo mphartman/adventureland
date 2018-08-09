@@ -30,7 +30,7 @@ public class GameTest {
         chamber.setExit(Nouns.DOWN, dungeon);
         dungeon.setExit(Nouns.UP, chamber);
 
-        Action goAction = new Action(Verbs.GO, Noun.ANY, setOf(Conditions.HasExit), setOf(Results.Goto));
+        Action goAction = new Action(Verbs.GO, Noun.ANY, setOf(Conditions.HasExit), setOf(Results.Go));
         Set<Action> actions = new LinkedHashSet<>(asList(Actions.QuitAction, goAction));
 
         Adventure adventure = new Adventure(vocabulary, Collections.emptySet(), actions, Collections.emptySet(), chamber);
