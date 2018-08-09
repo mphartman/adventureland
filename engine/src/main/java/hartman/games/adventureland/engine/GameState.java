@@ -8,7 +8,7 @@ import java.util.Set;
 
 /**
  * The state of the game world which consists of the player's current position
- * and a set of flags which the adventure's actions may set and interpret.
+ * and a toSet of flags which the adventure's actions may toSet and interpret.
  */
 public class GameState {
     private final Map<String, Object> flags = new HashMap<>();

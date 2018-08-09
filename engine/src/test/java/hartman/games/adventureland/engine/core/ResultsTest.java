@@ -1,18 +1,20 @@
 package hartman.games.adventureland.engine.core;
 
-import hartman.games.adventureland.engine.Item;
-import org.junit.Test;
-
-import hartman.games.adventureland.engine.GameState;
+import hartman.games.adventureland.engine.Action;
 import hartman.games.adventureland.engine.Command;
+import hartman.games.adventureland.engine.GameState;
+import hartman.games.adventureland.engine.Item;
 import hartman.games.adventureland.engine.Room;
+import org.junit.Test;
 
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class ResultsTest {
     
@@ -60,7 +62,7 @@ public class ResultsTest {
         AtomicReference<Room> roomRef = new AtomicReference<>();
         AtomicReference<List<Room.Exit>> exitsRef = new AtomicReference<>();
         AtomicReference<List<Item>> itemsRef = new AtomicReference<>();
-        Results.Look look = Results.Look.of(((room, exits, roomItems) -> {
+        Action.Result look = Results.look(((room, exits, roomItems) -> {
             roomRef.set(room);
             exitsRef.set(exits);
             itemsRef.set(roomItems);
@@ -81,7 +83,7 @@ public class ResultsTest {
     @Test
     public void printShouldPrintToDisplayGivenAString() {
         StringBuilder display = new StringBuilder();
-        Results.Print.of("Fly, you fools!").execute(Command.NONE, null, display::append);
+        Results.print("Fly, you fools!").execute(Command.NONE, null, display::append);
         assertEquals("Fly, you fools!", display.toString());
     }
 
@@ -112,7 +114,7 @@ public class ResultsTest {
         GameState gameState = new GameState(house, items);
 
         AtomicReference<List<Item>> itemsRef = new AtomicReference<>();
-        Results.Inventory inventory = Results.Inventory.of(((roomItems) -> {
+        Results.Inventory inventory = Results.inventory(((roomItems) -> {
             itemsRef.set(roomItems);
             return "okie dokie";
         }));

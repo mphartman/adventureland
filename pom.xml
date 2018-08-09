@@ -10,6 +10,7 @@
 
     <modules>
         <module>engine</module>
+		<module>adventures</module>
         <module>app-cli</module>
     </modules>    
 

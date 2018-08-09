@@ -30,8 +30,9 @@ public class GameTest {
         chamber.setExit(Nouns.DOWN, dungeon);
         dungeon.setExit(Nouns.UP, chamber);
 
-        Action goAction = new Action(Verbs.GO, Noun.ANY, setOf(Conditions.HasExit), setOf(Results.Go));
-        Set<Action> actions = new LinkedHashSet<>(asList(Actions.QuitAction, goAction));
+        Action goAction = new Action(Verbs.GO, Noun.ANY, setOf(Conditions.hasExit), setOf(Results.Go));
+        Action quitAction = new Action(Verbs.QUIT, Results.Quit);
+        Set<Action> actions = new LinkedHashSet<>(asList(quitAction, goAction));
 
         Adventure adventure = new Adventure(vocabulary, Collections.emptySet(), actions, Collections.emptySet(), chamber);
 
@@ -61,7 +62,8 @@ public class GameTest {
         Action action1 = new Action(Verbs.GO, Noun.ANY, setOf((command, gameState) -> { gameState.setFlag("action1", "called"); return false; } ), setOf(noOpResult));
         Action action2 = new Action(Verbs.GO, Noun.ANY, setOf((command, gameState) -> { gameState.setFlag("action2", "called"); return true; }), setOf(noOpResult));
         Action action3 = new Action(Verbs.GO, Noun.ANY, setOf((command, gameState) -> { gameState.setFlag("action3", "called"); return true; }), setOf(noOpResult));
-        Set<Action> actions = new LinkedHashSet<>(asList(action1, action2, action3, Actions.QuitAction));
+        Action quitAction = new Action(Verbs.QUIT, Results.Quit);
+        Set<Action> actions = new LinkedHashSet<>(asList(action1, action2, action3, quitAction));
 
         Adventure adventure = new Adventure(vocabulary, Collections.emptySet(), actions, Collections.emptySet(), Room.NOWHERE);
 

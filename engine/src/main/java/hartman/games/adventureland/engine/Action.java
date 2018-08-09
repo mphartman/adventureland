@@ -11,22 +11,47 @@ public class Action {
 
     public static class Builder {
 
-        public static Builder newBuilder() {
-            return new Builder();
-        }
-
         private Verb verb = Verb.NONE;
         private Noun noun = Noun.NONE;
         private Set<Result> results = new LinkedHashSet<>();
         private Set<Condition> conditions = new LinkedHashSet<>();
 
-        public Builder verb(Verb verb) {
+        public Builder on(Verb verb) {
             this.verb = verb;
             return this;
         }
 
-        public Builder noun(Noun noun) {
+        public Builder onUnrecognizedVerb() {
+            this.verb = Verb.UNRECOGNIZED;
+            return this;
+        }
+
+        public Builder onAnyVerb() {
+            this.verb = Verb.ANY;
+            return this;
+        }
+
+        public Builder withNoNoun() {
+            this.noun = Noun.NONE;
+            return this;
+        }
+
+        public Builder with(Noun noun) {
             this.noun = noun;
+            return this;
+        }
+
+        public Builder with(Item item) {
+            return with(item.asNoun());
+        }
+
+        public Builder withUnrecognizedNoun() {
+            this.noun = Noun.UNRECOGNIZED;
+            return this;
+        }
+
+        public Builder withAnyNoun() {
+            this.noun = Noun.ANY;
             return this;
         }
 

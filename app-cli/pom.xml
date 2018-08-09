@@ -8,7 +8,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>adventureland-app</name>
+	<name>adventureland-app-cli</name>
 	<description>An Adventureland-like game with text-based interface</description>
 
 	<parent>
@@ -34,6 +34,11 @@
             <artifactId>adventureland-engine</artifactId>
             <version>${project.version}</version>
         </dependency>
+		<dependency>
+			<groupId>hartman.games</groupId>
+			<artifactId>adventureland-adventures</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>

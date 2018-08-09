@@ -21,11 +21,31 @@ public final class Results {
 
     public static final Result Go = (command, gameState, display) -> gameState.exitTowards(command.getNoun());
 
-    public static class Look implements Result {
+    public static Result look(Look.LookCallback callback) {
+        return new Look(callback);
+    }
 
-        public static Look of(LookCallback callback) {
-            return new Look(callback);
-        }
+    public static Result print(String message) {
+        return new Print(message);
+    }
+
+    public static Result printf(String message, Object... args) {
+        return new Print(String.format(message, args));
+    }
+
+    public static Inventory inventory(Inventory.InventoryCallback callback) {
+        return new Inventory(callback);
+    }
+
+    public static Swap swap(Item item1, Item item2) {
+        return new Swap(item1, item2);
+    }
+
+    public static Goto gotoRoom(Room room) {
+        return new Goto(room);
+    }
+
+    public static class Look implements Result {
 
         @FunctionalInterface
         public interface LookCallback {
@@ -72,10 +92,6 @@ public final class Results {
 
     public static class Print implements Result {
 
-        public static Print of(String message) {
-            return new Print(message);
-        }
-
         private final String message;
 
         public Print(String message) {
@@ -91,10 +107,6 @@ public final class Results {
     public static final Result Get = ((command, gameState, display) -> gameState.get(command.getNoun()));
 
     public static class Inventory implements Result {
-
-        public static Inventory of(InventoryCallback callback) {
-            return new Inventory(callback);
-        }
 
         @FunctionalInterface
         public interface InventoryCallback {
@@ -134,10 +146,6 @@ public final class Results {
 
     public static class Swap implements Result {
 
-        public static Swap of(Item item1, Item item2) {
-            return new Swap(item1, item2);
-        }
-
         private final Item item1;
         private final Item item2;
 
@@ -153,10 +161,6 @@ public final class Results {
     }
 
     public static class Goto implements Result {
-
-        public static Goto of(Room room) {
-            return new Goto(room);
-        }
 
         private final Room room;
 

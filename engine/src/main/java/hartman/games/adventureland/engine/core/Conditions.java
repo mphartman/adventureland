@@ -13,10 +13,43 @@ public final class Conditions {
         throw new IllegalStateException();
     }
 
+    public static Condition times(int times) {
+        return new Times(times);
+    }
+
+    public static Condition random(Integer probability) {
+        return new Random(probability);
+    }
+
+    public static Condition isInRoom(Room room) {
+        return new IsInRoom(room);
+    }
+
+    public static Condition isItemCarried(Item item) {
+        return new IsItemCarried(item);
+    }
+
+    public static Condition isItemHere(Item item) {
+        return new IsItemHere(item);
+    }
+
+    public static Condition isPresent(Item item) {
+        return new IsPresent(item);
+    }
+
+    public static Condition not(Condition operand) {
+        return new Not(operand);
+    }
+
+    public static Condition hasItemMoved(Item item) {
+        return new HasItemMoved(item);
+    }
+
     /**
      * Returns true for the given number of times.
      */
     public static class Times implements Condition {
+
         private int counter;
         private final int maxTimes;
 
@@ -38,10 +71,6 @@ public final class Conditions {
      * E.g. given a probability of 10, this condition should evaluate to true, 10% of the time.
      */
     public static class Random implements Condition {
-
-        public static Random of(Integer probability) {
-            return new Random(probability);
-        }
 
         private Integer probability;
         private Supplier<Integer> randomIntFn;
@@ -74,20 +103,16 @@ public final class Conditions {
      * True if player's requested noun represents a valid direction and that the current room
      * she is in has an exit matching that direction.
      */
-    public static final Condition HasExit = (command, gameState) -> gameState.getCurrentRoom().hasExit(command.getNoun());
+    public static final Condition hasExit = (command, gameState) -> gameState.getCurrentRoom().hasExit(command.getNoun());
 
     /**
      * True if the player's current room is ROOM.
      */
-    public static class InRoom implements Condition {
-
-        public static InRoom of(Room room) {
-            return new InRoom(room);
-        }
+    public static class IsInRoom implements Condition {
 
         private final Room room;
 
-        public InRoom(Room room) {
+        public IsInRoom(Room room) {
             this.room = room;
         }
 
@@ -100,15 +125,11 @@ public final class Conditions {
     /**
      * True if the player is carrying ITEM in their inventory.
      */
-    public static class ItemCarried implements Condition {
-
-        public static ItemCarried of(Item item) {
-            return new ItemCarried(item);
-        }
+    public static class IsItemCarried implements Condition {
 
         private final Item item;
 
-        public ItemCarried(Item item) {
+        public IsItemCarried(Item item) {
             this.item = item;
         }
 
@@ -121,15 +142,11 @@ public final class Conditions {
     /**
      * True if ITEM is in the player's current room.
      */
-    public static class ItemHere implements Condition {
-
-        public static ItemHere of(Item item) {
-            return new ItemHere(item);
-        }
+    public static class IsItemHere implements Condition {
 
         private final Item item;
 
-        public ItemHere(Item item) {
+        public IsItemHere(Item item) {
             this.item = item;
         }
 
@@ -145,16 +162,12 @@ public final class Conditions {
      */
     public static class IsPresent implements Condition {
 
-        public static IsPresent of(Item item) {
-            return new IsPresent(item);
-        }
-
         private Condition isItemCarried;
         private Condition isItemHere;
 
         public IsPresent(Item item) {
-            isItemCarried = new ItemCarried(item);
-            isItemHere = new ItemHere(item);
+            isItemCarried = new IsItemCarried(item);
+            isItemHere = new IsItemHere(item);
         }
 
         @Override
@@ -167,10 +180,6 @@ public final class Conditions {
      * Returns the inverse of the wrapped condition.
      */
     public static class Not implements Condition {
-
-        public static Not of(Condition operand) {
-            return new Not(operand);
-        }
 
         private final Condition operand;
 
@@ -187,10 +196,10 @@ public final class Conditions {
     /**
      * True if ITEM has moved from its original starting location.
      */
-    public static class ItemMoved implements Condition {
+    public static class HasItemMoved implements Condition {
         private final Item item;
 
-        public ItemMoved(Item item) {
+        public HasItemMoved(Item item) {
             this.item = item;
         }
 
