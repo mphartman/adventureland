@@ -4,6 +4,7 @@ import hartman.games.adventureland.engine.Action.Condition;
 import hartman.games.adventureland.engine.Command;
 import hartman.games.adventureland.engine.GameState;
 import hartman.games.adventureland.engine.Item;
+import hartman.games.adventureland.engine.Noun;
 import hartman.games.adventureland.engine.Room;
 
 import java.util.function.Supplier;
@@ -15,6 +16,8 @@ public final class Conditions {
      * she is in has an exit matching that direction.
      */
     public static final Condition currentRoomHasExit = (command, gameState) -> gameState.getCurrentRoom().hasExit(command.getNoun());
+
+    public static final Condition currentRoomHasExitByVerb = (command, gameState) -> gameState.getCurrentRoom().hasExit(new Noun(command.getVerb().getName()));
 
     public static Condition isInRoom(Room room) {
         return new IsInRoom(room);

@@ -2,15 +2,7 @@ package hartman.games.adventureland.engine.core;
 
 import hartman.games.adventureland.engine.Noun;
 
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 public final class Nouns {
-
-    public static Set<Noun> directions() {
-        return new LinkedHashSet<>(Arrays.asList(NORTH, SOUTH, UP, DOWN, EAST, WEST));
-    }
 
     public static final Noun NORTH = new Noun("North", "N");
 
@@ -24,5 +16,4 @@ public final class Nouns {
 
     public static final Noun WEST = new Noun("West", "W");
 
-    public static final Noun DOOR = new Noun("Door");
 }

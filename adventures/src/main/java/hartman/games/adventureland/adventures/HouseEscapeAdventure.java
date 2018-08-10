@@ -3,20 +3,23 @@ package hartman.games.adventureland.adventures;
 import hartman.games.adventureland.engine.Action;
 import hartman.games.adventureland.engine.Adventure;
 import hartman.games.adventureland.engine.Item;
+import hartman.games.adventureland.engine.Noun;
 import hartman.games.adventureland.engine.Room;
 import hartman.games.adventureland.engine.Verb;
 import hartman.games.adventureland.engine.Vocabulary;
 import hartman.games.adventureland.engine.core.Actions;
 import hartman.games.adventureland.engine.core.Items;
-import hartman.games.adventureland.engine.core.Nouns;
 import hartman.games.adventureland.engine.core.Results;
 
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static hartman.games.adventureland.engine.core.Actions.newActionSet;
 import static hartman.games.adventureland.engine.core.Conditions.currentRoomHasExit;
+import static hartman.games.adventureland.engine.core.Conditions.currentRoomHasExitByVerb;
 import static hartman.games.adventureland.engine.core.Conditions.isInRoom;
 import static hartman.games.adventureland.engine.core.Conditions.isItemCarried;
 import static hartman.games.adventureland.engine.core.Conditions.isItemHere;
@@ -24,7 +27,6 @@ import static hartman.games.adventureland.engine.core.Conditions.isPresent;
 import static hartman.games.adventureland.engine.core.Conditions.not;
 import static hartman.games.adventureland.engine.core.Conditions.random;
 import static hartman.games.adventureland.engine.core.Conditions.times;
-import static hartman.games.adventureland.engine.core.Nouns.DOOR;
 import static hartman.games.adventureland.engine.core.Nouns.DOWN;
 import static hartman.games.adventureland.engine.core.Nouns.EAST;
 import static hartman.games.adventureland.engine.core.Nouns.NORTH;
@@ -34,6 +36,7 @@ import static hartman.games.adventureland.engine.core.Nouns.WEST;
 import static hartman.games.adventureland.engine.core.Results.drop;
 import static hartman.games.adventureland.engine.core.Results.get;
 import static hartman.games.adventureland.engine.core.Results.go;
+import static hartman.games.adventureland.engine.core.Results.goUsingVerb;
 import static hartman.games.adventureland.engine.core.Results.gotoRoom;
 import static hartman.games.adventureland.engine.core.Results.printf;
 import static hartman.games.adventureland.engine.core.Results.println;
@@ -43,6 +46,12 @@ import static hartman.games.adventureland.engine.core.Results.swap;
 import static hartman.games.adventureland.engine.core.Verbs.DROP;
 import static hartman.games.adventureland.engine.core.Verbs.GET;
 import static hartman.games.adventureland.engine.core.Verbs.GO;
+import static hartman.games.adventureland.engine.core.Verbs.GO_DOWN;
+import static hartman.games.adventureland.engine.core.Verbs.GO_EAST;
+import static hartman.games.adventureland.engine.core.Verbs.GO_NORTH;
+import static hartman.games.adventureland.engine.core.Verbs.GO_SOUTH;
+import static hartman.games.adventureland.engine.core.Verbs.GO_UP;
+import static hartman.games.adventureland.engine.core.Verbs.GO_WEST;
 import static hartman.games.adventureland.engine.core.Verbs.HELP;
 import static hartman.games.adventureland.engine.core.Verbs.INVENTORY;
 import static hartman.games.adventureland.engine.core.Verbs.LOOK;
@@ -62,6 +71,11 @@ public class HouseEscapeAdventure {
 
         Verb kill = new Verb("KILL", "SWAT", "HIT");
         Verb yell = new Verb("YELL", "SHOUT", "SCREAM");
+        Noun DOOR = new Noun("Door");
+
+        Set<Noun> directionNouns = new LinkedHashSet<>(Arrays.asList(NORTH, SOUTH, UP, DOWN, EAST, WEST));
+        Set<Verb> directionVerbs = new LinkedHashSet<>(Arrays.asList(GO_NORTH, GO_SOUTH, GO_UP, GO_DOWN, GO_EAST, GO_WEST));
+        Vocabulary movement = new Vocabulary(directionVerbs, directionNouns);
 
         /*
          *  ROOMS
@@ -106,7 +120,7 @@ public class HouseEscapeAdventure {
 
         Actions.ActionSet occurs = newActionSet();
         occurs.newAction().when(times(1)).then(look).build();
-        occurs.newAction().when(isInRoom(kitchen)).and(not(isItemHere(fly))).and(random(60)).then(put(fly, kitchen)).then(printf("%nA fly buzzes past my ear!%n")).build();
+        occurs.newAction().when(isInRoom(kitchen)).and(not(isItemHere(fly))).and(random(60)).then(put(fly, kitchen)).andThen(printf("%nA fly buzzes past my ear!%n")).build();
         occurs.newAction().when(not(isInRoom(outside))).then(printf("%nWhat should I do? ")).build();
         occurs.newAction().when(isInRoom(outside)).then(printf("%n*** Congratulations, you've escaped! ***")).andThen(quit).build();
 
@@ -132,17 +146,26 @@ public class HouseEscapeAdventure {
         adventureActions.newAction().on(GET).with(redPanda).when(isItemHere(redPanda)).then(get).andThen(println("%nOkay. I picked up the toy. It's a bit smelly but it's soft and I feel better carrying it.")).andThen(inventory).build();
         adventureActions.newAction().on(DROP).with(redPanda).when(isItemCarried(redPanda)).then(drop).andThen(look).build();
 
-        // Standard game actions
+        // *** Standard game actions ***
 
         Actions.ActionSet standardActions = newActionSet();
+
+        // movement
+        Action.Condition isDirectionVerb = (command, gameState) -> directionVerbs.contains(command.getVerb());
+        Action.Builder moveByVerb = standardActions.newAction().onAnyVerb().withNoNoun();
+        moveByVerb.when(isDirectionVerb).and(currentRoomHasExitByVerb).then(goUsingVerb).andThen(look).build();
+        moveByVerb.when(isDirectionVerb).and(not(currentRoomHasExitByVerb)).then(println("That's not an exit from here. Try one of the obvious exits.")).build();
         standardActions.newAction().on(GO).withNoNoun().then(println("{verb} where?")).build();
         standardActions.newAction().on(GO).withUnrecognizedNoun().then(println("I can't go that direction. Try one of the obvious exits.")).build();
         standardActions.newAction().on(GO).withAnyNoun().when(currentRoomHasExit).then(go).andThen(look).build();
         standardActions.newAction().on(GO).withAnyNoun().then(println("That's not an exit from here. Try one of the obvious exits.")).build();
+
         standardActions.newAction().on(LOOK).withAnyNoun().then(look).build();
         standardActions.newAction().on(INVENTORY).withAnyNoun().then(inventory).build();
         standardActions.newAction().on(QUIT).then(quit).build();
         standardActions.newAction().on(HELP).then(println("A voice BOOOMS out:\nTry --> \"GO, LOOK, JUMP, SWIM, CLIMB, TAKE, DROP\"\nand any other verbs you can think of...")).build();
+
+        // unrecognized input
         standardActions.newAction().onUnrecognizedVerb().then(println("Sorry, I don't know how to do that.")).build();
         standardActions.newAction().onUnrecognizedVerb().withUnrecognizedNoun().then(println("Sorry, I don't know how to do that with that thing.")).build();
         standardActions.newAction().onUnrecognizedVerb().withAnyNoun().then(println("Sorry, I don't know how to that with a {noun}.")).build();
@@ -155,7 +178,7 @@ public class HouseEscapeAdventure {
         /*
          * Build a vocabulary based off the verbs and nouns used in the Actions.
          */
-        Vocabulary vocabulary = Vocabulary.merge(fullActionSet.buildVocabulary(), new Vocabulary(Collections.emptySet(), Nouns.directions()));
+        Vocabulary vocabulary = Vocabulary.merge(fullActionSet.buildVocabulary(), movement);
 
         return new Adventure(vocabulary, occurs.copyOfActions(), fullActionSet.copyOfActions(), itemSet.copyOfItems(), hallway);
     }

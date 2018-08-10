@@ -6,6 +6,7 @@ import hartman.games.adventureland.engine.Display;
 import hartman.games.adventureland.engine.GameElementVisitor;
 import hartman.games.adventureland.engine.GameState;
 import hartman.games.adventureland.engine.Item;
+import hartman.games.adventureland.engine.Noun;
 import hartman.games.adventureland.engine.Room;
 
 import java.util.ArrayList;
@@ -17,6 +18,8 @@ public final class Results {
     public static final Result quit = (command, gameState, display) -> gameState.quit();
 
     public static final Result go = (command, gameState, display) -> gameState.exitTowards(command.getNoun());
+
+    public static final Result goUsingVerb = (command, gameState, display) -> gameState.exitTowards(new Noun(command.getVerb().getName()));
 
     public static Result look(Look.LookCallback callback) {
         return new Look(callback);

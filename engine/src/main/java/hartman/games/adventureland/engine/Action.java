@@ -1,6 +1,5 @@
 package hartman.games.adventureland.engine;
 
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -56,6 +55,7 @@ public class Action {
         }
 
         public Builder when(Condition condition) {
+            this.conditions.clear();
             this.conditions.add(condition);
             return this;
         }
@@ -66,6 +66,7 @@ public class Action {
         }
 
         public Builder then(Result result) {
+            this.results.clear();
             this.results.add(result);
             return this;
         }
