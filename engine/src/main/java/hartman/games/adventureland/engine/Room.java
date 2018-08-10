@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Rooms make up a connected network of nodes between which the player may move.
@@ -18,16 +17,14 @@ public class Room implements GameElement {
     public static final Room NOWHERE = new Room("nowhere", "I am no where.  It's dark and I am alone.");
 
     public static class Exit implements GameElement {
-        private Noun direction;
-        private Room room;
+        private final Noun direction;
+        private final Room room;
 
         public Exit(Noun direction, Room room) {
+            Objects.requireNonNull(direction, "Exit must have a direction.");
+            Objects.requireNonNull(room, "Exit must have a target room.");
             this.direction = direction;
             this.room = room;
-        }
-
-        public Exit(Noun direction) {
-            this(direction, null);
         }
 
         public Noun getDirection() {
@@ -51,41 +48,15 @@ public class Room implements GameElement {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
+
             Exit exit = (Exit) o;
-            return Objects.equals(direction, exit.direction);
+
+            return direction.equals(exit.direction);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(direction);
-        }
-
-        public static class Builder {
-            private Noun direction;
-            private Room room;
-
-            public Builder exit(Noun direction) {
-                this.direction = direction;
-                return this;
-            }
-
-            public Builder towards(Room room) {
-                this.room = room;
-                return this;
-            }
-
-            public Builder towardsSelf() {
-                this.room = null;
-                return this;
-            }
-
-            public Exit build() {
-                if (room == null) {
-                    return new Exit(direction);
-                } else {
-                    return new Exit(direction, room);
-                }
-            }
+            return direction.hashCode();
         }
     }
 
@@ -94,23 +65,20 @@ public class Room implements GameElement {
     private final Set<Exit> exits = new LinkedHashSet<>();
 
     /**
-     * Creates a new empty room with no exits.
-     */
-    public Room(String name, String description) {
-        this.name = name;
-        this.description = description;
-    }
-
-    /**
      * Creates a new empty room with the given exits.
      */
     public Room(String name, String description, Exit... exits) {
+        Objects.requireNonNull(name, "Room must have a name.");
         this.name = name;
         this.description = description;
-        // exits to NULL are replaced with exits back to this room.
-        this.exits.addAll(Arrays.stream(exits)
-                .map(x -> x.getRoom() == null ? new Exit(x.getDirection(), this) : x)
-                .collect(Collectors.toSet()));
+        this.exits.addAll(Arrays.asList(exits));
+    }
+
+    /**
+     * Creates a new empty room with no exits.
+     */
+    public Room(String name, String description) {
+        this(name, description, new Exit[0]);
     }
 
     public String getName() {
@@ -170,12 +138,14 @@ public class Room implements GameElement {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+
         Room room = (Room) o;
-        return Objects.equals(name, room.name);
+
+        return name.equals(room.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return name.hashCode();
     }
 }

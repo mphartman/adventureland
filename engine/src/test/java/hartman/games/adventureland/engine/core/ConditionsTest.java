@@ -17,6 +17,7 @@ import static hartman.games.adventureland.engine.core.Conditions.IsPresent;
 import static hartman.games.adventureland.engine.core.Conditions.Not;
 import static hartman.games.adventureland.engine.core.Conditions.Random;
 import static hartman.games.adventureland.engine.core.Conditions.currentRoomHasExit;
+import static hartman.games.adventureland.engine.core.Nouns.DOWN;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -27,7 +28,7 @@ public class ConditionsTest {
     public void hasExitShouldReturnFalseWhenRoomHasNoExits() {
         Room start = new Room("start", "start");
         GameState gameState = new GameState(start);
-        Command command = new Command(Verbs.GO, Nouns.DOWN);
+        Command command = new Command(Verbs.GO, DOWN);
         assertFalse(currentRoomHasExit.matches(command, gameState));
         command = new Command(Verbs.GO, Nouns.UP);
         assertFalse(currentRoomHasExit.matches(command, gameState));
@@ -36,9 +37,10 @@ public class ConditionsTest {
     @Test
     public void hasExitShouldReturnTrueWhenRoomHasRequestedExit() {
         Room end = new Room("end", "end");
-        Room start = new Room("start", "start", new Room.Exit.Builder().exit(Nouns.DOWN).towards(end).build());
+        Room start = new Room("start", "start");
+        start.setExit(DOWN, end);
         GameState gameState = new GameState(start);
-        Command command = new Command(Verbs.GO, Nouns.DOWN);
+        Command command = new Command(Verbs.GO, DOWN);
         assertTrue(currentRoomHasExit.matches(command, gameState));
         command = new Command(Verbs.GO, Nouns.UP);
         assertFalse(currentRoomHasExit.matches(command, gameState));

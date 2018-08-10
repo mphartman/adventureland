@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static hartman.games.adventureland.engine.core.Nouns.UP;
 import static hartman.games.adventureland.engine.core.Results.drop;
 import static hartman.games.adventureland.engine.core.Results.get;
 import static hartman.games.adventureland.engine.core.Results.go;
@@ -42,9 +43,10 @@ public class ResultsTest {
     @Test
     public void goShouldMovePlayerInDirectionOfGivenNoun() {
         Room tower_second_floor = new Room("tower_second_floor", "Second story room of the tower.");
-        Room tower_first_floor = new Room("tower_first_floor", "The first floor of a tall stone tower.", new Room.Exit.Builder().exit(Nouns.UP).towards(tower_second_floor).build());
+        Room tower_first_floor = new Room("tower_first_floor", "The first floor of a tall stone tower.");
+        tower_first_floor.setExit(UP, tower_second_floor);
         GameState gameState = new GameState(tower_first_floor);
-        Command command = new Command(Verbs.GO, Nouns.UP);
+        Command command = new Command(Verbs.GO, UP);
 
         go.execute(command, gameState, msg -> {});
 
@@ -55,7 +57,7 @@ public class ResultsTest {
     public void goShouldThrowExceptionIfDirectionIsNotValidExitFromCurrentRoom() {
         Room sealed_tomb = new Room("sealed_tomb", "There is no escape.");
         GameState gameState = new GameState(sealed_tomb);
-        Command command = new Command(Verbs.GO, Nouns.UP);
+        Command command = new Command(Verbs.GO, UP);
 
         go.execute(command, gameState, msg -> {});
     }
@@ -64,7 +66,7 @@ public class ResultsTest {
     public void lookShouldCollectCurrentRoomExitsAndItems() {
         Room house = new Room("house", "A little white house.");
         Room garage = new Room("garage", "A two stall, attached garage.");
-        garage.setExit(Nouns.UP, house);
+        garage.setExit(UP, house);
 
         Items.ItemSet itemSet = Items.newItemSet();
         Item car = itemSet.newItem().named("car").describedAs("A BMW 325XI sedan.").in(garage).build();
@@ -89,7 +91,7 @@ public class ResultsTest {
         assertEquals(1, itemsRef.get().size());
         assertEquals(car, itemsRef.get().get(0));
         assertEquals(1, exitsRef.get().size());
-        assertEquals(new Room.Exit(Nouns.UP, house), exitsRef.get().get(0));
+        assertEquals(new Room.Exit(UP, house), exitsRef.get().get(0));
     }
 
     @Test
