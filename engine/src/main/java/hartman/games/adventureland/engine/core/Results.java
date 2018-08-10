@@ -112,7 +112,9 @@ public final class Results {
 
         @Override
         public void execute(Command command, GameState gameState, Display display) {
-            display.print(message);
+            String output = message.replaceAll("\\Q{noun}\\E", command.getNoun().getName());
+            output = output.replaceAll("\\Q{verb}\\E", command.getVerb().getName());
+            display.print(output);
         }
     }
 

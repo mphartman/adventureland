@@ -5,7 +5,9 @@ import hartman.games.adventureland.engine.Command;
 import hartman.games.adventureland.engine.Display;
 import hartman.games.adventureland.engine.GameState;
 import hartman.games.adventureland.engine.Item;
+import hartman.games.adventureland.engine.Noun;
 import hartman.games.adventureland.engine.Room;
+import hartman.games.adventureland.engine.Verb;
 import org.junit.Test;
 
 import java.util.LinkedHashSet;
@@ -95,6 +97,19 @@ public class ResultsTest {
         StringBuilder display = new StringBuilder();
         print("Fly, you fools!").execute(Command.NONE, null, display::append);
         assertEquals("Fly, you fools!", display.toString());
+    }
+
+    @Test
+    public void printShouldValuesWhenGivenTemplateMessage() {
+        StringBuilder buf = new StringBuilder();
+
+        print("This is the noun \"{noun}\"").execute(new Command(Verb.NONE, new Noun("pop")), new GameState(Room.NOWHERE), buf::append);
+        assertEquals("This is the noun \"pop\"", buf.toString());
+
+        buf.setLength(0); // clears it
+
+        print("I don't know how to \"{verb}\"").execute(new Command(new Verb("Dance"), Noun.NONE), new GameState(Room.NOWHERE), buf::append);
+        assertEquals("I don't know how to \"Dance\"", buf.toString());
     }
 
     @Test
