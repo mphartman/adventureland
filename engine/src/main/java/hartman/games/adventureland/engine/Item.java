@@ -1,6 +1,5 @@
 package hartman.games.adventureland.engine;
 
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -116,6 +115,10 @@ public class Item implements GameElement {
             return formerRoom;
         }
         throw new IllegalStateException(String.format("Item %s cannot be put into inventory. Cannot stow a non-portable item.", name));
+    }
+
+    public void putWith(Item item) {
+        drop(item.currentRoom);
     }
 
     @Override

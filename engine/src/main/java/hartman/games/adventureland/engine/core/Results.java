@@ -57,6 +57,13 @@ public final class Results {
 
     public static final Result drop = ((command, gameState, display) -> gameState.drop(command.getNoun()));
 
+    public static Result putWith(Item item1, Item item2) {
+        return new PutWith(item1, item2);
+    }
+
+    /**
+     * Provides the room, exits, and items to a callback.
+     */
     public static class Look implements Result {
 
         @FunctionalInterface
@@ -102,6 +109,9 @@ public final class Results {
         }
     }
 
+    /**
+     * Prints the specified message to the {@link Display}
+     */
     public static class Print implements Result {
 
         private final String message;
@@ -118,6 +128,9 @@ public final class Results {
         }
     }
 
+    /**
+     * Provides a callback with a list of items that the player carrying.
+     */
     public static class Inventory implements Result {
 
         @FunctionalInterface
@@ -156,6 +169,9 @@ public final class Results {
         }
     }
 
+    /**
+     * Exchanges the two specified items, so that each occupies the location previously occupied by the other.
+     */
     public static class Swap implements Result {
 
         private final Item item1;
@@ -172,6 +188,9 @@ public final class Results {
         }
     }
 
+    /**
+     * Moves to the specified room
+     */
     public static class Goto implements Result {
 
         private final Room room;
@@ -186,6 +205,9 @@ public final class Results {
         }
     }
 
+    /**
+     * Puts the specified item in the specified room.
+     */
     public static class Put implements Result {
 
         private final Room room;
@@ -199,6 +221,25 @@ public final class Results {
         @Override
         public void execute(Command command, GameState gameState, Display display) {
             item.drop(room);
+        }
+    }
+
+    /**
+     * Puts the first-specified item into the same location as the second.
+     */
+    public static class PutWith implements Result {
+
+        private final Item item1;
+        private final Item item2;
+
+        public PutWith(Item item1, Item item2) {
+            this.item1 = item1;
+            this.item2 = item2;
+        }
+
+        @Override
+        public void execute(Command command, GameState gameState, Display display) {
+            this.item1.putWith(item2);
         }
     }
 }

@@ -24,6 +24,7 @@ import static hartman.games.adventureland.engine.core.Results.inventory;
 import static hartman.games.adventureland.engine.core.Results.look;
 import static hartman.games.adventureland.engine.core.Results.print;
 import static hartman.games.adventureland.engine.core.Results.put;
+import static hartman.games.adventureland.engine.core.Results.putWith;
 import static hartman.games.adventureland.engine.core.Results.quit;
 import static hartman.games.adventureland.engine.core.Results.swap;
 import static org.junit.Assert.assertEquals;
@@ -211,4 +212,20 @@ public class ResultsTest {
         assertTrue(potato.isHere(cellar));
 
     }
+
+    @Test
+    public void putWithShouldPlaceFirstItemInSameRoomAsSecondItem() {
+        Room pants = new Room("pants", "A pair of jorts");
+        Item grenade = new Item.Builder().named("grenade").build();
+        Item phone = new Item.Builder().named("phone").in(pants).build();
+
+        assertFalse(grenade.isHere(pants));
+        assertTrue(phone.isHere(pants));
+
+        putWith(grenade, phone).execute(Command.NONE, new GameState(Room.NOWHERE), msg -> {});
+
+        assertTrue(grenade.isHere(pants));
+        assertTrue(phone.isHere(pants));
+    }
+
 }
