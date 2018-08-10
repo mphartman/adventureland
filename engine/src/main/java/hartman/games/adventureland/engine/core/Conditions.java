@@ -51,6 +51,10 @@ public final class Conditions {
         return new Times(times);
     }
 
+    public static Condition isItemInRoom(Item item, Room room) {
+        return new IsItemInRoom(item, room);
+    }
+
     /**
      * Returns true for the given number of times.
      */
@@ -206,6 +210,24 @@ public final class Conditions {
         @Override
         public boolean matches(Command command, GameState gameState) {
             return item.hasMoved();
+        }
+    }
+
+    /**
+     * True if ITEM is in the ROOM
+     */
+    public static class IsItemInRoom implements Condition {
+        private final Item item;
+        private final Room room;
+
+        public IsItemInRoom(Item item, Room room) {
+            this.item = item;
+            this.room = room;
+        }
+
+        @Override
+        public boolean matches(Command command, GameState gameState) {
+            return item.isHere(room);
         }
     }
 }

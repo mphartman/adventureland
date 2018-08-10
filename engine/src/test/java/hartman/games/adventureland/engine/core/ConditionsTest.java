@@ -9,7 +9,6 @@ import hartman.games.adventureland.engine.Room;
 import hartman.games.adventureland.engine.Verb;
 import org.junit.Test;
 
-import static hartman.games.adventureland.engine.core.Conditions.HasItemMoved;
 import static hartman.games.adventureland.engine.core.Conditions.IsInRoom;
 import static hartman.games.adventureland.engine.core.Conditions.IsItemCarried;
 import static hartman.games.adventureland.engine.core.Conditions.IsItemHere;
@@ -17,6 +16,8 @@ import static hartman.games.adventureland.engine.core.Conditions.IsPresent;
 import static hartman.games.adventureland.engine.core.Conditions.Not;
 import static hartman.games.adventureland.engine.core.Conditions.Random;
 import static hartman.games.adventureland.engine.core.Conditions.currentRoomHasExit;
+import static hartman.games.adventureland.engine.core.Conditions.hasItemMoved;
+import static hartman.games.adventureland.engine.core.Conditions.isItemInRoom;
 import static hartman.games.adventureland.engine.core.Nouns.DOWN;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -201,12 +202,11 @@ public class ConditionsTest {
         Item item = new Item.Builder().named("chalice").describedAs("A jewel-encrusted golden chalice.").portable().build();
         Command command = new Command(new Verb("PICKUP"), new Noun("chalice"));
         GameState gameState = new GameState(Room.NOWHERE);
-        Condition itemMoved = new HasItemMoved(item);
-        assertFalse(itemMoved.matches(command, gameState));
+        assertFalse(hasItemMoved(item).matches(command, gameState));
         item.stow();
-        assertTrue(itemMoved.matches(command, gameState));
+        assertTrue(hasItemMoved(item).matches(command, gameState));
         item.drop(Room.NOWHERE);
-        assertFalse(itemMoved.matches(command, gameState));
+        assertFalse(hasItemMoved(item).matches(command, gameState));
     }
 
     @Test
@@ -224,5 +224,15 @@ public class ConditionsTest {
         Condition never = new Conditions.Times(-1);
         assertFalse(never.matches(Command.NONE, gameState));
         assertFalse(never.matches(Command.NONE, gameState));
+    }
+
+    @Test
+    public void itemIsInRoomShouldReturnTrueIfItemIsInRoom() {
+        Room bus = new Room("bus", "A city bus.");
+        Item vomit = new Item.Builder().named("vomit").in(bus).build();
+        Item driver = new Item.Builder().named("driver").build();
+
+        assertTrue(isItemInRoom(vomit, bus).matches(Command.NONE, new GameState(bus)));
+        assertFalse(isItemInRoom(driver, bus).matches(Command.NONE, new GameState(bus)));
     }
 }

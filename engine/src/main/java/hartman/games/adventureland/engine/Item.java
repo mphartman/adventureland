@@ -66,6 +66,7 @@ public class Item implements GameElement {
     private Noun noun;
 
     protected Item(String name, String description, boolean portable, Room startingRoom, String... aliases) {
+        Objects.requireNonNull(name, "Item must have a name.");
         this.name = name;
         this.description = description;
         this.portable = portable;
@@ -141,13 +142,14 @@ public class Item implements GameElement {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+
         Item item = (Item) o;
-        return Objects.equals(name, item.name);
+
+        return name.equals(item.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return name.hashCode();
     }
-
 }
