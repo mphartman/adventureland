@@ -8,10 +8,6 @@ import java.util.Set;
 
 public final class Nouns {
 
-    private Nouns() {
-        throw new IllegalStateException();
-    }
-
     public static Set<Noun> directions() {
         return new LinkedHashSet<>(Arrays.asList(NORTH, SOUTH, UP, DOWN, EAST, WEST));
     }

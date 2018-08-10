@@ -13,9 +13,6 @@ import java.util.Collections;
 import java.util.List;
 
 public final class Results {
-    private Results() {
-        throw new IllegalStateException();
-    }
 
     public static final Result quit = (command, gameState, display) -> gameState.quit();
 

@@ -5,10 +5,7 @@ import hartman.games.adventureland.engine.Item;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class Items {
-    private Items() {
-        throw new IllegalStateException();
-    }
+public final class Items {
 
     public static class ItemSet {
         private final Set<Item> items = new LinkedHashSet<>();

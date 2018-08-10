@@ -10,9 +10,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public final class Actions {
-    private Actions() {
-        throw new IllegalStateException();
-    }
 
     public static class ActionSet {
 

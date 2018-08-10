@@ -9,9 +9,6 @@ import hartman.games.adventureland.engine.Room;
 import java.util.function.Supplier;
 
 public final class Conditions {
-    private Conditions() {
-        throw new IllegalStateException();
-    }
 
     /**
      * True if player's requested noun represents a valid direction and that the current room
