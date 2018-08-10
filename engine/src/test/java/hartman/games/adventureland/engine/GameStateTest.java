@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class GameStateTest {
@@ -24,6 +26,29 @@ public class GameStateTest {
 
         assertEquals(former, start);
         assertEquals(end, gameState.getCurrentRoom());
+    }
+
+    @Test
+    public void getShouldUpdateInventoryWhenItemIsPortable() {
+        Items.ItemSet itemSet = Items.newItemSet();
+        Item icecreamCone = itemSet.newItem().named("cone").build();
+
+        assertFalse(icecreamCone.isCarried());
+
+        GameState gameState = new GameState(Room.NOWHERE);
+        gameState.get(icecreamCone);
+
+        assertFalse("ice cream cone wasn't registered with gamestate", icecreamCone.isCarried());
+
+        gameState = new GameState(Room.NOWHERE, itemSet.copyOfItems());
+        gameState.get(icecreamCone);
+        assertFalse("ice cream cone isn't portable", icecreamCone.isCarried());
+
+        Item cup = itemSet.newItem().named("cup").portable().build();
+        assertFalse(cup.isCarried());
+        gameState = new GameState(Room.NOWHERE, itemSet.copyOfItems());
+        gameState.get(cup);
+        assertTrue(cup.isCarried());
     }
 
     @Test
@@ -95,11 +120,31 @@ public class GameStateTest {
 
     @Test
     public void dropShouldPlaceCarriedItemInCurrentRoom() {
-        // TODO
+        Room conferenceRoom = new Room("conferenceRoom", "A brightly lit corporate conference room");
+
+        Items.ItemSet itemSet = Items.newItemSet();
+        Item marker = itemSet.newItem().named("marker").in(conferenceRoom).portable().build();
+
+        assertFalse(marker.isCarried());
+        assertTrue(marker.isHere(conferenceRoom));
+
+        GameState gameState = new GameState(conferenceRoom, itemSet.copyOfItems());
+        gameState.drop(marker);
+        assertTrue("marker should already be here", marker.isHere(conferenceRoom));
+
+        Item wallet = itemSet.newItem().named("wallet").inInventory().build();
+        gameState = new GameState(conferenceRoom /* no items on purpose */);
+        gameState.drop(wallet);
+        assertFalse("item missing from gamestate", wallet.isHere(conferenceRoom));
+
+        gameState = new GameState(conferenceRoom, itemSet.copyOfItems());
+        gameState.drop(wallet);
+        assertTrue(wallet.isHere(conferenceRoom));
+
+        Item carrot = itemSet.newItem().named("carrot").build();
+        gameState = new GameState(conferenceRoom, itemSet.copyOfItems());
+        gameState.drop(carrot);
+        assertFalse("carrot wasn't being carried", carrot.isHere(conferenceRoom));
     }
 
-    @Test
-    public void getShouldPlaceItemInInventory() {
-        // TODO
-    }
 }

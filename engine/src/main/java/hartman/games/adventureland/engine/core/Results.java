@@ -53,7 +53,7 @@ public final class Results {
         return new Put(item, room);
     }
 
-    public static final Result get = ((command, gameState, display) -> gameState.pickup(command.getNoun()));
+    public static final Result get = ((command, gameState, display) -> gameState.get(command.getNoun()));
 
     public static final Result drop = ((command, gameState, display) -> gameState.drop(command.getNoun()));
 

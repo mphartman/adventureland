@@ -59,9 +59,21 @@ public class GameState {
 
     /**
      * Places item represented here as a Noun, in the inventory.
+     * Item only needs to exist, it does not need to be in the current room.
      */
-    public void pickup(Noun noun) {
-        items.stream().filter(i -> i.asNoun().equals(noun)).findFirst().ifPresent(Item::stow);
+    public void get(Noun noun) {
+        items.stream()
+                .filter(i -> i.asNoun().equals(noun))
+                .filter(Item::isPortable)
+                .findFirst()
+                .ifPresent(Item::stow);
+    }
+
+    /**
+     * @see #get(Noun)
+     */
+    public void get(Item item) {
+        get(item.asNoun());
     }
 
     /**
@@ -89,5 +101,12 @@ public class GameState {
                 .filter(item -> item.asNoun().equals(noun))
                 .findFirst()
                 .ifPresent(item -> item.drop(currentRoom));
+    }
+
+    /**
+     * @see #drop(Noun)
+     */
+    public void drop(Item item) {
+        drop(item.asNoun());
     }
 }
