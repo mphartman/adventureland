@@ -2,14 +2,27 @@ package hartman.games.adventureland.engine.core;
 
 import hartman.games.adventureland.engine.Action;
 import hartman.games.adventureland.engine.Command;
+import hartman.games.adventureland.engine.Display;
 import hartman.games.adventureland.engine.GameState;
 import hartman.games.adventureland.engine.Item;
 import hartman.games.adventureland.engine.Room;
 import org.junit.Test;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static hartman.games.adventureland.engine.core.Results.drop;
+import static hartman.games.adventureland.engine.core.Results.get;
+import static hartman.games.adventureland.engine.core.Results.go;
+import static hartman.games.adventureland.engine.core.Results.gotoRoom;
+import static hartman.games.adventureland.engine.core.Results.inventory;
+import static hartman.games.adventureland.engine.core.Results.look;
+import static hartman.games.adventureland.engine.core.Results.print;
+import static hartman.games.adventureland.engine.core.Results.put;
+import static hartman.games.adventureland.engine.core.Results.quit;
+import static hartman.games.adventureland.engine.core.Results.swap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -17,32 +30,32 @@ import static org.junit.Assert.assertTrue;
 public class ResultsTest {
 
     @Test
-    public void gotoRoomShouldMovePlayerInDirectionOfGivenNoun() {
+    public void quitShouldChangeGameStateRunning() {
+        GameState gameState = new GameState(Room.NOWHERE);
+        assertTrue(gameState.isRunning());
+        quit.execute(Command.NONE, gameState, msg -> {});
+        assertFalse(gameState.isRunning());
+    }
+
+    @Test
+    public void goShouldMovePlayerInDirectionOfGivenNoun() {
         Room tower_second_floor = new Room("tower_second_floor", "Second story room of the tower.");
         Room tower_first_floor = new Room("tower_first_floor", "The first floor of a tall stone tower.", new Room.Exit.Builder().exit(Nouns.UP).towards(tower_second_floor).build());
         GameState gameState = new GameState(tower_first_floor);
         Command command = new Command(Verbs.GO, Nouns.UP);
 
-        Results.go.execute(command, gameState, msg -> {});
+        go.execute(command, gameState, msg -> {});
 
         assertEquals(tower_second_floor, gameState.getCurrentRoom());
     }
 
     @Test(expected = IllegalStateException.class)
-    public void gotoRoomShouldThrowExceptionIfDirectionIsNotValidExitFromCurrentRoom() {
+    public void goShouldThrowExceptionIfDirectionIsNotValidExitFromCurrentRoom() {
         Room sealed_tomb = new Room("sealed_tomb", "There is no escape.");
         GameState gameState = new GameState(sealed_tomb);
         Command command = new Command(Verbs.GO, Nouns.UP);
 
-        Results.go.execute(command, gameState, msg -> {});
-    }
-
-    @Test
-    public void quitShouldChangeGameStateRunning() {
-        GameState gameState = new GameState(Room.NOWHERE);
-        assertTrue(gameState.isRunning());
-        Results.quit.execute(Command.NONE, gameState, msg -> {});
-        assertFalse(gameState.isRunning());
+        go.execute(command, gameState, msg -> {});
     }
 
     @Test
@@ -59,7 +72,7 @@ public class ResultsTest {
         AtomicReference<Room> roomRef = new AtomicReference<>();
         AtomicReference<List<Room.Exit>> exitsRef = new AtomicReference<>();
         AtomicReference<List<Item>> itemsRef = new AtomicReference<>();
-        Action.Result look = Results.look(((room, exits, roomItems) -> {
+        Action.Result look = look(((room, exits, roomItems) -> {
             roomRef.set(room);
             exitsRef.set(exits);
             itemsRef.set(roomItems);
@@ -80,23 +93,8 @@ public class ResultsTest {
     @Test
     public void printShouldPrintToDisplayGivenAString() {
         StringBuilder display = new StringBuilder();
-        Results.print("Fly, you fools!").execute(Command.NONE, null, display::append);
+        print("Fly, you fools!").execute(Command.NONE, null, display::append);
         assertEquals("Fly, you fools!", display.toString());
-    }
-
-    @Test
-    public void getShouldSetInventoryItemGivenCommandNoun() {
-        Items.ItemSet itemSet = Items.newItemSet();
-        Item bowl = itemSet.newItem().named("bowl").describedAs("A wooden bowl.").portable().in(Room.NOWHERE).build();
-        GameState gameState = new GameState(Room.NOWHERE, itemSet.copyOfItems());
-
-        assertTrue(bowl.isPortable());
-        assertFalse(bowl.isCarried());
-
-        Results.get.execute(new Command(Verbs.GET, bowl.asNoun()), gameState, msg -> {});
-
-        assertFalse(bowl.isHere(Room.NOWHERE));
-        assertTrue(bowl.isCarried());
     }
 
     @Test
@@ -108,7 +106,7 @@ public class ResultsTest {
         GameState gameState = new GameState(house, itemSet.copyOfItems());
 
         AtomicReference<List<Item>> itemsRef = new AtomicReference<>();
-        Action.Result inventory = Results.inventory(((roomItems) -> {
+        Action.Result inventory = inventory(((roomItems) -> {
             itemsRef.set(roomItems);
             return "okie dokie";
         }));
@@ -123,17 +121,33 @@ public class ResultsTest {
 
     @Test
     public void swapShouldSwitchRoomsGivenTwoItems() {
-        // TODO
+        Room bedroom = new Room("bedroom", "A bedroom");
+        Item lockedChest = new Item.Builder().named("locked_chest").in(bedroom).build();
+        Item openedChest = new Item.Builder().named("opened_chest").build();
+
+        assertTrue(lockedChest.isHere(bedroom));
+        assertTrue(openedChest.isHere(Room.NOWHERE));
+
+        GameState gameState = new GameState(bedroom);
+        Display noDisplay = msg -> {};
+        swap(lockedChest, openedChest).execute(Command.NONE, gameState, noDisplay);
+
+        assertTrue(lockedChest.isHere(Room.NOWHERE));
+        assertTrue(openedChest.isHere(bedroom));
+
+        swap(lockedChest, openedChest).execute(Command.NONE, gameState, noDisplay);
+
+        assertTrue(lockedChest.isHere(bedroom));
+        assertTrue(openedChest.isHere(Room.NOWHERE));
     }
 
     @Test
-    public void gotoShouldUpdateCurrentRoomGivenARoom() {
-        // TODO
-    }
-
-    @Test
-    public void dropShouldPlaceItemGivenCurrentRoom() {
-        // TODO
+    public void gotoRoomShouldUpdateCurrentRoomGivenARoom() {
+        Room atrium = new Room("atrium", "A spacious atrium.");
+        GameState gameState = new GameState(Room.NOWHERE);
+        assertEquals(Room.NOWHERE, gameState.getCurrentRoom());
+        gotoRoom(atrium).execute(Command.NONE, gameState, msg -> {});
+        assertEquals(atrium, gameState.getCurrentRoom());
     }
 
     @Test
@@ -143,8 +157,41 @@ public class ResultsTest {
 
         assertFalse(fly.isHere(kitchen));
 
-        Results.put(fly, kitchen).execute(Command.NONE, new GameState(kitchen), msg -> {});
+        put(fly, kitchen).execute(Command.NONE, new GameState(kitchen), msg -> {});
 
         assertTrue(fly.isHere(kitchen));
+    }
+
+    @Test
+    public void getShouldUpdateInventoryGivenAnItem() {
+        Items.ItemSet itemSet = Items.newItemSet();
+        Item bowl = itemSet.newItem().named("bowl").describedAs("A wooden bowl.").portable().in(Room.NOWHERE).build();
+        GameState gameState = new GameState(Room.NOWHERE, itemSet.copyOfItems());
+
+        assertTrue(bowl.isPortable());
+        assertFalse(bowl.isCarried());
+
+        get.execute(new Command(Verbs.GET, bowl.asNoun()), gameState, msg -> {});
+
+        assertFalse(bowl.isHere(Room.NOWHERE));
+        assertTrue(bowl.isCarried());
+    }
+
+    @Test
+    public void dropShouldPlaceItemInCurrentRoomGivenItsBeingCarried() {
+        Item potato = new Item.Builder().named("potato").inInventory().build();
+        Set<Item> items = new LinkedHashSet<>();
+        items.add(potato);
+        Room cellar = new Room("cellar", "a potato cellar");
+        GameState gameState = new GameState(cellar, items);
+
+        assertTrue(potato.isCarried());
+        assertFalse(potato.isHere(cellar));
+
+        drop.execute(new Command(Verbs.DROP, potato.asNoun()), gameState, msg -> {});
+
+        assertFalse(potato.isCarried());
+        assertTrue(potato.isHere(cellar));
+
     }
 }
