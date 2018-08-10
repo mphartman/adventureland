@@ -16,7 +16,7 @@ import static hartman.games.adventureland.engine.core.Conditions.IsItemHere;
 import static hartman.games.adventureland.engine.core.Conditions.IsPresent;
 import static hartman.games.adventureland.engine.core.Conditions.Not;
 import static hartman.games.adventureland.engine.core.Conditions.Random;
-import static hartman.games.adventureland.engine.core.Conditions.hasExit;
+import static hartman.games.adventureland.engine.core.Conditions.currentRoomHasExit;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -28,9 +28,9 @@ public class ConditionsTest {
         Room start = new Room("start", "start");
         GameState gameState = new GameState(start);
         Command command = new Command(Verbs.GO, Nouns.DOWN);
-        assertFalse(hasExit.matches(command, gameState));
+        assertFalse(currentRoomHasExit.matches(command, gameState));
         command = new Command(Verbs.GO, Nouns.UP);
-        assertFalse(hasExit.matches(command, gameState));
+        assertFalse(currentRoomHasExit.matches(command, gameState));
     }
 
     @Test
@@ -39,9 +39,9 @@ public class ConditionsTest {
         Room start = new Room("start", "start", new Room.Exit.Builder().exit(Nouns.DOWN).towards(end).build());
         GameState gameState = new GameState(start);
         Command command = new Command(Verbs.GO, Nouns.DOWN);
-        assertTrue(hasExit.matches(command, gameState));
+        assertTrue(currentRoomHasExit.matches(command, gameState));
         command = new Command(Verbs.GO, Nouns.UP);
-        assertFalse(hasExit.matches(command, gameState));
+        assertFalse(currentRoomHasExit.matches(command, gameState));
     }
 
     @Test
@@ -64,7 +64,7 @@ public class ConditionsTest {
 
     @Test
     public void itemCarriedShouldReturnFalseWhenPlayerInventoryDoesNotHaveItem() {
-        Item dagger = Item.newPortableObjectItem("dagger", "A dull, chipped blade.");
+        Item dagger = new Item.Builder().named("dagger").describedAs("A dull, chipped blade.").portable().in(Room.NOWHERE).build();
         GameState gameState = new GameState(Room.NOWHERE);
         Command command = new Command(Verbs.GO, Noun.ANY);
         Condition itemCarried = new IsItemCarried(dagger);
@@ -73,7 +73,7 @@ public class ConditionsTest {
 
     @Test
     public void itemCarriedShouldReturnTrueWhenPlayerInventoryHasItem() {
-        Item torch = Item.newInventoryItem("torch", "An unlit wooden torch dipped in pitch.");
+        Item torch = new Item.Builder().named("torch").describedAs("An unlit wooden torch dipped in pitch.").inInventory().build();
         GameState gameState = new GameState(Room.NOWHERE);
         Command command = new Command(Verbs.GO, Noun.ANY);
         Condition itemCarried = new IsItemCarried(torch);
@@ -83,7 +83,7 @@ public class ConditionsTest {
     @Test
     public void itemHereShouldReturnTrueWhenItemIsInRoom() {
         Room entryway = new Room("entryway", "A dark, narrow entry way into the house.");
-        Item dog = Item.newSceneryRoomItem("dog", "A large, rapid dog growls at me.", entryway);
+        Item dog = new Item.Builder().named("dog").describedAs("A large, rapid dog growls at me.").in(entryway).build();
         GameState gameState = new GameState(entryway);
         Command command = new Command(Verbs.GO, Noun.ANY);
         Condition itemHere = new IsItemHere(dog);
@@ -93,7 +93,7 @@ public class ConditionsTest {
     @Test
     public void itemHereShouldReturnFalseWhenItemIsNotInRoom() {
         Room bathroom = new Room("bathroom", "A luxurious master bathroom with a claw-foot tub.");
-        Item microwave = Item.newSceneryRoomItem("microwave", "A 1200-watt microwave.");
+        Item microwave = new Item.Builder().named("microwave").describedAs("A 1200-watt microwave.").build();
         GameState gameState = new GameState(bathroom);
         Command command = new Command(Verbs.GO, Noun.ANY);
         Condition itemHere = new IsItemHere(microwave);
@@ -103,7 +103,7 @@ public class ConditionsTest {
     @Test
     public void isPresentShouldReturnTrueWhenItemIsInRoom() {
         Room doghouse = new Room("doghouse", "A cozy, warm kennel.");
-        Item dog = Item.newSceneryRoomItem("dog", "A small sleeps here.", doghouse);
+        Item dog = new Item.Builder().named("dog").describedAs("A small sleeps here.").in(doghouse).build();
         GameState gameState = new GameState(doghouse);
         Command command = new Command(Verbs.GO, Noun.ANY);
         Condition isPresent = new IsPresent(dog);
@@ -112,7 +112,7 @@ public class ConditionsTest {
 
     @Test
     public void isPresentShouldReturnTrueWhenItemIsInInventory() {
-        Item key = Item.newInventoryItem("key", "A tarnished brass skeleton key.");
+        Item key = new Item.Builder().named("key").describedAs("A tarnished brass skeleton key.").inInventory().build();
         GameState gameState = new GameState(Room.NOWHERE);
         Command command = new Command(Verbs.GO, Noun.ANY);
         Condition isPresent = new IsPresent(key);
@@ -122,7 +122,7 @@ public class ConditionsTest {
     @Test
     public void isPresentShouldReturnFalseWhenItemIsNeitherInInventoryOrInRoom() {
         Room cell = new Room("cell", "A filthy, tiny prison cell.");
-        Item key = Item.newPortableObjectItem("key", "A small key.");
+        Item key = new Item.Builder().named("key").describedAs("A small key").portable().build();
         GameState gameState = new GameState(cell);
         Command command = new Command(Verbs.GO, Nouns.NORTH);
         Condition isPresent = new IsPresent(key);
@@ -132,7 +132,7 @@ public class ConditionsTest {
     @Test
     public void notShouldReturnLogicalComplementOfGivenCondition() {
         Room cell = new Room("cell", "A filthy, tiny prison cell.");
-        Item key = Item.newPortableObjectItem("key", "A small key.", cell);
+        Item key = new Item.Builder().named("key").describedAs("A small key.").in(cell).build();
         GameState gameState = new GameState(cell);
         Command command = new Command(Verbs.GO, Nouns.NORTH);
         Condition isPresent = new IsPresent(key);
@@ -196,7 +196,7 @@ public class ConditionsTest {
 
     @Test
     public void itemMovedShouldReturnTrueIfItemsCurrentLocationDoesNotMatchItsStartingLocation() {
-        Item item = Item.newPortableObjectItem("chalice", "A jewel-encrusted golden chalice.");
+        Item item = new Item.Builder().named("chalice").describedAs("A jewel-encrusted golden chalice.").portable().build();
         Command command = new Command(new Verb("PICKUP"), new Noun("chalice"));
         GameState gameState = new GameState(Room.NOWHERE);
         Condition itemMoved = new HasItemMoved(item);

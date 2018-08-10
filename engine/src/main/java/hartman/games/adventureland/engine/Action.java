@@ -80,14 +80,6 @@ public class Action {
         }
     }
 
-    public static Set<Condition> setOf(Condition... conditions) {
-        return new LinkedHashSet<>(Arrays.asList(conditions));
-    }
-
-    public static Set<Result> setOf(Result... results) {
-        return new LinkedHashSet<>(Arrays.asList(results));
-    }
-
     @FunctionalInterface
     public interface Condition {
         boolean matches(Command command, GameState gameState);
@@ -103,44 +95,7 @@ public class Action {
     private final Set<Condition> conditions = new LinkedHashSet<>();
     private final Set<Result> results = new LinkedHashSet<>();
 
-    public Action(Set<Result> results) {
-        this.verb = Verb.NONE;
-        this.noun = Noun.NONE;
-        this.results.addAll(results);
-    }
-
-    public Action(Result... results) {
-        this(new LinkedHashSet<>(Arrays.asList(results)));
-    }
-
-    public Action(Set<Condition> conditions, Set<Result> results) {
-        this.verb = Verb.NONE;
-        this.noun = Noun.NONE;
-        this.conditions.addAll(conditions);
-        this.results.addAll(results);
-    }
-
-    public Action(Verb verb, Set<Result> results) {
-        this.verb = verb;
-        this.noun = Noun.NONE;
-        this.results.addAll(results);
-    }
-
-    public Action(Verb verb, Result... results) {
-        this(verb, new LinkedHashSet<>(Arrays.asList(results)));
-    }
-
-    public Action(Verb verb, Noun noun, Set<Result> results) {
-        this.verb = verb;
-        this.noun = noun;
-        this.results.addAll(results);
-    }
-
-    public Action(Verb verb, Noun noun, Result... results) {
-        this(verb, noun, new LinkedHashSet<>(Arrays.asList(results)));
-    }
-
-    public Action(Verb verb, Noun noun, Set<Condition> conditions, Set<Result> results) {
+    protected Action(Verb verb, Noun noun, Set<Condition> conditions, Set<Result> results) {
         this.verb = verb;
         this.noun = noun;
         this.conditions.addAll(conditions);

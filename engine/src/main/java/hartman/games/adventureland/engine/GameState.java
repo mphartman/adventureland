@@ -26,6 +26,14 @@ public class GameState {
         this(startRoom, Collections.emptySet());
     }
 
+    public void setFlag(String key, Object value) {
+        flags.put(key, value);
+    }
+
+    public Object getFlag(String key) {
+        return flags.get(key);
+    }
+
     public boolean isRunning() {
         return running;
     }
@@ -49,16 +57,11 @@ public class GameState {
         running = false;
     }
 
-    public void get(Noun noun) {
+    /**
+     * Places item represented here as a Noun, in the inventory.
+     */
+    public void pickup(Noun noun) {
         items.stream().filter(i -> i.asNoun().equals(noun)).findFirst().ifPresent(Item::stow);
-    }
-
-    public void setFlag(String key, Object value) {
-        flags.put(key, value);
-    }
-
-    public Object getFlag(String key) {
-        return flags.get(key);
     }
 
     /**
@@ -76,6 +79,10 @@ public class GameState {
         items.stream().filter(Item::isCarried).forEach(item -> item.accept(visitor));
     }
 
+    /**
+     * Places the item represented by noun in the current room.
+     * If noun does not match an known item or is not carried, does nothing.
+     */
     public void drop(Noun noun) {
         items.stream()
                 .filter(Item::isCarried)

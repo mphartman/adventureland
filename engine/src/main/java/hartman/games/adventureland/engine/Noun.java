@@ -11,8 +11,8 @@ public class Noun {
     private String name;
     private Set<String> synonyms = new HashSet<>();
 
-    public Noun(String name) {
-        this(name, "ANY");
+    private Noun(String name) {
+        this.name = name;
     }
 
     public Noun(String name, String... synonyms) {

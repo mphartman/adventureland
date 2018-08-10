@@ -11,7 +11,7 @@ public class ActionTest {
     public void shouldApplyResultWhenVerbMatches() {
         GameState gameState = new GameState(Room.NOWHERE);
 
-        Action action = new Action(new Verb("SLAP"), ((pc, gs, dsp) -> gs.setFlag("MESSAGE", "Ouch! That hurts!")));
+        Action action = new Action.Builder().on(new Verb("SLAP")).then((pc, gs, dsp) -> gs.setFlag("MESSAGE", "Ouch! That hurts!")).build();
 
         Display noop = msg -> {};
 

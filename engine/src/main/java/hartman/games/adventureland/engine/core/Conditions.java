@@ -46,6 +46,12 @@ public final class Conditions {
     }
 
     /**
+     * True if player's requested noun represents a valid direction and that the current room
+     * she is in has an exit matching that direction.
+     */
+    public static final Condition currentRoomHasExit = (command, gameState) -> gameState.getCurrentRoom().hasExit(command.getNoun());
+
+    /**
      * Returns true for the given number of times.
      */
     public static class Times implements Condition {
@@ -98,12 +104,6 @@ public final class Conditions {
             }
         }
     }
-
-    /**
-     * True if player's requested noun represents a valid direction and that the current room
-     * she is in has an exit matching that direction.
-     */
-    public static final Condition hasExit = (command, gameState) -> gameState.getCurrentRoom().hasExit(command.getNoun());
 
     /**
      * True if the player's current room is ROOM.

@@ -3,22 +3,19 @@ package hartman.games.adventureland.adventures;
 import hartman.games.adventureland.engine.Action;
 import hartman.games.adventureland.engine.Adventure;
 import hartman.games.adventureland.engine.Item;
-import hartman.games.adventureland.engine.Noun;
 import hartman.games.adventureland.engine.Room;
 import hartman.games.adventureland.engine.Verb;
 import hartman.games.adventureland.engine.Vocabulary;
 import hartman.games.adventureland.engine.core.Actions;
+import hartman.games.adventureland.engine.core.Items;
 import hartman.games.adventureland.engine.core.Nouns;
 import hartman.games.adventureland.engine.core.Results;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static hartman.games.adventureland.engine.core.Actions.newActionSet;
-import static hartman.games.adventureland.engine.core.Conditions.hasExit;
+import static hartman.games.adventureland.engine.core.Conditions.currentRoomHasExit;
 import static hartman.games.adventureland.engine.core.Conditions.isInRoom;
 import static hartman.games.adventureland.engine.core.Conditions.isItemCarried;
 import static hartman.games.adventureland.engine.core.Conditions.isItemHere;
@@ -33,12 +30,14 @@ import static hartman.games.adventureland.engine.core.Nouns.NORTH;
 import static hartman.games.adventureland.engine.core.Nouns.SOUTH;
 import static hartman.games.adventureland.engine.core.Nouns.UP;
 import static hartman.games.adventureland.engine.core.Nouns.WEST;
-import static hartman.games.adventureland.engine.core.Results.Drop;
-import static hartman.games.adventureland.engine.core.Results.Get;
-import static hartman.games.adventureland.engine.core.Results.Go;
-import static hartman.games.adventureland.engine.core.Results.Quit;
+import static hartman.games.adventureland.engine.core.Results.drop;
+import static hartman.games.adventureland.engine.core.Results.get;
+import static hartman.games.adventureland.engine.core.Results.go;
+import static hartman.games.adventureland.engine.core.Results.println;
+import static hartman.games.adventureland.engine.core.Results.quit;
 import static hartman.games.adventureland.engine.core.Results.gotoRoom;
 import static hartman.games.adventureland.engine.core.Results.printf;
+import static hartman.games.adventureland.engine.core.Results.put;
 import static hartman.games.adventureland.engine.core.Results.swap;
 import static hartman.games.adventureland.engine.core.Verbs.DROP;
 import static hartman.games.adventureland.engine.core.Verbs.GET;
@@ -61,39 +60,41 @@ public class HouseEscapeAdventure {
 
         Verb kill = new Verb("KILL", "SWAT", "HIT");
         Verb yell = new Verb("YELL", "SHOUT", "SCREAM");
-        Noun fly = new Noun("FLY", "BUG", "INSECT", "PEST");
-
 
         /*
          *  ROOMS
          */
 
         Room hallway = new Room("hallway", format("I'm in a short, narrow hallway.%nThere's a short flight of stairs going up.%nThe hallway continues to the south."));
-        Room upper_stairs = new Room("upper_stairs", "I'm on the top of the stairs.");
-        Room bedroom = new Room("bedroom", "I'm in the master bedroom.");
-        Room kitchen = new Room("kitchen", "I'm the kitchen.");
-        Room living_room = new Room("living_room", "I'm in a living room with old couches.");
+        Room upperStairs = new Room("upper_stairs", "I'm on the top of the stairs.");
+        Room masterBedroom = new Room("master_bedroom", "I'm in the master bedroom.");
+        Room kitchen = new Room("kitchen", "I'm in the kitchen.");
+        Room livingRoom = new Room("living_room", "I'm in a living room with old couches.");
         Room outside = new Room("outside", "I'm outside the house.");
-        hallway.setExit(UP, upper_stairs);
+        Room isaacBedroom = new Room("isaac_bedroom", "I'm in what looks to be a little boy's room. It has posters of video games on the wall.");
+        hallway.setExit(UP, upperStairs);
         hallway.setExit(SOUTH, kitchen);
-        upper_stairs.setExit(DOWN, hallway);
-        upper_stairs.setExit(SOUTH, bedroom);
-        bedroom.setExit(NORTH, upper_stairs);
+        upperStairs.setExit(DOWN, hallway);
+        upperStairs.setExit(SOUTH, masterBedroom);
+        masterBedroom.setExit(NORTH, upperStairs);
         kitchen.setExit(NORTH, hallway);
-        kitchen.setExit(WEST, living_room);
-        living_room.setExit(EAST, kitchen);
-
+        kitchen.setExit(WEST, livingRoom);
+        livingRoom.setExit(EAST, kitchen);
+        upperStairs.setExit(WEST, isaacBedroom);
+        isaacBedroom.setExit(EAST, upperStairs);
 
         /*
          * ITEMS
          */
 
-        Item key = Item.newPortableObjectItem("key", "A brass key.", bedroom);
-        Item lockedDoor = Item.newSceneryRoomItem("locked_door", "Locked door.", kitchen);
-        Item openDoor = Item.newSceneryRoomItem("open_door", "An unlocked door.");
-        Item flyswatter = Item.newPortableObjectItem("flyswatter", "A messy, green flyswatter", living_room);
-        Set<Item> items = new LinkedHashSet<>(Arrays.asList(key, lockedDoor, openDoor, flyswatter));
-
+        Items.ItemSet itemSet = Items.newItemSet();
+        Item key = itemSet.newItem().named("key").describedAs("a brass key").portable().in(masterBedroom).build();
+        Item lockedDoor = itemSet.newItem().named("locked_door").describedAs("a locked door").in(kitchen).build();
+        Item openDoor = itemSet.newItem().named("open_door").describedAs("an unlocked door").build();
+        Item flyswatter = itemSet.newItem().named("flyswatter").alias("swatter").describedAs("a green fly swatter").portable().in(livingRoom).build();
+        Item redPanda = itemSet.newItem().named("panda").describedAs("a red panda stuffed animal").portable().in(isaacBedroom).build();
+        Item fly = itemSet.newItem().named("fly").describedAs("a large house fly").build();
+        Item deadFly = itemSet.newItem().named("deadFly").describedAs("a smeared stain that was once a fly").build();
 
         /*
          * ACTIONS
@@ -102,62 +103,58 @@ public class HouseEscapeAdventure {
         // Occurs
 
         Actions.ActionSet occurs = newActionSet();
-        occurs.newAction().when(times(1)).then(Look).build();
-        occurs.newAction().when(isInRoom(kitchen)).when(random(60)).then(printf("A fly buzzes past my ear.%n")).build();
+        occurs.newAction().when(times(1)).then(look).build();
+        occurs.newAction().when(isInRoom(kitchen)).and(not(isItemHere(fly))).and(random(60)).then(put(fly, kitchen)).then(printf("%n%nA fly buzzes past my ear!%n%n")).build();
         occurs.newAction().when(not(isInRoom(outside))).then(printf("What should I do? ")).build();
-        occurs.newAction().when(isInRoom(outside)).then(printf("%n*** Congratulations, you've escaped! ***")).andThen(Quit).build();
-
-        // Standard game actions
-
-        Actions.ActionSet standardActions = newActionSet();
-        standardActions.newAction().on(GO).withAnyNoun().when(hasExit).then(Go).andThen(Look).build();
-        standardActions.newAction().on(LOOK).withAnyNoun().then(Look).build();
-        standardActions.newAction().on(INVENTORY).withAnyNoun().then(Inventory).build();
-        standardActions.newAction().on(QUIT).then(Quit).build();
-        standardActions.newAction().onUnrecognizedVerb().then(printf("Sorry, I don't know how to do that.%n")).build();
-        standardActions.newAction().onUnrecognizedVerb().withAnyNoun().then(printf("Sorry, I don't understand what you said.%n")).build();
-        standardActions.newAction().onUnrecognizedVerb().withUnrecognizedNoun().then(printf("I don't know how to do that.%n")).build();
-        standardActions.newAction().onAnyVerb().withUnrecognizedNoun().then(printf("I don't know what that is.%n")).build();
-        standardActions.newAction().onAnyVerb().withNoNoun().then(printf("Do that with what?%n")).build();
-        standardActions.newAction().onAnyVerb().withAnyNoun().then(printf("I don't know how to do that.")).build();
+        occurs.newAction().when(isInRoom(outside)).then(printf("%n*** Congratulations, you've escaped! ***")).andThen(quit).build();
 
         // Adventure-specific actions
 
         Actions.ActionSet adventureActions = newActionSet();
+
         adventureActions.newAction().on(OPEN).with(DOOR).when(isItemHere(lockedDoor)).and(not(isPresent(key))).then(printf("%nIt's locked. I need some way to unlock it.%n")).build();
         adventureActions.newAction().on(GO).with(DOOR).when(isItemHere(lockedDoor)).then(printf("%nI can't. It's locked.%n")).build();
-        adventureActions.newAction().on(GET).with(key).when(isItemHere(key)).then(Get).andThen(printf("%nOkay. I got the key. Type INVENTORY to see what I'm carrying.%n")).build();
-        adventureActions.newAction().on(DROP).with(key).when(isItemCarried(key)).then(Drop).andThen(printf("%nI dropped the key.%n")).build();
-
-        /*
-         Same conditions and results, just different verbs and nouns so we can avoid duplicating and reuse the conditions and results portions of the Action Builder
-
-         Instead of this:
-            adventureActions.newAction().on(OPEN).with(DOOR).when(isItemHere(lockedDoor)).and(isPresent(key)).then(swap(lockedDoor, openDoor)).andThen(printf("<CLICK> That did it. It's unlocked.%n")).andThen(Look).build();
-            adventureActions.newAction().on(USE).with(key).when(isItemHere(lockedDoor)).and(isPresent(key)).then(swap(lockedDoor, openDoor)).andThen(printf("<CLICK> That did it. It's unlocked.%n")).andThen(Look).build();
-
-         */
-        Action.Builder lockedDoorWithKey = adventureActions.newAction().when(isItemHere(lockedDoor)).and(isPresent(key)).then(swap(lockedDoor, openDoor)).andThen(printf("<CLICK> That did it. It's unlocked.%n")).andThen(Look);
+        adventureActions.newAction().on(GET).with(key).when(isItemHere(key)).then(get).andThen(printf("%nOkay. I got the key. Type INVENTORY to see what I'm carrying.%n")).build();
+        adventureActions.newAction().on(DROP).with(key).when(isItemCarried(key)).then(drop).andThen(printf("%nI dropped the key.%n")).build();
+        Action.Builder lockedDoorWithKey = adventureActions.newAction().when(isItemHere(lockedDoor)).and(isPresent(key)).then(swap(lockedDoor, openDoor)).andThen(printf("<CLICK> That did it. It's unlocked.%n")).andThen(look);
         lockedDoorWithKey.on(OPEN).with(DOOR).build();
         lockedDoorWithKey.on(USE).with(key).build();
 
         adventureActions.newAction().on(GO).with(DOOR).when(isItemHere(openDoor)).then(gotoRoom(outside)).andThen(printf("%nYeah! I've made it outside!%n")).build();
-        adventureActions.newAction().on(GET).with(flyswatter).when(isItemHere(flyswatter)).then(Get).andThen(printf("%nOkay. I picked up the flyswatter.%n")).build();
-        adventureActions.newAction().on(kill).with(fly).when(isItemCarried(flyswatter)).then(printf("%nI got 'em. It's dead.%n")).build();
-        adventureActions.newAction().on(yell).then(printf("%nYou don't have to yell. I can hear you.%n")).build();
+        adventureActions.newAction().on(GET).with(flyswatter).when(isItemHere(flyswatter)).then(get).andThen(printf("%nOkay. I picked up the flyswatter.%n")).build();
+        adventureActions.newAction().on(kill).with(fly).when(isItemHere(fly)).and(not(isItemCarried(flyswatter))).then(printf("%nSmack! I tried but I'm not fast enough. I need some sort of tool.%n")).build();
+        adventureActions.newAction().on(kill).with(fly).when(isItemHere(fly)).then(swap(fly, deadFly)).andThen(printf("%nWHACK! I got 'em! It's dead.%n")).build();
+
+        adventureActions.newAction().on(yell).withAnyNoun().then(printf("%nYou don't have to yell. I can hear you.%n")).build();
+
+        adventureActions.newAction().on(GET).with(redPanda).when(isItemHere(redPanda)).then(get).andThen(println("%nOkay. I picked up the toy. It's a bit smelly but it's soft and I feel better carrying it.")).andThen(inventory).build();
+        adventureActions.newAction().on(DROP).with(redPanda).when(isItemCarried(redPanda)).then(drop).andThen(look).build();
+
+        // Standard game actions
+
+        Actions.ActionSet standardActions = newActionSet();
+        standardActions.newAction().on(GO).withAnyNoun().when(currentRoomHasExit).then(go).andThen(look).build();
+        standardActions.newAction().on(LOOK).withAnyNoun().then(look).build();
+        standardActions.newAction().on(INVENTORY).withAnyNoun().then(inventory).build();
+        standardActions.newAction().on(QUIT).then(quit).build();
+        standardActions.newAction().onUnrecognizedVerb().then(println("Sorry, I don't know how to do that.")).build();
+        standardActions.newAction().onUnrecognizedVerb().withAnyNoun().then(println("Sorry, I don't understand what you said.")).build();
+        standardActions.newAction().onUnrecognizedVerb().withUnrecognizedNoun().then(println("I don't know how to do that.")).build();
+        standardActions.newAction().onAnyVerb().withUnrecognizedNoun().then(println("I don't know what that is.")).build();
+        standardActions.newAction().onAnyVerb().withNoNoun().then(println("Do that with what?")).build();
+        standardActions.newAction().onAnyVerb().withAnyNoun().then(println("I don't know how to do that.")).build();
 
         Actions.ActionSet fullActionSet = adventureActions.addAll(standardActions);
-
 
         /*
          * Build a vocabulary based off the verbs and nouns used in the Actions.
          */
-        Vocabulary vocabulary = fullActionSet.buildVocabulary().merge(new Vocabulary(Collections.emptySet(), Nouns.directions()));
+        Vocabulary vocabulary = Vocabulary.merge(fullActionSet.buildVocabulary(), new Vocabulary(Collections.emptySet(), Nouns.directions()));
 
-        return new Adventure(vocabulary, occurs.toSet(), fullActionSet.toSet(), items, hallway);
+        return new Adventure(vocabulary, occurs.copyOfActions(), fullActionSet.copyOfActions(), itemSet.copyOfItems(), hallway);
     }
 
-    private static Action.Result Look = new Results.Look((room, exits, items) -> {
+    private static Action.Result look = Results.look((room, exits, items) -> {
         StringBuilder buf = new StringBuilder();
         buf.append(format("%n%s%n", room.getDescription()));
         if (exits.size() == 0) {
@@ -171,23 +168,28 @@ public class HouseEscapeAdventure {
             }
         }
         if (!items.isEmpty()) {
-            buf.append(format("I can also see %s%n", join(", ", items.stream().map(Item::getDescription).collect(Collectors.toSet()))));
+            if (items.size() == 1) {
+                buf.append(format("I can also see %s%n", items.get(0).getDescription()));
+            }
+            else {
+                buf.append(format("I can also see %d other things here:%n%s%n", items.size(), join(System.getProperty("line.separator") + " - ", items.stream().map(Item::getDescription).collect(Collectors.toSet()))));
+            }
         }
         return buf.toString();
     });
 
-    private static Action.Result Inventory = new Results.Inventory((items) -> {
+    private static Action.Result inventory = Results.inventory((items) -> {
         StringBuilder buf = new StringBuilder();
         if (items.isEmpty()) {
-            buf.append(format("%nI ain't got nothing.%n"));
+            buf.append(format("%nI'm not carrying anything right now.%n"));
         } else {
             if (items.size() == 1) {
-                buf.append(format("%nI'm carrying 1 item."));
+                buf.append(format("%nI'm carrying %s%n", items.get(0).getDescription()));
             }
             else {
-                buf.append(format("%nI'm carrying %d items.", items.size()));
+                buf.append(format("%nI'm carrying %d items:", items.size()));
+                buf.append(format("%n%s%n", join(System.getProperty("line.separator") + " - ", items.stream().map(Item::getDescription).collect(Collectors.toSet()))));
             }
-            buf.append(format("%n%s%n", join(System.getProperty("line.separator"), items.stream().map(Item::getDescription).collect(Collectors.toSet()))));
         }
         return buf.toString();
     });

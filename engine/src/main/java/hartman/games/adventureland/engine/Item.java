@@ -1,6 +1,9 @@
 package hartman.games.adventureland.engine;
 
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Things in a room, some of which can be picked up, carried around and dropped.
@@ -9,6 +12,50 @@ import java.util.Objects;
  * are "scenery" like trees, signs, crypts, tables, altars, donkeys, etc.
  */
 public class Item implements GameElement {
+
+    public static class Builder {
+        private String name;
+        private String description;
+        private boolean portable;
+        private Room startingRoom = Room.NOWHERE;
+        private Set<String> aliases = new LinkedHashSet<>();
+
+        public Builder named(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder describedAs(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public Builder portable() {
+            this.portable = true;
+            return this;
+        }
+
+        public Builder in(Room room) {
+            this.startingRoom = room;
+            return this;
+        }
+
+        public Builder inInventory() {
+            this.startingRoom = INVENTORY;
+            this.portable = true;
+            return this;
+        }
+
+        public Builder alias(String alias) {
+            this.aliases.add(alias);
+            return this;
+        }
+
+        public Item build() {
+            return new Item(name, description, portable, startingRoom, aliases.toArray(new String[0]));
+        }
+    }
+
     private static final Room INVENTORY = new Room("Inventory", "Player's inventory of carried items.");
 
     private final String name;
@@ -19,33 +66,13 @@ public class Item implements GameElement {
     private Room currentRoom;
     private Noun noun;
 
-    protected Item(String name, String description, boolean portable, Room startingRoom) {
+    protected Item(String name, String description, boolean portable, Room startingRoom, String... aliases) {
         this.name = name;
         this.description = description;
         this.portable = portable;
         this.startingRoom = startingRoom;
         this.currentRoom = startingRoom;
-        this.noun = new Noun(name);
-    }
-
-    public static Item newSceneryRoomItem(String name, String description, Room startingRoom) {
-        return new Item(name, description, false, startingRoom);
-    }
-
-    public static Item newSceneryRoomItem(String name, String description) {
-        return newSceneryRoomItem(name, description, Room.NOWHERE);
-    }
-
-    public static Item newPortableObjectItem(String name, String description, Room startingRoom) {
-        return new Item(name, description, true, startingRoom);
-    }
-
-    public static Item newPortableObjectItem(String name, String description) {
-        return newPortableObjectItem(name, description, Room.NOWHERE);
-    }
-
-    public static Item newInventoryItem(String name, String description) {
-        return newPortableObjectItem(name, description, INVENTORY);
+        this.noun = new Noun(name, aliases);
     }
 
     public String getName() {

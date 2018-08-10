@@ -12,14 +12,6 @@ import java.util.stream.Collectors;
  */
 public class Vocabulary {
 
-    public static Set<Verb> setOf(Verb... verbs) {
-        return new LinkedHashSet<>(Arrays.asList(verbs));
-    }
-
-    public static Set<Noun> setOf(Noun... nouns) {
-        return new LinkedHashSet<>(Arrays.asList(nouns));
-    }
-
     private final Set<Verb> verbs = new LinkedHashSet<>();
     private final Set<Noun> nouns = new LinkedHashSet<>();
 

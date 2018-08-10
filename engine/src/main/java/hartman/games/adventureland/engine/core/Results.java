@@ -17,9 +17,9 @@ public final class Results {
         throw new IllegalStateException();
     }
 
-    public static final Result Quit = (command, gameState, display) -> gameState.quit();
+    public static final Result quit = (command, gameState, display) -> gameState.quit();
 
-    public static final Result Go = (command, gameState, display) -> gameState.exitTowards(command.getNoun());
+    public static final Result go = (command, gameState, display) -> gameState.exitTowards(command.getNoun());
 
     public static Result look(Look.LookCallback callback) {
         return new Look(callback);
@@ -30,20 +30,32 @@ public final class Results {
     }
 
     public static Result printf(String message, Object... args) {
-        return new Print(String.format(message, args));
+        return print(String.format(message, args));
     }
 
-    public static Inventory inventory(Inventory.InventoryCallback callback) {
+    public static Result println(String message) {
+        return printf(message + "%n");
+    }
+
+    public static Result inventory(Inventory.InventoryCallback callback) {
         return new Inventory(callback);
     }
 
-    public static Swap swap(Item item1, Item item2) {
+    public static Result swap(Item item1, Item item2) {
         return new Swap(item1, item2);
     }
 
-    public static Goto gotoRoom(Room room) {
+    public static Result gotoRoom(Room room) {
         return new Goto(room);
     }
+
+    public static Result put(Item item, Room room) {
+        return new Put(item, room);
+    }
+
+    public static final Result get = ((command, gameState, display) -> gameState.pickup(command.getNoun()));
+
+    public static final Result drop = ((command, gameState, display) -> gameState.drop(command.getNoun()));
 
     public static class Look implements Result {
 
@@ -54,7 +66,7 @@ public final class Results {
 
         private final LookCallback callback;
 
-        public Look(LookCallback callback) {
+        Look(LookCallback callback) {
             this.callback = callback;
         }
 
@@ -94,7 +106,7 @@ public final class Results {
 
         private final String message;
 
-        public Print(String message) {
+        Print(String message) {
             this.message = message;
         }
 
@@ -103,8 +115,6 @@ public final class Results {
             display.print(message);
         }
     }
-
-    public static final Result Get = ((command, gameState, display) -> gameState.get(command.getNoun()));
 
     public static class Inventory implements Result {
 
@@ -115,7 +125,7 @@ public final class Results {
 
         private final InventoryCallback callback;
 
-        public Inventory(InventoryCallback callback) {
+        Inventory(InventoryCallback callback) {
             this.callback = callback;
         }
 
@@ -149,7 +159,7 @@ public final class Results {
         private final Item item1;
         private final Item item2;
 
-        public Swap(Item item1, Item item2) {
+        Swap(Item item1, Item item2) {
             this.item1 = item1;
             this.item2 = item2;
         }
@@ -164,7 +174,7 @@ public final class Results {
 
         private final Room room;
 
-        public Goto(Room room) {
+        Goto(Room room) {
             this.room = room;
         }
 
@@ -174,5 +184,19 @@ public final class Results {
         }
     }
 
-    public static final Result Drop = ((command, gameState, display) -> gameState.drop(command.getNoun()));
+    public static class Put implements Result {
+
+        private final Room room;
+        private final Item item;
+
+        Put(Item item, Room room) {
+            this.room = room;
+            this.item = item;
+        }
+
+        @Override
+        public void execute(Command command, GameState gameState, Display display) {
+            item.drop(room);
+        }
+    }
 }

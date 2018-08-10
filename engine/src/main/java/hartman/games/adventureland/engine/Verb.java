@@ -13,8 +13,8 @@ public class Verb {
     private final String name;
     private final Set<String> synonyms = new LinkedHashSet<>();
 
-    public Verb(String name) {
-        this(name, "ANY");
+    private Verb(String name) {
+        this.name = name;
     }
 
     public Verb(String name, String... synonyms) {

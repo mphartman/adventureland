@@ -46,11 +46,12 @@ public final class Actions {
                     actions.add(action);
                     return action;
                 }
+
             };
         }
 
-        public Set<Action> toSet() {
-            return actions;
+        public Set<Action> copyOfActions() {
+            return new LinkedHashSet<>(actions);
         }
 
         public ActionSet addAll(ActionSet actionSet) {

@@ -5,7 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * A collection of rooms and actions which make up the adventure story.
+ * A vocabulary, a set of actions, and a collection of game elements like rooms and items which make up the adventure story.
  */
 public class Adventure {
     private final Vocabulary vocabulary;

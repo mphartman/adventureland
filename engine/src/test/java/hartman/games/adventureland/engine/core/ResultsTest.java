@@ -7,9 +7,7 @@ import hartman.games.adventureland.engine.Item;
 import hartman.games.adventureland.engine.Room;
 import org.junit.Test;
 
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.assertEquals;
@@ -17,7 +15,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class ResultsTest {
-    
+
     @Test
     public void gotoRoomShouldMovePlayerInDirectionOfGivenNoun() {
         Room tower_second_floor = new Room("tower_second_floor", "Second story room of the tower.");
@@ -25,7 +23,7 @@ public class ResultsTest {
         GameState gameState = new GameState(tower_first_floor);
         Command command = new Command(Verbs.GO, Nouns.UP);
 
-        Results.Go.execute(command, gameState, msg -> {});
+        Results.go.execute(command, gameState, msg -> {});
 
         assertEquals(tower_second_floor, gameState.getCurrentRoom());
     }
@@ -36,14 +34,14 @@ public class ResultsTest {
         GameState gameState = new GameState(sealed_tomb);
         Command command = new Command(Verbs.GO, Nouns.UP);
 
-        Results.Go.execute(command, gameState, msg -> {});
+        Results.go.execute(command, gameState, msg -> {});
     }
 
     @Test
     public void quitShouldChangeGameStateRunning() {
         GameState gameState = new GameState(Room.NOWHERE);
         assertTrue(gameState.isRunning());
-        Results.Quit.execute(Command.NONE, gameState, msg -> {});
+        Results.quit.execute(Command.NONE, gameState, msg -> {});
         assertFalse(gameState.isRunning());
     }
 
@@ -52,12 +50,11 @@ public class ResultsTest {
         Room house = new Room("house", "A little white house.");
         Room garage = new Room("garage", "A two stall, attached garage.");
         garage.setExit(Nouns.UP, house);
-        Item car = Item.newSceneryRoomItem("car", "A BMW 325XI sedan.", garage);
-        Item mailbox = Item.newSceneryRoomItem("mailbox", "A wooden mailbox.");
-        Set<Item> items = new LinkedHashSet<>();
-        items.add(car);
-        items.add(mailbox);
-        GameState gameState = new GameState(garage, items);
+
+        Items.ItemSet itemSet = Items.newItemSet();
+        Item car = itemSet.newItem().named("car").describedAs("A BMW 325XI sedan.").in(garage).build();
+        Item mailbox = itemSet.newItem().named("mailbox").describedAs("A wooden mailbox.").build();
+        GameState gameState = new GameState(garage, itemSet.copyOfItems());
 
         AtomicReference<Room> roomRef = new AtomicReference<>();
         AtomicReference<List<Room.Exit>> exitsRef = new AtomicReference<>();
@@ -89,15 +86,14 @@ public class ResultsTest {
 
     @Test
     public void getShouldSetInventoryItemGivenCommandNoun() {
-        Item bowl = Item.newPortableObjectItem("bowl", "A wooden bowl.", Room.NOWHERE);
-        Set<Item> items = new LinkedHashSet<>();
-        items.add(bowl);
-        GameState gameState = new GameState(Room.NOWHERE, items);
+        Items.ItemSet itemSet = Items.newItemSet();
+        Item bowl = itemSet.newItem().named("bowl").describedAs("A wooden bowl.").portable().in(Room.NOWHERE).build();
+        GameState gameState = new GameState(Room.NOWHERE, itemSet.copyOfItems());
 
         assertTrue(bowl.isPortable());
         assertFalse(bowl.isCarried());
 
-        Results.Get.execute(new Command(Verbs.GET, bowl.asNoun()), gameState, msg -> {});
+        Results.get.execute(new Command(Verbs.GET, bowl.asNoun()), gameState, msg -> {});
 
         assertFalse(bowl.isHere(Room.NOWHERE));
         assertTrue(bowl.isCarried());
@@ -106,15 +102,13 @@ public class ResultsTest {
     @Test
     public void inventoryShouldCollectItemsGivenItemsAreCarried() {
         Room house = new Room("house", "A little white house.");
-        Item phone = Item.newInventoryItem("phone", "A iPhone 8");
-        Item vacuum = Item.newSceneryRoomItem("vacuum", "A Hoover upright vacuum.", house);
-        Set<Item> items = new LinkedHashSet<>();
-        items.add(phone);
-        items.add(vacuum);
-        GameState gameState = new GameState(house, items);
+        Items.ItemSet itemSet = Items.newItemSet();
+        Item phone = itemSet.newItem().named("phone").describedAs("an iPhone 8").inInventory().build();
+        Item vacuum = itemSet.newItem().named("vacuum").describedAs("A Hoover upright vacuum.").in(house).build();
+        GameState gameState = new GameState(house, itemSet.copyOfItems());
 
         AtomicReference<List<Item>> itemsRef = new AtomicReference<>();
-        Results.Inventory inventory = Results.inventory(((roomItems) -> {
+        Action.Result inventory = Results.inventory(((roomItems) -> {
             itemsRef.set(roomItems);
             return "okie dokie";
         }));
@@ -140,5 +134,17 @@ public class ResultsTest {
     @Test
     public void dropShouldPlaceItemGivenCurrentRoom() {
         // TODO
+    }
+
+    @Test
+    public void putShouldPlaceItemGivenRoomAndItem() {
+        Item fly = new Item.Builder().named("fly").describedAs("A house fly").build();
+        Room kitchen = new Room("kitchen", "A dirty kitchen");
+
+        assertFalse(fly.isHere(kitchen));
+
+        Results.put(fly, kitchen).execute(Command.NONE, new GameState(kitchen), msg -> {});
+
+        assertTrue(fly.isHere(kitchen));
     }
 }

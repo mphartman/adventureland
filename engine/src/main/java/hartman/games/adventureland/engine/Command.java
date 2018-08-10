@@ -19,6 +19,11 @@ public class Command {
         this.noun = Noun.NONE;
     }
 
+    public Command(Noun noun) {
+        this.verb = Verb.NONE;
+        this.noun = noun;
+    }
+
     public Verb getVerb() {
         return verb;
     }

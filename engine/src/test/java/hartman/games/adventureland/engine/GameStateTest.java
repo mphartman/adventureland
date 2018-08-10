@@ -1,9 +1,9 @@
 package hartman.games.adventureland.engine;
 
+import hartman.games.adventureland.engine.core.Items;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -30,12 +30,11 @@ public class GameStateTest {
     public void describeShouldVisitRoomAndItems() {
         Room forest = new Room("forest", "I'm in a lush, green forest.");
 
-        Item tree = Item.newSceneryRoomItem("tree", "An American Sycamore tree.", forest);
-        Item key = Item.newSceneryRoomItem("key", "A skeleton key.");
+        Items.ItemSet itemSet = Items.newItemSet();
+        Item tree = itemSet.newItem().named("tree").alias("Tim").describedAs("An American Sycamore tree.").in(forest).build();
+        Item key = itemSet.newItem().named("key").describedAs("A skeleton key.").build();
 
-        Set<Item> items = new LinkedHashSet<>();
-        items.add(tree);
-        items.add(key);
+        Set<Item> items = itemSet.copyOfItems();
 
         GameState gameState = new GameState(forest, items);
 
@@ -64,13 +63,11 @@ public class GameStateTest {
 
     @Test
     public void inventoryShouldVisitItems() {
-        Item tree = Item.newSceneryRoomItem("tree", "An American Sycamore tree.");
-        Item key = Item.newSceneryRoomItem("key", "A skeleton key.");
-        Item sandwich = Item.newInventoryItem("sandwich", "A ham and cheese sandwich on rye bread.");
-        Set<Item> items = new LinkedHashSet<>();
-        items.add(tree);
-        items.add(key);
-        items.add(sandwich);
+        Items.ItemSet itemSet = Items.newItemSet();
+        Item tree = itemSet.newItem().named("tree").alias("Tim").describedAs("An American Sycamore tree.").build();
+        Item key = itemSet.newItem().named("key").describedAs("A skeleton key.").build();
+        Item sandwich = itemSet.newItem().named("sandwich").describedAs("A ham and cheese sandwich on rye bread.").inInventory().build();
+        Set<Item> items = itemSet.copyOfItems();
 
         GameState gameState = new GameState(Room.NOWHERE, items);
 
@@ -98,6 +95,11 @@ public class GameStateTest {
 
     @Test
     public void dropShouldPlaceCarriedItemInCurrentRoom() {
+        // TODO
+    }
+
+    @Test
+    public void getShouldPlaceItemInInventory() {
         // TODO
     }
 }

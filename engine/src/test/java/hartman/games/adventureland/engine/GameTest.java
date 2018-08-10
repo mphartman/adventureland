@@ -1,18 +1,17 @@
 package hartman.games.adventureland.engine;
 
-import hartman.games.adventureland.engine.core.Actions;
 import hartman.games.adventureland.engine.core.Conditions;
 import hartman.games.adventureland.engine.core.Nouns;
 import hartman.games.adventureland.engine.core.Results;
 import hartman.games.adventureland.engine.core.Verbs;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static hartman.games.adventureland.engine.Action.setOf;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -20,18 +19,22 @@ import static org.junit.Assert.assertNull;
 
 public class GameTest {
 
+    private static Set<Verb> setOf(Verb... verbs) {
+        return new LinkedHashSet<>(Arrays.asList(verbs));
+    }
+
     @Test
     public void gameShouldInvokeActionsGivenPlayerCommandsWhichChangeGameState() {
 
-        Vocabulary vocabulary = new Vocabulary(Vocabulary.setOf(Verbs.GO, Verbs.QUIT), Nouns.directions());
+        Vocabulary vocabulary = new Vocabulary(setOf(Verbs.GO, Verbs.QUIT), Nouns.directions());
 
         Room dungeon = new Room("dungeon", "A miserable, dark place with cold stone floors and cracked walls.");
         Room chamber = new Room("chamber", "A clean, bright chamber with red carpet and floral drapes.");
         chamber.setExit(Nouns.DOWN, dungeon);
         dungeon.setExit(Nouns.UP, chamber);
 
-        Action goAction = new Action(Verbs.GO, Noun.ANY, setOf(Conditions.hasExit), setOf(Results.Go));
-        Action quitAction = new Action(Verbs.QUIT, Results.Quit);
+        Action goAction = new Action.Builder().on(Verbs.GO).withAnyNoun().when(Conditions.currentRoomHasExit).then(Results.go).build();
+        Action quitAction = new Action.Builder().on(Verbs.QUIT).then(Results.quit).build();
         Set<Action> actions = new LinkedHashSet<>(asList(quitAction, goAction));
 
         Adventure adventure = new Adventure(vocabulary, Collections.emptySet(), actions, Collections.emptySet(), chamber);
@@ -56,13 +59,14 @@ public class GameTest {
     @Test
     public void gameShouldStopRunActionsAfterFirstOneWhichReturnsTrue() {
 
-        Vocabulary vocabulary = new Vocabulary(Vocabulary.setOf(Verbs.GO, Verbs.QUIT), Nouns.directions());
+        Vocabulary vocabulary = new Vocabulary(setOf(Verbs.GO, Verbs.QUIT), Nouns.directions());
 
         Action.Result noOpResult = (command, gameState, display) -> {};
-        Action action1 = new Action(Verbs.GO, Noun.ANY, setOf((command, gameState) -> { gameState.setFlag("action1", "called"); return false; } ), setOf(noOpResult));
-        Action action2 = new Action(Verbs.GO, Noun.ANY, setOf((command, gameState) -> { gameState.setFlag("action2", "called"); return true; }), setOf(noOpResult));
-        Action action3 = new Action(Verbs.GO, Noun.ANY, setOf((command, gameState) -> { gameState.setFlag("action3", "called"); return true; }), setOf(noOpResult));
-        Action quitAction = new Action(Verbs.QUIT, Results.Quit);
+
+        Action action1 = new Action.Builder().on(Verbs.GO).withAnyNoun().when((command, gameState) -> { gameState.setFlag("action1", "called"); return false; }).then(noOpResult).build();
+        Action action2 = new Action.Builder().on(Verbs.GO).withAnyNoun().when((command, gameState) -> { gameState.setFlag("action2", "called"); return true;  }).then(noOpResult).build();
+        Action action3 = new Action.Builder().on(Verbs.GO).withAnyNoun().when((command, gameState) -> { gameState.setFlag("action3", "called"); return true;  }).then(noOpResult).build();
+        Action quitAction = new Action.Builder().on(Verbs.QUIT).then(Results.quit).build();
         Set<Action> actions = new LinkedHashSet<>(asList(action1, action2, action3, quitAction));
 
         Adventure adventure = new Adventure(vocabulary, Collections.emptySet(), actions, Collections.emptySet(), Room.NOWHERE);

@@ -24,7 +24,7 @@ public class ActionsTest {
                 .then((command, gameState, display) -> gameState.setFlag("result", true))
                 .build();
 
-        assertTrue(actionSet.toSet().contains(action));
+        assertTrue(actionSet.copyOfActions().contains(action));
 
         GameState gameState = new GameState(Room.NOWHERE);
         action.run(new ActionContext(gameState, message -> {}, Command.NONE));
