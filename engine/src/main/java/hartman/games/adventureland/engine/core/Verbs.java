@@ -8,13 +8,15 @@ public final class Verbs {
         throw new IllegalStateException();
     }
 
+    public static final Verb HELP = new Verb("HELP", "?");
+
     public static final Verb QUIT = new Verb("QUIT", "Q");
 
     public static final Verb INVENTORY = new Verb("INVENTORY", "I");
 
     public static final Verb LOOK = new Verb("LOOK", "L");
 
-    public static final Verb GO = new Verb("GO", "G", "ENTER", "WALK", "RUN", "EXIT", "LEAVE" );
+    public static final Verb GO = new Verb("GO", "G", "GOTO", "ENTER", "WALK", "RUN", "EXIT", "LEAVE" );
 
     public static final Verb OPEN = new Verb("OPEN", "UNLOCK");
 

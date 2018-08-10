@@ -13,6 +13,7 @@ import hartman.games.adventureland.engine.core.Results;
 
 import java.util.Collections;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static hartman.games.adventureland.engine.core.Actions.newActionSet;
 import static hartman.games.adventureland.engine.core.Conditions.currentRoomHasExit;
@@ -33,15 +34,16 @@ import static hartman.games.adventureland.engine.core.Nouns.WEST;
 import static hartman.games.adventureland.engine.core.Results.drop;
 import static hartman.games.adventureland.engine.core.Results.get;
 import static hartman.games.adventureland.engine.core.Results.go;
-import static hartman.games.adventureland.engine.core.Results.println;
-import static hartman.games.adventureland.engine.core.Results.quit;
 import static hartman.games.adventureland.engine.core.Results.gotoRoom;
 import static hartman.games.adventureland.engine.core.Results.printf;
+import static hartman.games.adventureland.engine.core.Results.println;
 import static hartman.games.adventureland.engine.core.Results.put;
+import static hartman.games.adventureland.engine.core.Results.quit;
 import static hartman.games.adventureland.engine.core.Results.swap;
 import static hartman.games.adventureland.engine.core.Verbs.DROP;
 import static hartman.games.adventureland.engine.core.Verbs.GET;
 import static hartman.games.adventureland.engine.core.Verbs.GO;
+import static hartman.games.adventureland.engine.core.Verbs.HELP;
 import static hartman.games.adventureland.engine.core.Verbs.INVENTORY;
 import static hartman.games.adventureland.engine.core.Verbs.LOOK;
 import static hartman.games.adventureland.engine.core.Verbs.OPEN;
@@ -65,7 +67,7 @@ public class HouseEscapeAdventure {
          *  ROOMS
          */
 
-        Room hallway = new Room("hallway", format("I'm in a short, narrow hallway.%nThere's a short flight of stairs going up.%nThe hallway continues to the south."));
+        Room hallway = new Room("hallway", format("I'm in a short, narrow hallway.%nThere's a carpeted flight of stairs going up.%nThe hallway continues to the south."));
         Room upperStairs = new Room("upper_stairs", "I'm on the top of the stairs.");
         Room masterBedroom = new Room("master_bedroom", "I'm in the master bedroom.");
         Room kitchen = new Room("kitchen", "I'm in the kitchen.");
@@ -104,8 +106,8 @@ public class HouseEscapeAdventure {
 
         Actions.ActionSet occurs = newActionSet();
         occurs.newAction().when(times(1)).then(look).build();
-        occurs.newAction().when(isInRoom(kitchen)).and(not(isItemHere(fly))).and(random(60)).then(put(fly, kitchen)).then(printf("%n%nA fly buzzes past my ear!%n%n")).build();
-        occurs.newAction().when(not(isInRoom(outside))).then(printf("What should I do? ")).build();
+        occurs.newAction().when(isInRoom(kitchen)).and(not(isItemHere(fly))).and(random(60)).then(put(fly, kitchen)).then(printf("%nA fly buzzes past my ear!%n")).build();
+        occurs.newAction().when(not(isInRoom(outside))).then(printf("%nWhat should I do? ")).build();
         occurs.newAction().when(isInRoom(outside)).then(printf("%n*** Congratulations, you've escaped! ***")).andThen(quit).build();
 
         // Adventure-specific actions
@@ -133,16 +135,20 @@ public class HouseEscapeAdventure {
         // Standard game actions
 
         Actions.ActionSet standardActions = newActionSet();
+        standardActions.newAction().on(GO).withNoNoun().then(println("{verb} where?")).build();
+        standardActions.newAction().on(GO).withUnrecognizedNoun().then(println("I can't go that direction. Try one of the obvious exits.")).build();
         standardActions.newAction().on(GO).withAnyNoun().when(currentRoomHasExit).then(go).andThen(look).build();
+        standardActions.newAction().on(GO).withAnyNoun().then(println("That's not an exit from here. Try one of the obvious exits.")).build();
         standardActions.newAction().on(LOOK).withAnyNoun().then(look).build();
         standardActions.newAction().on(INVENTORY).withAnyNoun().then(inventory).build();
         standardActions.newAction().on(QUIT).then(quit).build();
+        standardActions.newAction().on(HELP).then(println("A voice BOOOMS out:\nTry --> \"GO, LOOK, JUMP, SWIM, CLIMB, TAKE, DROP\"\nand any other verbs you can think of...")).build();
         standardActions.newAction().onUnrecognizedVerb().then(println("Sorry, I don't know how to do that.")).build();
-        standardActions.newAction().onUnrecognizedVerb().withAnyNoun().then(println("Sorry, I don't understand what you said.")).build();
-        standardActions.newAction().onUnrecognizedVerb().withUnrecognizedNoun().then(println("I don't know how to do that.")).build();
-        standardActions.newAction().onAnyVerb().withUnrecognizedNoun().then(println("I don't know what that is.")).build();
-        standardActions.newAction().onAnyVerb().withNoNoun().then(println("Do that with what?")).build();
-        standardActions.newAction().onAnyVerb().withAnyNoun().then(println("I don't know how to do that.")).build();
+        standardActions.newAction().onUnrecognizedVerb().withUnrecognizedNoun().then(println("Sorry, I don't know how to do that with that thing.")).build();
+        standardActions.newAction().onUnrecognizedVerb().withAnyNoun().then(println("Sorry, I don't know how to that with a {noun}.")).build();
+        standardActions.newAction().onAnyVerb().withUnrecognizedNoun().then(println("I don't know how to {verb} with that thing.")).build();
+        standardActions.newAction().onAnyVerb().withNoNoun().then(println("{verb} what?")).build();
+        standardActions.newAction().onAnyVerb().withAnyNoun().then(println("I can't do that here right now.")).build();
 
         Actions.ActionSet fullActionSet = adventureActions.addAll(standardActions);
 
@@ -157,6 +163,24 @@ public class HouseEscapeAdventure {
     private static Action.Result look = Results.look((room, exits, items) -> {
         StringBuilder buf = new StringBuilder();
         buf.append(format("%n%s%n", room.getDescription()));
+        if (!items.isEmpty()) {
+            if (items.size() == 1) {
+                buf.append(format("I can also see %s%n", items.get(0).getDescription()));
+            }
+            else {
+                buf.append(format("I can also see %d other things here: ", items.size()));
+                IntStream.range(0, items.size()).forEachOrdered(i -> {
+                    if (i > 0) {
+                        buf.append(", ");
+                    }
+                    if (i == (items.size() - 1)) {
+                        buf.append("and ");
+                    }
+                    buf.append(items.get(i).getDescription());
+                });
+                buf.append('\n');
+            }
+        }
         if (exits.size() == 0) {
             buf.append(format("There are no obvious exits from here.%n"));
         } else {
@@ -167,14 +191,6 @@ public class HouseEscapeAdventure {
                 buf.append(format("There are %d obvious exits: %s%n", exits.size(), exitsString));
             }
         }
-        if (!items.isEmpty()) {
-            if (items.size() == 1) {
-                buf.append(format("I can also see %s%n", items.get(0).getDescription()));
-            }
-            else {
-                buf.append(format("I can also see %d other things here:%n%s%n", items.size(), join(System.getProperty("line.separator") + " - ", items.stream().map(Item::getDescription).collect(Collectors.toSet()))));
-            }
-        }
         return buf.toString();
     });
 
@@ -183,13 +199,17 @@ public class HouseEscapeAdventure {
         if (items.isEmpty()) {
             buf.append(format("%nI'm not carrying anything right now.%n"));
         } else {
+            buf.append(format("%nI'm carrying "));
             if (items.size() == 1) {
-                buf.append(format("%nI'm carrying %s%n", items.get(0).getDescription()));
+                buf.append(format("%s%n", items.get(0).getDescription()));
             }
             else {
-                buf.append(format("%nI'm carrying %d items:", items.size()));
-                buf.append(format("%n%s%n", join(System.getProperty("line.separator") + " - ", items.stream().map(Item::getDescription).collect(Collectors.toSet()))));
+                buf.append(format("%d items: ", items.size()));
+                IntStream.range(0, items.size()).forEachOrdered(i -> {
+                    buf.append(format("%n - %s", items.get(i).getDescription()));
+                });
             }
+            buf.append('\n');
         }
         return buf.toString();
     });
