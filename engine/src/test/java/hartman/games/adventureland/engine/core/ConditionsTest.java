@@ -141,7 +141,7 @@ public class ConditionsTest {
     }
 
     @Test
-    public void occursRandomlyShouldReturnTrueGiven100PercentProbability() {
+    public void randomShouldReturnTrueGiven100PercentProbability() {
         GameState gameState = new GameState(Room.NOWHERE);
         Command command = new Command(Verb.ANY, Noun.UNRECOGNIZED);
         Condition occurs = new Random(100);
@@ -205,5 +205,22 @@ public class ConditionsTest {
         assertTrue(itemMoved.matches(command, gameState));
         item.drop(Room.NOWHERE);
         assertFalse(itemMoved.matches(command, gameState));
+    }
+
+    @Test
+    public void timesShouldReturnTrueForTheGivenNumberOfTimes() {
+        GameState gameState = new GameState(Room.NOWHERE);
+
+        Condition zero = new Conditions.Times(0);
+        assertFalse(zero.matches(Command.NONE, gameState));
+        assertFalse(zero.matches(Command.NONE, gameState));
+
+        Condition once = new Conditions.Times(1);
+        assertTrue(once.matches(Command.NONE, gameState));
+        assertFalse(once.matches(Command.NONE, gameState));
+
+        Condition never = new Conditions.Times(-1);
+        assertFalse(never.matches(Command.NONE, gameState));
+        assertFalse(never.matches(Command.NONE, gameState));
     }
 }

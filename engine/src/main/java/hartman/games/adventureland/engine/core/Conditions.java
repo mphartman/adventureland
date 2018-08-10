@@ -13,13 +13,11 @@ public final class Conditions {
         throw new IllegalStateException();
     }
 
-    public static Condition times(int times) {
-        return new Times(times);
-    }
-
-    public static Condition random(Integer probability) {
-        return new Random(probability);
-    }
+    /**
+     * True if player's requested noun represents a valid direction and that the current room
+     * she is in has an exit matching that direction.
+     */
+    public static final Condition currentRoomHasExit = (command, gameState) -> gameState.getCurrentRoom().hasExit(command.getNoun());
 
     public static Condition isInRoom(Room room) {
         return new IsInRoom(room);
@@ -41,15 +39,17 @@ public final class Conditions {
         return new Not(operand);
     }
 
+    public static Condition random(Integer probability) {
+        return new Random(probability);
+    }
+
     public static Condition hasItemMoved(Item item) {
         return new HasItemMoved(item);
     }
 
-    /**
-     * True if player's requested noun represents a valid direction and that the current room
-     * she is in has an exit matching that direction.
-     */
-    public static final Condition currentRoomHasExit = (command, gameState) -> gameState.getCurrentRoom().hasExit(command.getNoun());
+    public static Condition times(int times) {
+        return new Times(times);
+    }
 
     /**
      * Returns true for the given number of times.
