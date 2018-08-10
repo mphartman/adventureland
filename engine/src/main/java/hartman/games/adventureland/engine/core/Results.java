@@ -61,6 +61,10 @@ public final class Results {
         return new PutWith(item1, item2);
     }
 
+    public static Result destory(Item item) {
+        return new Destory(item);
+    }
+
     /**
      * Provides the room, exits, and items to a callback.
      */
@@ -240,6 +244,22 @@ public final class Results {
         @Override
         public void execute(Command command, GameState gameState, Display display) {
             this.item1.putWith(item2);
+        }
+    }
+
+    /**
+     * Removes ITEM from the game.
+     */
+    public static class Destory implements Result {
+        private final Item item;
+
+        public Destory(Item item) {
+            this.item = item;
+        }
+
+        @Override
+        public void execute(Command command, GameState gameState, Display display) {
+            gameState.destroy(item);
         }
     }
 }

@@ -69,6 +69,7 @@ public class Room implements GameElement {
      */
     public Room(String name, String description, Exit... exits) {
         Objects.requireNonNull(name, "Room must have a name.");
+        Objects.requireNonNull(description, "Room must have a description");
         this.name = name;
         this.description = description;
         this.exits.addAll(Arrays.asList(exits));

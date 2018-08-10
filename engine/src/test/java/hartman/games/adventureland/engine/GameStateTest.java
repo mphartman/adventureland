@@ -147,4 +147,16 @@ public class GameStateTest {
         assertFalse("carrot wasn't being carried", carrot.isHere(conferenceRoom));
     }
 
+    @Test
+    public void destroyShouldRemoveItemFromGameState() {
+        Items.ItemSet itemSet = Items.newItemSet();
+        Item hammer = itemSet.newItem().named("hammer").build();
+
+        GameState gameState = new GameState(Room.NOWHERE, itemSet.copyOfItems());
+
+        assertTrue(gameState.exists(hammer));
+        gameState.destroy(hammer);
+        assertFalse(gameState.exists(hammer));
+        assertTrue(hammer.isDestroyed());
+    }
 }

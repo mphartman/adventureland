@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static hartman.games.adventureland.engine.core.Nouns.UP;
+import static hartman.games.adventureland.engine.core.Results.destory;
 import static hartman.games.adventureland.engine.core.Results.drop;
 import static hartman.games.adventureland.engine.core.Results.get;
 import static hartman.games.adventureland.engine.core.Results.go;
@@ -228,4 +229,15 @@ public class ResultsTest {
         assertTrue(phone.isHere(pants));
     }
 
+    @Test
+    public void destroyShouldAnnihilateItem() {
+        Items.ItemSet itemSet = Items.newItemSet();
+        Item orb = itemSet.newItem().named("orb").build();
+        GameState gameState = new GameState(Room.NOWHERE, itemSet.copyOfItems());
+        assertTrue(gameState.exists(orb));
+        assertFalse(orb.isDestroyed());
+        destory(orb).execute(Command.NONE, gameState, msg -> {});
+        assertFalse(gameState.exists(orb));
+        assertTrue(orb.isDestroyed());
+    }
 }

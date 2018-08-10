@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -108,5 +109,37 @@ public class GameState {
      */
     public void drop(Item item) {
         drop(item.asNoun());
+    }
+
+    /**
+     * Removes item thus effectively destroying it from game.
+     */
+    public void destory(Noun noun) {
+         Optional<Item> maybeItem = items.stream().filter(item -> item.asNoun().equals(noun)).findFirst();
+         maybeItem.ifPresent(item -> {
+             items.remove(item);
+             item.destroy();
+         });
+    }
+
+    /**
+     * @see #destory(Noun)
+     */
+    public void destroy(Item item) {
+        destory(item.asNoun());
+    }
+
+    /**
+     * True if ITEM is in the game.
+     */
+    public boolean exists(Noun noun) {
+        return items.stream().anyMatch(item -> item.asNoun().equals(noun));
+    }
+
+    /**
+     * @see #exists(Noun)
+     */
+    public boolean exists(Item item) {
+        return exists(item.asNoun());
     }
 }

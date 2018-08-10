@@ -3,6 +3,7 @@ package hartman.games.adventureland.engine;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.StringJoiner;
 
 /**
  * Things in a room, some of which can be picked up, carried around and dropped.
@@ -61,9 +62,10 @@ public class Item implements GameElement {
     private final String description;
     private final boolean portable;
     private final Room startingRoom;
+    private final Noun noun;
 
     private Room currentRoom;
-    private Noun noun;
+    private boolean destroyed;
 
     protected Item(String name, String description, boolean portable, Room startingRoom, String... aliases) {
         Objects.requireNonNull(name, "Item must have a name.");
@@ -92,10 +94,12 @@ public class Item implements GameElement {
     }
 
     public boolean isHere(Room room) {
+        if (destroyed) throw new IllegalStateException("Item is destroyed.");
         return currentRoom.equals(room);
     }
 
     public Boolean hasMoved() {
+        if (destroyed) throw new IllegalStateException("Item is destroyed.");
         return !currentRoom.equals(startingRoom);
     }
 
@@ -104,12 +108,14 @@ public class Item implements GameElement {
     }
 
     public Room drop(Room room) {
+        if (destroyed) throw new IllegalStateException("Item is destroyed.");
         Room formerLocation = currentRoom;
         currentRoom = room;
         return formerLocation;
     }
 
     public Room stow() {
+        if (destroyed) throw new IllegalStateException("Item is destroyed.");
         if (portable) {
             Room formerRoom = currentRoom;
             currentRoom = INVENTORY;
@@ -122,20 +128,31 @@ public class Item implements GameElement {
         drop(item.currentRoom);
     }
 
+    public void destroy() {
+        this.destroyed = true;
+        this.currentRoom = Room.NOWHERE;
+    }
+
+    public boolean isDestroyed() {
+        return destroyed;
+    }
+
     @Override
     public void accept(GameElementVisitor visitor) {
-        visitor.visit(this);
+        if (!destroyed) visitor.visit(this);
     }
 
     @Override
     public String toString() {
-        return "Item{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", portable=" + portable +
-                ", startingRoom=" + startingRoom +
-                ", currentRoom=" + currentRoom +
-                '}';
+        return new StringJoiner(", ", Item.class.getSimpleName() + "[", "]")
+                .add("name='" + name + "'")
+                .add("description='" + description + "'")
+                .add("destroyed=" + destroyed)
+                .add("portable=" + portable)
+                .add("currentRoom=" + currentRoom)
+                .add("noun=" + noun)
+                .add("startingRoom=" + startingRoom)
+                .toString();
     }
 
     @Override
