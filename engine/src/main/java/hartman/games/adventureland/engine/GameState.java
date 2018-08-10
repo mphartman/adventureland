@@ -114,7 +114,7 @@ public class GameState {
     /**
      * Removes item thus effectively destroying it from game.
      */
-    public void destory(Noun noun) {
+    public void destroy(Noun noun) {
          Optional<Item> maybeItem = items.stream().filter(item -> item.asNoun().equals(noun)).findFirst();
          maybeItem.ifPresent(item -> {
              items.remove(item);
@@ -123,10 +123,10 @@ public class GameState {
     }
 
     /**
-     * @see #destory(Noun)
+     * @see #destroy(Noun)
      */
     public void destroy(Item item) {
-        destory(item.asNoun());
+        destroy(item.asNoun());
     }
 
     /**

@@ -61,8 +61,8 @@ public final class Results {
         return new PutWith(item1, item2);
     }
 
-    public static Result destory(Item item) {
-        return new Destory(item);
+    public static Result destroy(Item item) {
+        return new Destroy(item);
     }
 
     /**
@@ -250,10 +250,10 @@ public final class Results {
     /**
      * Removes ITEM from the game.
      */
-    public static class Destory implements Result {
+    public static class Destroy implements Result {
         private final Item item;
 
-        public Destory(Item item) {
+        public Destroy(Item item) {
             this.item = item;
         }
 
