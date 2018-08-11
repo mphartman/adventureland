@@ -9,16 +9,19 @@ import hartman.games.adventureland.engine.Room;
 import hartman.games.adventureland.engine.Verb;
 import org.junit.Test;
 
-import static hartman.games.adventureland.engine.core.Conditions.IsInRoom;
-import static hartman.games.adventureland.engine.core.Conditions.IsItemCarried;
-import static hartman.games.adventureland.engine.core.Conditions.IsItemHere;
-import static hartman.games.adventureland.engine.core.Conditions.IsPresent;
-import static hartman.games.adventureland.engine.core.Conditions.Not;
-import static hartman.games.adventureland.engine.core.Conditions.Random;
+import java.util.stream.IntStream;
+
 import static hartman.games.adventureland.engine.core.Conditions.currentRoomHasExit;
 import static hartman.games.adventureland.engine.core.Conditions.exists;
 import static hartman.games.adventureland.engine.core.Conditions.hasItemMoved;
+import static hartman.games.adventureland.engine.core.Conditions.isInRoom;
+import static hartman.games.adventureland.engine.core.Conditions.isItemCarried;
+import static hartman.games.adventureland.engine.core.Conditions.isItemHere;
 import static hartman.games.adventureland.engine.core.Conditions.isItemInRoom;
+import static hartman.games.adventureland.engine.core.Conditions.isPresent;
+import static hartman.games.adventureland.engine.core.Conditions.not;
+import static hartman.games.adventureland.engine.core.Conditions.random;
+import static hartman.games.adventureland.engine.core.Conditions.times;
 import static hartman.games.adventureland.engine.core.Nouns.DOWN;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -53,7 +56,7 @@ public class ConditionsTest {
         Room start = new Room("start", "start");
         GameState gameState = new GameState(start);
         Command command = new Command(Verbs.GO, Noun.ANY);
-        Condition inRoom = new IsInRoom(Room.NOWHERE);
+        Condition inRoom = isInRoom(Room.NOWHERE);
         assertFalse(inRoom.matches(command, gameState));
     }
 
@@ -62,7 +65,7 @@ public class ConditionsTest {
         Room start = new Room("start", "start");
         GameState gameState = new GameState(start);
         Command command = new Command(Verbs.GO, Noun.ANY);
-        Condition inRoom = new IsInRoom(start);
+        Condition inRoom = isInRoom(start);
         assertTrue(inRoom.matches(command, gameState));
     }
 
@@ -71,7 +74,7 @@ public class ConditionsTest {
         Item dagger = new Item.Builder().named("dagger").describedAs("A dull, chipped blade.").portable().in(Room.NOWHERE).build();
         GameState gameState = new GameState(Room.NOWHERE);
         Command command = new Command(Verbs.GO, Noun.ANY);
-        Condition itemCarried = new IsItemCarried(dagger);
+        Condition itemCarried = isItemCarried(dagger);
         assertFalse(itemCarried.matches(command, gameState));
     }
 
@@ -80,7 +83,7 @@ public class ConditionsTest {
         Item torch = new Item.Builder().named("torch").describedAs("An unlit wooden torch dipped in pitch.").inInventory().build();
         GameState gameState = new GameState(Room.NOWHERE);
         Command command = new Command(Verbs.GO, Noun.ANY);
-        Condition itemCarried = new IsItemCarried(torch);
+        Condition itemCarried = isItemCarried(torch);
         assertTrue(itemCarried.matches(command, gameState));
     }
 
@@ -90,7 +93,7 @@ public class ConditionsTest {
         Item dog = new Item.Builder().named("dog").describedAs("A large, rapid dog growls at me.").in(entryway).build();
         GameState gameState = new GameState(entryway);
         Command command = new Command(Verbs.GO, Noun.ANY);
-        Condition itemHere = new IsItemHere(dog);
+        Condition itemHere = isItemHere(dog);
         assertTrue(itemHere.matches(command, gameState));
     }
 
@@ -100,7 +103,7 @@ public class ConditionsTest {
         Item microwave = new Item.Builder().named("microwave").describedAs("A 1200-watt microwave.").build();
         GameState gameState = new GameState(bathroom);
         Command command = new Command(Verbs.GO, Noun.ANY);
-        Condition itemHere = new IsItemHere(microwave);
+        Condition itemHere = isItemHere(microwave);
         assertFalse(itemHere.matches(command, gameState));
     }
 
@@ -110,7 +113,7 @@ public class ConditionsTest {
         Item dog = new Item.Builder().named("dog").describedAs("A small sleeps here.").in(doghouse).build();
         GameState gameState = new GameState(doghouse);
         Command command = new Command(Verbs.GO, Noun.ANY);
-        Condition isPresent = new IsPresent(dog);
+        Condition isPresent = isPresent(dog);
         assertTrue(isPresent.matches(command, gameState));
     }
 
@@ -119,7 +122,7 @@ public class ConditionsTest {
         Item key = new Item.Builder().named("key").describedAs("A tarnished brass skeleton key.").inInventory().build();
         GameState gameState = new GameState(Room.NOWHERE);
         Command command = new Command(Verbs.GO, Noun.ANY);
-        Condition isPresent = new IsPresent(key);
+        Condition isPresent = isPresent(key);
         assertTrue(isPresent.matches(command, gameState));
     }
 
@@ -129,7 +132,7 @@ public class ConditionsTest {
         Item key = new Item.Builder().named("key").describedAs("A small key").portable().build();
         GameState gameState = new GameState(cell);
         Command command = new Command(Verbs.GO, Nouns.NORTH);
-        Condition isPresent = new IsPresent(key);
+        Condition isPresent = isPresent(key);
         assertFalse(isPresent.matches(command, gameState));
     }
 
@@ -139,8 +142,8 @@ public class ConditionsTest {
         Item key = new Item.Builder().named("key").describedAs("A small key.").in(cell).build();
         GameState gameState = new GameState(cell);
         Command command = new Command(Verbs.GO, Nouns.NORTH);
-        Condition isPresent = new IsPresent(key);
-        Condition isNotPresent = new Not(isPresent);
+        Condition isPresent = isPresent(key);
+        Condition isNotPresent = not(isPresent);
         assertEquals(!isPresent.matches(command, gameState), isNotPresent.matches(command, gameState));
     }
 
@@ -148,54 +151,25 @@ public class ConditionsTest {
     public void randomShouldReturnTrueGiven100PercentProbability() {
         GameState gameState = new GameState(Room.NOWHERE);
         Command command = new Command(Verb.ANY, Noun.UNRECOGNIZED);
-        Condition occurs = new Random(100);
-        assertTrue(occurs.matches(command, gameState));
-        occurs = new Random(100, () -> 0);
-        assertTrue(occurs.matches(command, gameState));
-        occurs = new Random(100, () -> 50);
-        assertTrue(occurs.matches(command, gameState));
-        occurs = new Random(100, () -> 100);
-        assertTrue(occurs.matches(command, gameState));
-        occurs = new Random(100, () -> -1);
-        assertTrue(occurs.matches(command, gameState));
-        occurs = new Random(100, () -> 101);
-        assertTrue(occurs.matches(command, gameState));
+
+        IntStream.range(0, 100).forEachOrdered(i -> assertTrue(random(100, () -> i).matches(command, gameState)));
     }
 
     @Test
     public void randomShouldReturnFalseGivenZeroPercentProbability() {
         GameState gameState = new GameState(Room.NOWHERE);
         Command command = new Command(Verb.ANY, Noun.UNRECOGNIZED);
-        Condition occurs = new Random(0);
-        assertFalse(occurs.matches(command, gameState));
-        occurs = new Random(0, () -> 0);
-        assertFalse(occurs.matches(command, gameState));
-        occurs = new Random(0, () -> 50);
-        assertFalse(occurs.matches(command, gameState));
-        occurs = new Random(0, () -> 100);
-        assertFalse(occurs.matches(command, gameState));
-        occurs = new Random(0, () -> -1);
-        assertFalse(occurs.matches(command, gameState));
-        occurs = new Random(0, () -> 101);
-        assertFalse(occurs.matches(command, gameState));
+
+        IntStream.range(0, 100).forEachOrdered(i -> assertFalse(random(0, () -> i).matches(command, gameState)));
     }
 
     @Test
     public void randomShouldReturnTrueGivenSuppliedNumberIsLessThenProbability() {
         GameState gameState = new GameState(Room.NOWHERE);
         Command command = new Command(Verb.ANY, Noun.UNRECOGNIZED);
-        Condition occurs = new Random(25, () -> 24);
-        assertTrue(occurs.matches(command, gameState));
-        occurs = new Random(25, () -> 0);
-        assertTrue(occurs.matches(command, gameState));
-        occurs = new Random(25, () -> 50);
-        assertFalse(occurs.matches(command, gameState));
-        occurs = new Random(25, () -> 100);
-        assertFalse(occurs.matches(command, gameState));
-        occurs = new Random(25, () -> -1);
-        assertTrue(occurs.matches(command, gameState));
-        occurs = new Random(25, () -> 101);
-        assertFalse(occurs.matches(command, gameState));
+
+        IntStream.range(0, 100).forEachOrdered(i ->
+                assertTrue(random(i + 1, () -> i).matches(command, gameState)));
     }
 
     @Test
@@ -214,15 +188,15 @@ public class ConditionsTest {
     public void timesShouldReturnTrueForTheGivenNumberOfTimes() {
         GameState gameState = new GameState(Room.NOWHERE);
 
-        Condition zero = new Conditions.Times(0);
+        Condition zero = times(0);
         assertFalse(zero.matches(Command.NONE, gameState));
         assertFalse(zero.matches(Command.NONE, gameState));
 
-        Condition once = new Conditions.Times(1);
+        Condition once = times(1);
         assertTrue(once.matches(Command.NONE, gameState));
         assertFalse(once.matches(Command.NONE, gameState));
 
-        Condition never = new Conditions.Times(-1);
+        Condition never = times(-1);
         assertFalse(never.matches(Command.NONE, gameState));
         assertFalse(never.matches(Command.NONE, gameState));
     }

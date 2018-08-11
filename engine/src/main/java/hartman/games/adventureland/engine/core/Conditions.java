@@ -16,6 +16,20 @@ public final class Conditions {
     }
 
     /**
+     * Performs a logical NOT of the Condition operand.
+     */
+    public static Condition not(Condition operand) {
+        return (command, gameState) -> !operand.matches(command, gameState);
+    }
+
+    /**
+     * Two Conditions combined with a 'logical OR'
+     */
+    public static Condition or(Condition condition1, Condition condition2) {
+        return (command, gameState) -> condition1.matches(command, gameState) || condition2.matches(command, gameState);
+    }
+
+    /**
      * True if player's requested noun represents a valid direction and that the current room
      * she is in has an exit matching that direction.
      */
@@ -23,217 +37,80 @@ public final class Conditions {
 
     public static final Condition currentRoomHasExitByVerb = (command, gameState) -> gameState.getCurrentRoom().hasExit(new Noun(command.getVerb().getName()));
 
-    public static Condition isInRoom(Room room) {
-        return new IsInRoom(room);
-    }
-
-    public static Condition isItemCarried(Item item) {
-        return new IsItemCarried(item);
-    }
-
-    public static Condition isItemHere(Item item) {
-        return new IsItemHere(item);
-    }
-
-    public static Condition isPresent(Item item) {
-        return new IsPresent(item);
-    }
-
-    public static Condition not(Condition operand) {
-        return new Not(operand);
-    }
-
-    public static Condition random(Integer probability) {
-        return new Random(probability);
-    }
-
-    public static Condition hasItemMoved(Item item) {
-        return new HasItemMoved(item);
-    }
-
-    public static Condition times(int times) {
-        return new Times(times);
-    }
-
-    public static Condition isItemInRoom(Item item, Room room) {
-        return new IsItemInRoom(item, room);
-    }
-
-    public static Condition exists(Item item) {
-        return new Exists(item);
-    }
-
-    /**
-     * Returns true for the given number of times.
-     */
-    public static class Times implements Condition {
-
-        private int counter;
-        private final int maxTimes;
-
-        public Times(int times) {
-            this.maxTimes = times;
-        }
-
-        @Override
-        public boolean matches(Command command, GameState gameState) {
-            return counter++ < maxTimes;
-        }
-    }
-
-    /**
-     * A condition which returns true based on a desired probability and a random number.
-     * E.g. given a probability of 10, this condition should evaluate to true, 10% of the time.
-     */
-    public static class Random implements Condition {
-
-        private Integer probability;
-        private Supplier<Integer> randomIntFn;
-
-        public Random(Integer probability) {
-            this(probability, () -> new java.util.Random().nextInt(100) + 1 /* 1 - 100 */);
-        }
-
-        public Random(Integer probability, Supplier<Integer> randomIntFn) {
-            if (probability < 0 || probability > 100) {
-                throw new IllegalArgumentException("Invalid value. Probability must be between 0 and 100 inclusive.");
-            }
-            this.probability = probability;
-            this.randomIntFn = randomIntFn;
-        }
-
-        @Override
-        public boolean matches(Command command, GameState gameState) {
-            if (probability == 0) {
-                return false;
-            } else if (probability == 100) {
-                return true;
-            } else {
-                return probability - randomIntFn.get() >= 0;
-            }
-        }
-    }
-
     /**
      * True if the player's current room is ROOM.
      */
-    public static class IsInRoom implements Condition {
-
-        private final Room room;
-
-        public IsInRoom(Room room) {
-            this.room = room;
-        }
-
-        @Override
-        public boolean matches(Command command, GameState gameState) {
-            return gameState.getCurrentRoom().equals(room);
-        }
+    public static Condition isInRoom(Room room) {
+        return (command, gameState) -> gameState.getCurrentRoom().equals(room);
     }
 
     /**
      * True if the player is carrying ITEM in their inventory.
      */
-    public static class IsItemCarried implements Condition {
-
-        private final Item item;
-
-        public IsItemCarried(Item item) {
-            this.item = item;
-        }
-
-        @Override
-        public boolean matches(Command command, GameState gameState) {
-            return item.isCarried();
-        }
+    public static Condition isItemCarried(Item item) {
+        return (command, gameState) -> item.isCarried();
     }
 
     /**
      * True if ITEM is in the player's current room.
      */
-    public static class IsItemHere implements Condition {
-
-        private final Item item;
-
-        public IsItemHere(Item item) {
-            this.item = item;
-        }
-
-        @Override
-        public boolean matches(Command command, GameState gameState) {
-            return item.isHere(gameState.getCurrentRoom());
-        }
+    public static Condition isItemHere(Item item) {
+        return (command, gameState) -> item.isHere(gameState.getCurrentRoom());
     }
 
     /**
      * True if ITEM is either being carried by the player
      * or is in the player's current room.
      */
-    public static class IsPresent implements Condition {
-
-        private Condition isItemCarried;
-        private Condition isItemHere;
-
-        public IsPresent(Item item) {
-            isItemCarried = new IsItemCarried(item);
-            isItemHere = new IsItemHere(item);
-        }
-
-        @Override
-        public boolean matches(Command command, GameState gameState) {
-            return isItemCarried.matches(command, gameState) || isItemHere.matches(command, gameState);
-        }
+    public static Condition isPresent(Item item) {
+        return or(isItemHere(item), isItemCarried(item));
     }
 
     /**
-     * Returns the inverse of the wrapped condition.
+     * A condition which returns true based on a desired probability and a random number.
+     * E.g. given a probability of 10, this condition should evaluate to true, 10% of the time.
      */
-    public static class Not implements Condition {
+    public static Condition random(Integer probability) {
+        return random(probability, () -> new java.util.Random().nextInt(100) /* 0 - 99 */);
+    }
 
-        private final Condition operand;
-
-        public Not(Condition operand) {
-            this.operand = operand;
+    /**
+     * A condition which returns true based on a desired probability and the result of the given supplier function.
+     */
+    public static Condition random(Integer probability, Supplier<Integer> d100) {
+        if (probability < 0 || probability > 100) {
+            throw new IllegalArgumentException("Invalid value. Probability must be between 0 and 100 inclusive.");
         }
-
-        @Override
-        public boolean matches(Command command, GameState gameState) {
-            return !operand.matches(command, gameState);
-        }
+        return (command, gameState) -> probability - d100.get() > 0;
     }
 
     /**
      * True if ITEM has moved from its original starting location.
      */
-    public static class HasItemMoved implements Condition {
-        private final Item item;
+    public static Condition hasItemMoved(Item item) {
+        return (command, gameState) -> item.hasMoved();
+    }
 
-        public HasItemMoved(Item item) {
-            this.item = item;
-        }
+    /**
+     * Returns true for the given number of times.
+     */
+    public static Condition times(int times) {
+        return new Condition() {
 
-        @Override
-        public boolean matches(Command command, GameState gameState) {
-            return item.hasMoved();
-        }
+            private int counter;
+
+            @Override
+            public boolean matches(Command command, GameState gameState) {
+                return counter++ < times;
+            }
+        };
     }
 
     /**
      * True if ITEM is in the ROOM
      */
-    public static class IsItemInRoom implements Condition {
-        private final Item item;
-        private final Room room;
-
-        public IsItemInRoom(Item item, Room room) {
-            this.item = item;
-            this.room = room;
-        }
-
-        @Override
-        public boolean matches(Command command, GameState gameState) {
-            return item.isHere(room);
-        }
+    public static Condition isItemInRoom(Item item, Room room) {
+        return (command, gameState) -> item.isHere(room);
     }
 
     /**
@@ -241,16 +118,8 @@ public final class Conditions {
      *
      * An ITEM in NOWHERE is considered to exist.
      */
-    public static class Exists implements Condition {
-        private final Item item;
-
-        public Exists(Item item) {
-            this.item = item;
-        }
-
-        @Override
-        public boolean matches(Command command, GameState gameState) {
-            return gameState.exists(item);
-        }
+    public static Condition exists(Item item) {
+        return (command, gameState) -> gameState.exists(item);
     }
+
 }
