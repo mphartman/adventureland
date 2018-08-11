@@ -35,10 +35,10 @@ public class Vocabulary {
     }
 
     public Vocabulary merge(Vocabulary vocab) {
-        Set<Verb> verbs = new LinkedHashSet<>(this.verbs);
-        verbs.addAll(vocab.verbs);
-        Set<Noun> nouns = new LinkedHashSet<>(this.nouns);
-        nouns.addAll(vocab.nouns);
-        return new Vocabulary(verbs, nouns);
+        Set<Verb> mergedVerbSet = new LinkedHashSet<>(this.verbs);
+        mergedVerbSet.addAll(vocab.verbs);
+        Set<Noun> mergedNounSet = new LinkedHashSet<>(this.nouns);
+        mergedNounSet.addAll(vocab.nouns);
+        return new Vocabulary(mergedVerbSet, mergedNounSet);
     }
 }
