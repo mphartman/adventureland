@@ -1,6 +1,10 @@
 package hartman.games.adventureland.engine.core;
 
-import hartman.games.adventureland.engine.*;
+import hartman.games.adventureland.engine.Command;
+import hartman.games.adventureland.engine.CommandInterpreter;
+import hartman.games.adventureland.engine.Noun;
+import hartman.games.adventureland.engine.Verb;
+import hartman.games.adventureland.engine.Vocabulary;
 
 import java.util.Scanner;
 
@@ -18,26 +22,22 @@ public class DefaultCommandInterpreter implements CommandInterpreter {
     public Command nextCommand() {
 
         String line = scanner.nextLine();
-        Scanner lineScanner = new Scanner(line);
+        try (Scanner lineScanner = new Scanner(line)) {
 
-        Verb verb = Verb.NONE;
-        Noun noun = Noun.NONE;
-
-        if (lineScanner.hasNext()) {
-            String firstTerm = lineScanner.next();
-            verb = vocabulary.toVerb(firstTerm).orElse(Verb.UNRECOGNIZED);
+            Verb verb = Verb.NONE;
+            Noun noun = Noun.NONE;
 
             if (lineScanner.hasNext()) {
-                String secondTerm = lineScanner.next();
-                noun = vocabulary.toNoun(secondTerm).orElse(Noun.UNRECOGNIZED);
+                String firstTerm = lineScanner.next();
+                verb = vocabulary.toVerb(firstTerm).orElse(Verb.UNRECOGNIZED);
+
+                if (lineScanner.hasNext()) {
+                    String secondTerm = lineScanner.next();
+                    noun = vocabulary.toNoun(secondTerm).orElse(Noun.UNRECOGNIZED);
+                }
             }
+
+            return new Command(verb, noun);
         }
-
-        Command command = new Command(verb, noun);
-
-//        System.out.printf("I heard you say: \"%s\"%n", line);
-//        System.out.printf("And I understood it as  %s%n", command);
-
-        return command;
     }
 }
