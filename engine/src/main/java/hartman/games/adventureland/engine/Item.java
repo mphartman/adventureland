@@ -1,9 +1,7 @@
 package hartman.games.adventureland.engine;
 
 import java.util.LinkedHashSet;
-import java.util.Objects;
 import java.util.Set;
-import java.util.StringJoiner;
 
 /**
  * Things in a room, some of which can be picked up, carried around and dropped.
@@ -11,7 +9,7 @@ import java.util.StringJoiner;
  * Items are either "objects" like keys, swords, lamps, and mud while other items
  * are "scenery" like trees, signs, crypts, tables, altars, donkeys, etc.
  */
-public class Item implements GameElement {
+public class Item extends Noun implements GameElement {
 
     public static class Builder {
         private String name;
@@ -60,31 +58,23 @@ public class Item implements GameElement {
 
     private static final Room INVENTORY = new Room("Inventory", "Player's inventory of carried items.");
 
-    private final String name;
     private final String description;
     private final boolean portable;
     private final Room startingRoom;
-    private final Noun noun;
 
     private Room currentRoom;
     private boolean destroyed;
 
     protected Item(String name, String description, boolean portable, Room startingRoom, String... aliases) {
-        Objects.requireNonNull(name, "Item must have a name.");
-        this.name = name;
+        super(name, aliases);
         this.description = description;
         this.portable = portable;
         this.startingRoom = startingRoom;
         this.currentRoom = startingRoom;
-        this.noun = new Noun(name, aliases);
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
-        return description;
+        return description == null ? getName() : description;
     }
 
     public boolean isPortable() {
@@ -96,17 +86,13 @@ public class Item implements GameElement {
     }
 
     public boolean isHere(Room room) {
-        if (destroyed) throw new IllegalStateException(ITEM_IS_DESTROYED);
+        if (destroyed) return false;
         return currentRoom.equals(room);
     }
 
     public Boolean hasMoved() {
-        if (destroyed) throw new IllegalStateException(ITEM_IS_DESTROYED);
+        if (destroyed) return false;
         return !currentRoom.equals(startingRoom);
-    }
-
-    public Noun asNoun() {
-        return noun;
     }
 
     public Room drop(Room room) {
@@ -121,7 +107,7 @@ public class Item implements GameElement {
         if (portable) {
             return drop(INVENTORY);
         }
-        throw new IllegalStateException(String.format("Item %s cannot be put into inventory. Cannot stow a non-portable item.", name));
+        throw new IllegalStateException("Item cannot be put into inventory. Cannot stow a non-portable item.");
     }
 
     public void putWith(Item item) {
@@ -142,31 +128,4 @@ public class Item implements GameElement {
         if (!destroyed) visitor.visit(this);
     }
 
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", Item.class.getSimpleName() + "[", "]")
-                .add("name='" + name + "'")
-                .add("description='" + description + "'")
-                .add("destroyed=" + destroyed)
-                .add("portable=" + portable)
-                .add("currentRoom=" + currentRoom)
-                .add("noun=" + noun)
-                .add("startingRoom=" + startingRoom)
-                .toString();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Item item = (Item) o;
-
-        return name.equals(item.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return name.hashCode();
-    }
 }

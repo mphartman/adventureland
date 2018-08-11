@@ -1,7 +1,6 @@
 package hartman.games.adventureland.engine.core;
 
 import hartman.games.adventureland.engine.Action;
-import hartman.games.adventureland.engine.Item;
 import hartman.games.adventureland.engine.Noun;
 import hartman.games.adventureland.engine.Verb;
 import hartman.games.adventureland.engine.Vocabulary;
@@ -33,12 +32,6 @@ public final class Actions {
                 public Action.Builder with(Noun noun) {
                     nouns.add(noun);
                     return super.with(noun);
-                }
-
-                @Override
-                public Action.Builder with(Item item) {
-                    nouns.add(item.asNoun());
-                    return super.with(item);
                 }
 
                 @Override

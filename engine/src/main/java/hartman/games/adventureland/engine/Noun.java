@@ -1,7 +1,10 @@
 
 package hartman.games.adventureland.engine;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 public class Noun {
     public static final Noun UNRECOGNIZED = new Noun("Unrecognized");
@@ -12,12 +15,12 @@ public class Noun {
     private Set<String> synonyms = new HashSet<>();
 
     private Noun(String name) {
+        Objects.requireNonNull(name, "Noun must have a name.");
         this.name = name;
     }
 
     public Noun(String name, String... synonyms) {
-        Objects.requireNonNull(name, "name cannot be null");
-        this.name = name;
+        this(name);
         this.synonyms.addAll(Arrays.asList(synonyms));
         this.synonyms.add("ANY");
     }

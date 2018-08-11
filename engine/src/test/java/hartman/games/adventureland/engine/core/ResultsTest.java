@@ -190,7 +190,7 @@ public class ResultsTest {
         assertTrue(bowl.isPortable());
         assertFalse(bowl.isCarried());
 
-        get.execute(new Command(Verbs.GET, bowl.asNoun()), gameState, msg -> {});
+        get.execute(new Command(Verbs.GET, bowl), gameState, msg -> {});
 
         assertFalse(bowl.isHere(Room.NOWHERE));
         assertTrue(bowl.isCarried());
@@ -207,7 +207,7 @@ public class ResultsTest {
         assertTrue(potato.isCarried());
         assertFalse(potato.isHere(cellar));
 
-        drop.execute(new Command(Verbs.DROP, potato.asNoun()), gameState, msg -> {});
+        drop.execute(new Command(Verbs.DROP, potato), gameState, msg -> {});
 
         assertFalse(potato.isCarried());
         assertTrue(potato.isHere(cellar));

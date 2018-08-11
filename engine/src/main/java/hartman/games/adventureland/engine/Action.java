@@ -40,10 +40,6 @@ public class Action {
             return this;
         }
 
-        public Builder with(Item item) {
-            return with(item.asNoun());
-        }
-
         public Builder withUnrecognizedNoun() {
             this.noun = Noun.UNRECOGNIZED;
             return this;

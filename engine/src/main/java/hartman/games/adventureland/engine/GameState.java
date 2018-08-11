@@ -64,17 +64,10 @@ public class GameState {
      */
     public void putInInventory(Noun noun) {
         items.stream()
-                .filter(i -> i.asNoun().equals(noun))
+                .filter(i -> i.equals(noun))
                 .filter(Item::isPortable)
                 .findFirst()
                 .ifPresent(Item::stow);
-    }
-
-    /**
-     * @see #putInInventory(Noun)
-     */
-    public void putInInventory(Item item) {
-        putInInventory(item.asNoun());
     }
 
     /**
@@ -101,23 +94,18 @@ public class GameState {
      */
     public void drop(Noun noun) {
         items.stream()
-                .filter(item -> item.asNoun().equals(noun))
+                .filter(item -> item.equals(noun))
                 .findFirst()
                 .ifPresent(item -> item.drop(currentRoom));
-    }
-
-    /**
-     * @see #drop(Noun)
-     */
-    public void drop(Item item) {
-        drop(item.asNoun());
     }
 
     /**
      * Removes item thus effectively destroying it from game.
      */
     public void destroy(Noun noun) {
-         Optional<Item> maybeItem = items.stream().filter(item -> item.asNoun().equals(noun)).findFirst();
+         Optional<Item> maybeItem = items.stream()
+                 .filter(item -> item.equals(noun))
+                 .findFirst();
          maybeItem.ifPresent(item -> {
              items.remove(item);
              item.destroy();
@@ -125,23 +113,10 @@ public class GameState {
     }
 
     /**
-     * @see #destroy(Noun)
-     */
-    public void destroy(Item item) {
-        destroy(item.asNoun());
-    }
-
-    /**
      * True if ITEM is in the game and not destroyed.
      */
     public boolean exists(Noun noun) {
-        return items.stream().anyMatch(item -> item.asNoun().equals(noun) && !item.isDestroyed());
+        return items.stream().anyMatch(item -> item.equals(noun) && !item.isDestroyed());
     }
 
-    /**
-     * @see #exists(Noun)
-     */
-    public boolean exists(Item item) {
-        return exists(item.asNoun());
-    }
 }
