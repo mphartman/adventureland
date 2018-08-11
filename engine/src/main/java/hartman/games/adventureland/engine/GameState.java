@@ -106,10 +106,7 @@ public class GameState {
          Optional<Item> maybeItem = items.stream()
                  .filter(item -> item.equals(noun))
                  .findFirst();
-         maybeItem.ifPresent(item -> {
-             items.remove(item);
-             item.destroy();
-         });
+         maybeItem.ifPresent(Item::destroy);
     }
 
     /**

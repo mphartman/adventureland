@@ -149,12 +149,13 @@ public class GameStateTest {
 
     @Test
     public void destroyShouldRemoveItemFromGameState() {
+        Room shed = new Room("shed", "A rickety old tool shed.");
         Items.ItemSet itemSet = Items.newItemSet();
-        Item hammer = itemSet.newItem().named("hammer").build();
+        Item hammer = itemSet.newItem().named("hammer").in(shed).build();
 
         GameState gameState = new GameState(Room.NOWHERE, itemSet.copyOfItems());
-
         assertTrue(gameState.exists(hammer));
+
         gameState.destroy(hammer);
         assertFalse(gameState.exists(hammer));
         assertTrue(hammer.isDestroyed());

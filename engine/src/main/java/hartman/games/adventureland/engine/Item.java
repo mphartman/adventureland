@@ -54,8 +54,6 @@ public class Item extends Noun implements GameElement {
         }
     }
 
-    private static final String ITEM_IS_DESTROYED = "Item is destroyed.";
-
     private static final Room INVENTORY = new Room("Inventory", "Player's inventory of carried items.");
 
     private final String description;
@@ -63,7 +61,6 @@ public class Item extends Noun implements GameElement {
     private final Room startingRoom;
 
     private Room currentRoom;
-    private boolean destroyed;
 
     protected Item(String name, String description, boolean portable, Room startingRoom, String... aliases) {
         super(name, aliases);
@@ -78,7 +75,7 @@ public class Item extends Noun implements GameElement {
     }
 
     public boolean isPortable() {
-        return portable && !destroyed;
+        return portable;
     }
 
     public boolean isCarried() {
@@ -86,24 +83,20 @@ public class Item extends Noun implements GameElement {
     }
 
     public boolean isHere(Room room) {
-        if (destroyed) return false;
         return currentRoom.equals(room);
     }
 
     public Boolean hasMoved() {
-        if (destroyed) return false;
         return !currentRoom.equals(startingRoom);
     }
 
     public Room drop(Room room) {
-        if (destroyed) throw new IllegalStateException(ITEM_IS_DESTROYED);
         Room formerLocation = currentRoom;
         currentRoom = room;
         return formerLocation;
     }
 
     public Room stow() {
-        if (destroyed) throw new IllegalStateException(ITEM_IS_DESTROYED);
         if (portable) {
             return drop(INVENTORY);
         }
@@ -115,17 +108,16 @@ public class Item extends Noun implements GameElement {
     }
 
     public void destroy() {
-        this.destroyed = true;
         this.currentRoom = Room.NOWHERE;
     }
 
     public boolean isDestroyed() {
-        return destroyed;
+        return isHere(Room.NOWHERE);
     }
 
     @Override
     public void accept(GameElementVisitor visitor) {
-        if (!destroyed) visitor.visit(this);
+        visitor.visit(this);
     }
 
 }

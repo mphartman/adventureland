@@ -213,12 +213,16 @@ public class ConditionsTest {
 
     @Test
     public void existsShouldReturnTrueForNonDestroyedGameItems() {
+        Room desk = new Room("desk", "A school desk.");
         Items.ItemSet itemSet = Items.newItemSet();
-        Item pencil = itemSet.newItem().named("pencil").build();
+        Item pencil = itemSet.newItem().named("pencil").in(desk).build();
 
-        assertFalse(exists(pencil).matches(Command.NONE, new GameState(Room.NOWHERE)));
+        GameState gameState;
 
-        GameState gameState = new GameState(Room.NOWHERE, itemSet.copyOfItems());
+        gameState = new GameState(Room.NOWHERE);
+        assertFalse("item is not in game", exists(pencil).matches(Command.NONE, gameState));
+
+        gameState = new GameState(Room.NOWHERE, itemSet.copyOfItems());
         assertTrue(exists(pencil).matches(Command.NONE, gameState));
 
         gameState.destroy(pencil);

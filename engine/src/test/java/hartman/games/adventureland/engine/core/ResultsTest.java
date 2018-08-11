@@ -231,11 +231,14 @@ public class ResultsTest {
 
     @Test
     public void destroyShouldAnnihilateItem() {
+        Room xandar = new Room("xandar", "The plant Xandar");
         Items.ItemSet itemSet = Items.newItemSet();
-        Item orb = itemSet.newItem().named("orb").build();
+        Item orb = itemSet.newItem().named("orb").in(xandar).build();
+
         GameState gameState = new GameState(Room.NOWHERE, itemSet.copyOfItems());
         assertTrue(gameState.exists(orb));
         assertFalse(orb.isDestroyed());
+
         destroy(orb).execute(Command.NONE, gameState, msg -> {});
         assertFalse(gameState.exists(orb));
         assertTrue(orb.isDestroyed());
