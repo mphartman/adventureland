@@ -77,10 +77,7 @@ public final class Conditions {
 
         @Override
         public boolean matches(Command command, GameState gameState) {
-            if (counter++ < maxTimes) {
-                return true;
-            }
-            return false;
+            return counter++ < maxTimes;
         }
     }
 
