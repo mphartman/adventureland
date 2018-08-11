@@ -115,11 +115,12 @@ public class Action {
         Display display = context.getDisplay();
         GameState gameState = context.getGameState();
 
-        if (verb.equals(command.getVerb()) && noun.equals(command.getNoun())) {
-            if (conditions.stream().allMatch(condition -> condition.matches(command, gameState))) {
-                results.forEach(result -> result.execute(command, gameState, display));
-                return true;
-            }
+        if (verb.equals(command.getVerb())
+                && noun.equals(command.getNoun())
+                && conditions.stream().allMatch(condition -> condition.matches(command, gameState))) {
+
+            results.forEach(result -> result.execute(command, gameState, display));
+            return true;
         }
         return false;
     }
