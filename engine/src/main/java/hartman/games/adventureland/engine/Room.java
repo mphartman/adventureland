@@ -112,10 +112,6 @@ public class Room implements GameElement {
         return exits.stream().anyMatch(e -> e.getDirection().matches(direction));
     }
 
-    public int numberOfExits() {
-        return exits.size();
-    }
-
     public Room exit(Noun direction) {
         return exits.stream()
                 .filter(e -> e.getDirection().matches(direction))
