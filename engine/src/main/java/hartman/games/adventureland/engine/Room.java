@@ -124,7 +124,7 @@ public class Room implements GameElement {
     @Override
     public void accept(GameElementVisitor visitor) {
         visitor.visit(this);
-        exits.forEach(exit -> visitor.visit(exit));
+        exits.forEach(visitor::visit);
     }
 
     @Override
