@@ -1,7 +1,6 @@
 package hartman.games.adventureland.engine.core;
 
 import hartman.games.adventureland.engine.Action;
-import hartman.games.adventureland.engine.ActionContext;
 import hartman.games.adventureland.engine.Command;
 import hartman.games.adventureland.engine.GameState;
 import hartman.games.adventureland.engine.Room;
@@ -27,7 +26,7 @@ public class ActionsTest {
         assertTrue(actionSet.copyOfActions().contains(action));
 
         GameState gameState = new GameState(Room.NOWHERE);
-        action.run(new ActionContext(gameState, message -> {}, Command.NONE));
+        action.run(gameState, message -> {}, Command.NONE);
 
         assertEquals(true, gameState.getFlag("condition"));
         assertEquals(true, gameState.getFlag("result"));

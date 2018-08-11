@@ -26,11 +26,11 @@ public class Game {
     }
 
     private void runOccurs() {
-        adventure.getOccurs().forEach(occur -> occur.run(new ActionContext(gameState, display)));
+        adventure.getOccurs().forEach(occur -> occur.run(gameState, display));
     }
 
     private void runActions(Command command) {
         for (Action action : adventure.getActions())
-            if (action.run(new ActionContext(gameState, display, command))) return;
+            if (action.run(gameState, display, command)) return;
     }
 }

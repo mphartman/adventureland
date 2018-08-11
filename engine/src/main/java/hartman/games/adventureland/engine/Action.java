@@ -115,15 +115,9 @@ public class Action {
     /**
      * Runs this Action if the command matches and all conditions are met.
      *
-     * @param context
      * @return true if this action is applicable to the given command and all conditions are met, otherwise returns false.
      */
-    public boolean run(ActionContext context) {
-
-        Command command = context.getCommand();
-        Display display = context.getDisplay();
-        GameState gameState = context.getGameState();
-
+    public boolean run(GameState gameState, Display display, Command command) {
         if (verb.matches(command.getVerb())
                 && noun.matches(command.getNoun())
                 && conditions.stream().allMatch(condition -> condition.matches(command, gameState))) {
@@ -132,6 +126,15 @@ public class Action {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Runs this Action if all conditions are met.
+     *
+     * @return true if this action's all conditions are met, otherwise returns false.
+     */
+    public boolean run(GameState gameState, Display display) {
+        return run(gameState, display, Command.NONE);
     }
 
 }
