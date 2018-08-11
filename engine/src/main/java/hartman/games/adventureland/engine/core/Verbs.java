@@ -4,6 +4,10 @@ import hartman.games.adventureland.engine.Verb;
 
 public final class Verbs {
 
+    private Verbs() {
+        throw new IllegalStateException("utility class");
+    }
+
     public static final Verb HELP = new Verb("HELP", "?");
 
     public static final Verb QUIT = new Verb("QUIT");

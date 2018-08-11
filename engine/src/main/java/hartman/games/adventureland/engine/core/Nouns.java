@@ -4,6 +4,10 @@ import hartman.games.adventureland.engine.Noun;
 
 public final class Nouns {
 
+    private Nouns() {
+        throw new IllegalStateException("utility class");
+    }
+
     public static final Noun NORTH = new Noun("North", "N");
 
     public static final Noun SOUTH = new Noun("South", "S");

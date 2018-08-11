@@ -7,6 +7,10 @@ import java.util.Set;
 
 public final class Items {
 
+    private Items() {
+        throw new IllegalStateException("utility class");
+    }
+
     public static class ItemSet {
         private final Set<Item> items = new LinkedHashSet<>();
 

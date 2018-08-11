@@ -11,6 +11,10 @@ import java.util.Set;
 
 public final class Actions {
 
+    private Actions() {
+        throw new IllegalStateException("utility class");
+    }
+
     public static class ActionSet {
 
         private Set<Action> actions = new LinkedHashSet<>();
