@@ -56,6 +56,8 @@ public class Item implements GameElement {
         }
     }
 
+    private static final String ITEM_IS_DESTROYED = "Item is destroyed.";
+
     private static final Room INVENTORY = new Room("Inventory", "Player's inventory of carried items.");
 
     private final String name;
@@ -94,12 +96,12 @@ public class Item implements GameElement {
     }
 
     public boolean isHere(Room room) {
-        if (destroyed) throw new IllegalStateException("Item is destroyed.");
+        if (destroyed) throw new IllegalStateException(ITEM_IS_DESTROYED);
         return currentRoom.equals(room);
     }
 
     public Boolean hasMoved() {
-        if (destroyed) throw new IllegalStateException("Item is destroyed.");
+        if (destroyed) throw new IllegalStateException(ITEM_IS_DESTROYED);
         return !currentRoom.equals(startingRoom);
     }
 
@@ -108,14 +110,14 @@ public class Item implements GameElement {
     }
 
     public Room drop(Room room) {
-        if (destroyed) throw new IllegalStateException("Item is destroyed.");
+        if (destroyed) throw new IllegalStateException(ITEM_IS_DESTROYED);
         Room formerLocation = currentRoom;
         currentRoom = room;
         return formerLocation;
     }
 
     public Room stow() {
-        if (destroyed) throw new IllegalStateException("Item is destroyed.");
+        if (destroyed) throw new IllegalStateException(ITEM_IS_DESTROYED);
         if (portable) {
             return drop(INVENTORY);
         }
