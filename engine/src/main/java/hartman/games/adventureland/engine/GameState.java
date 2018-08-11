@@ -60,9 +60,9 @@ public class GameState {
 
     /**
      * Places item represented here as a Noun, in the inventory.
-     * Item only needs to exist, it does not need to be in the current room.
+     * Item only needs to exist and be portable, it does not need to be in the current room.
      */
-    public void get(Noun noun) {
+    public void putInInventory(Noun noun) {
         items.stream()
                 .filter(i -> i.asNoun().equals(noun))
                 .filter(Item::isPortable)
@@ -71,10 +71,10 @@ public class GameState {
     }
 
     /**
-     * @see #get(Noun)
+     * @see #putInInventory(Noun)
      */
-    public void get(Item item) {
-        get(item.asNoun());
+    public void putInInventory(Item item) {
+        putInInventory(item.asNoun());
     }
 
     /**
@@ -82,23 +82,25 @@ public class GameState {
      */
     public void describe(GameElementVisitor visitor) {
         currentRoom.accept(visitor);
-        items.stream().filter(item -> item.isHere(currentRoom)).forEach(item -> item.accept(visitor));
+        items.stream()
+                .filter(item -> item.isHere(currentRoom))
+                .forEach(item -> item.accept(visitor));
     }
 
     /**
      * Visits only those items currently held in player's inventory.
      */
     public void inventory(GameElementVisitor visitor) {
-        items.stream().filter(Item::isCarried).forEach(item -> item.accept(visitor));
+        items.stream()
+                .filter(Item::isCarried)
+                .forEach(item -> item.accept(visitor));
     }
 
     /**
-     * Places the item represented by noun in the current room.
-     * If noun does not match an known item or is not carried, does nothing.
+     * Places the item in the current room.
      */
     public void drop(Noun noun) {
         items.stream()
-                .filter(Item::isCarried)
                 .filter(item -> item.asNoun().equals(noun))
                 .findFirst()
                 .ifPresent(item -> item.drop(currentRoom));
@@ -130,10 +132,10 @@ public class GameState {
     }
 
     /**
-     * True if ITEM is in the game.
+     * True if ITEM is in the game and not destroyed.
      */
     public boolean exists(Noun noun) {
-        return items.stream().anyMatch(item -> item.asNoun().equals(noun));
+        return items.stream().anyMatch(item -> item.asNoun().equals(noun) && !item.isDestroyed());
     }
 
     /**

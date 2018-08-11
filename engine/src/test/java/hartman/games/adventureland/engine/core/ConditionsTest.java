@@ -16,6 +16,7 @@ import static hartman.games.adventureland.engine.core.Conditions.IsPresent;
 import static hartman.games.adventureland.engine.core.Conditions.Not;
 import static hartman.games.adventureland.engine.core.Conditions.Random;
 import static hartman.games.adventureland.engine.core.Conditions.currentRoomHasExit;
+import static hartman.games.adventureland.engine.core.Conditions.exists;
 import static hartman.games.adventureland.engine.core.Conditions.hasItemMoved;
 import static hartman.games.adventureland.engine.core.Conditions.isItemInRoom;
 import static hartman.games.adventureland.engine.core.Nouns.DOWN;
@@ -234,5 +235,19 @@ public class ConditionsTest {
 
         assertTrue(isItemInRoom(vomit, bus).matches(Command.NONE, new GameState(bus)));
         assertFalse(isItemInRoom(driver, bus).matches(Command.NONE, new GameState(bus)));
+    }
+
+    @Test
+    public void existsShouldReturnTrueForNonDestroyedGameItems() {
+        Items.ItemSet itemSet = Items.newItemSet();
+        Item pencil = itemSet.newItem().named("pencil").build();
+
+        assertFalse(exists(pencil).matches(Command.NONE, new GameState(Room.NOWHERE)));
+
+        GameState gameState = new GameState(Room.NOWHERE, itemSet.copyOfItems());
+        assertTrue(exists(pencil).matches(Command.NONE, gameState));
+
+        gameState.destroy(pencil);
+        assertFalse(exists(pencil).matches(Command.NONE, gameState));
     }
 }

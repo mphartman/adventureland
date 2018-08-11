@@ -50,10 +50,14 @@ public final class Results {
     }
 
     public static Result put(Item item, Room room) {
-        return new Put(item, room);
+        return ((command, gameState, display) -> item.drop(room));
     }
 
-    public static final Result get = ((command, gameState, display) -> gameState.get(command.getNoun()));
+    public static Result putHere(Item item) {
+        return (command, gameState, display) -> item.drop(gameState.getCurrentRoom());
+    }
+
+    public static final Result get = ((command, gameState, display) -> gameState.putInInventory(command.getNoun()));
 
     public static final Result drop = ((command, gameState, display) -> gameState.drop(command.getNoun()));
 
@@ -206,25 +210,6 @@ public final class Results {
         @Override
         public void execute(Command command, GameState gameState, Display display) {
             gameState.moveTo(room);
-        }
-    }
-
-    /**
-     * Puts the specified item in the specified room.
-     */
-    public static class Put implements Result {
-
-        private final Room room;
-        private final Item item;
-
-        Put(Item item, Room room) {
-            this.room = room;
-            this.item = item;
-        }
-
-        @Override
-        public void execute(Command command, GameState gameState, Display display) {
-            item.drop(room);
         }
     }
 

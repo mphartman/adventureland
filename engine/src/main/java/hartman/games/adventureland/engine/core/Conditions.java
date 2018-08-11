@@ -55,6 +55,10 @@ public final class Conditions {
         return new IsItemInRoom(item, room);
     }
 
+    public static Condition exists(Item item) {
+        return new Exists(item);
+    }
+
     /**
      * Returns true for the given number of times.
      */
@@ -228,6 +232,24 @@ public final class Conditions {
         @Override
         public boolean matches(Command command, GameState gameState) {
             return item.isHere(room);
+        }
+    }
+
+    /**
+     * True if ITEM is somewhere in the game, i.e. not destroyed.
+     *
+     * An ITEM in NOWHERE is considered to exist.
+     */
+    public static class Exists implements Condition {
+        private final Item item;
+
+        public Exists(Item item) {
+            this.item = item;
+        }
+
+        @Override
+        public boolean matches(Command command, GameState gameState) {
+            return gameState.exists(item);
         }
     }
 }

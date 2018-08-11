@@ -36,18 +36,18 @@ public class GameStateTest {
         assertFalse(icecreamCone.isCarried());
 
         GameState gameState = new GameState(Room.NOWHERE);
-        gameState.get(icecreamCone);
+        gameState.putInInventory(icecreamCone);
 
         assertFalse("ice cream cone wasn't registered with gamestate", icecreamCone.isCarried());
 
         gameState = new GameState(Room.NOWHERE, itemSet.copyOfItems());
-        gameState.get(icecreamCone);
+        gameState.putInInventory(icecreamCone);
         assertFalse("ice cream cone isn't portable", icecreamCone.isCarried());
 
         Item cup = itemSet.newItem().named("cup").portable().build();
         assertFalse(cup.isCarried());
         gameState = new GameState(Room.NOWHERE, itemSet.copyOfItems());
-        gameState.get(cup);
+        gameState.putInInventory(cup);
         assertTrue(cup.isCarried());
     }
 
@@ -119,7 +119,7 @@ public class GameStateTest {
     }
 
     @Test
-    public void dropShouldPlaceCarriedItemInCurrentRoom() {
+    public void dropShouldPlaceItemInCurrentRoom() {
         Room conferenceRoom = new Room("conferenceRoom", "A brightly lit corporate conference room");
 
         Items.ItemSet itemSet = Items.newItemSet();
@@ -144,7 +144,7 @@ public class GameStateTest {
         Item carrot = itemSet.newItem().named("carrot").build();
         gameState = new GameState(conferenceRoom, itemSet.copyOfItems());
         gameState.drop(carrot);
-        assertFalse("carrot wasn't being carried", carrot.isHere(conferenceRoom));
+        assertTrue(carrot.isHere(conferenceRoom));
     }
 
     @Test

@@ -86,7 +86,7 @@ public class Item implements GameElement {
     }
 
     public boolean isPortable() {
-        return portable;
+        return portable && !destroyed;
     }
 
     public boolean isCarried() {
@@ -117,9 +117,7 @@ public class Item implements GameElement {
     public Room stow() {
         if (destroyed) throw new IllegalStateException("Item is destroyed.");
         if (portable) {
-            Room formerRoom = currentRoom;
-            currentRoom = INVENTORY;
-            return formerRoom;
+            return drop(INVENTORY);
         }
         throw new IllegalStateException(String.format("Item %s cannot be put into inventory. Cannot stow a non-portable item.", name));
     }
