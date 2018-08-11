@@ -3,17 +3,18 @@ sudo: false
 install: true
 
 addons:
-    sonarcloud:
-        organization: "mphartman-github"
-        token:
-            secure: "$SONAR_TOKEN"
-    jdk:
-        - oraclejdk8
+  sonarcloud:
+    organization: "mphartman-github"
+      token:
+        secure: "$SONAR_TOKEN"
 
-    script:
-        - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
+jdk:
+  - oraclejdk8
 
-    cache:
-        directories:
-            - '$HOME/.m2/repository'
-            - '$HOME/.sonar/cache'
+script:
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
+
+cache:
+  directories:
+    - '$HOME/.m2/repository'
+    - '$HOME/.sonar/cache'
