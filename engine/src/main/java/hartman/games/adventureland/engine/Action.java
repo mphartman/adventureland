@@ -60,8 +60,7 @@ public class Action {
         }
 
         public Builder anything() {
-            this.noun = Noun.ANY;
-            return this;
+            return withAnyNoun();
         }
 
         public Builder when(Condition condition) {
