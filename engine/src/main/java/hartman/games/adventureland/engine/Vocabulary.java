@@ -26,11 +26,11 @@ public class Vocabulary {
         this.nouns.addAll(nouns);
     }
 
-    public Optional<Verb> toVerb(String name) {
+    public Optional<Verb> findVerb(String name) {
         return verbs.stream().filter(v -> v.equals(new Verb(name))).findFirst();
     }
 
-    public Optional<Noun> toNoun(String name) {
+    public Optional<Noun> findNoun(String name) {
         return nouns.stream().filter(n -> n.equals(new Noun(name))).findFirst();
     }
 

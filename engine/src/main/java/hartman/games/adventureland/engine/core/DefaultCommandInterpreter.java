@@ -29,11 +29,11 @@ public class DefaultCommandInterpreter implements CommandInterpreter {
 
             if (lineScanner.hasNext()) {
                 String firstTerm = lineScanner.next();
-                verb = vocabulary.toVerb(firstTerm).orElse(Verb.UNRECOGNIZED);
+                verb = vocabulary.findVerb(firstTerm).orElse(Verb.UNRECOGNIZED);
 
                 if (lineScanner.hasNext()) {
                     String secondTerm = lineScanner.next();
-                    noun = vocabulary.toNoun(secondTerm).orElse(Noun.UNRECOGNIZED);
+                    noun = vocabulary.findNoun(secondTerm).orElse(Noun.UNRECOGNIZED);
                 }
             }
 

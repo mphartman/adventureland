@@ -1,15 +1,13 @@
 package hartman.games.adventureland.engine;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static java.util.Arrays.*;
-import static org.junit.Assert.*;
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
 
 public class VocabularyTest {
 
@@ -22,7 +20,7 @@ public class VocabularyTest {
 
         Vocabulary vocabulary = new Vocabulary(verbs, Collections.emptySet());
 
-        assertEquals(verb, vocabulary.toVerb("suck").get());
+        assertEquals(verb, vocabulary.findVerb("suck").get());
     }
 
     @Test
@@ -34,7 +32,7 @@ public class VocabularyTest {
 
         Vocabulary vocabulary = new Vocabulary(Collections.emptySet(), nouns);
 
-        assertEquals(noun, vocabulary.toNoun("mouse").get());
+        assertEquals(noun, vocabulary.findNoun("mouse").get());
     }
 
     @Test
@@ -46,16 +44,16 @@ public class VocabularyTest {
 
         Vocabulary vocab4 = Vocabulary.merge(vocab1, vocab2, vocab3);
 
-        assertEquals(new Verb("v1"), vocab4.toVerb("v1").get());
-        assertEquals(new Verb("v2"), vocab4.toVerb("v2").get());
-        assertEquals(new Noun("n1"), vocab4.toNoun("n1").get());
-        assertEquals(new Noun("n2"), vocab4.toNoun("n2").get());
+        assertEquals(new Verb("v1"), vocab4.findVerb("v1").get());
+        assertEquals(new Verb("v2"), vocab4.findVerb("v2").get());
+        assertEquals(new Noun("n1"), vocab4.findNoun("n1").get());
+        assertEquals(new Noun("n2"), vocab4.findNoun("n2").get());
 
         vocab4 = vocab1.merge(vocab2).merge(vocab3);
 
-        assertEquals(new Verb("v1"), vocab4.toVerb("v1").get());
-        assertEquals(new Verb("v2"), vocab4.toVerb("v2").get());
-        assertEquals(new Noun("n1"), vocab4.toNoun("n1").get());
-        assertEquals(new Noun("n2"), vocab4.toNoun("n2").get());
+        assertEquals(new Verb("v1"), vocab4.findVerb("v1").get());
+        assertEquals(new Verb("v2"), vocab4.findVerb("v2").get());
+        assertEquals(new Noun("n1"), vocab4.findNoun("n1").get());
+        assertEquals(new Noun("n2"), vocab4.findNoun("n2").get());
     }
 }
