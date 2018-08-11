@@ -49,7 +49,7 @@ public class GameTest {
                 new Command(GO, DOWN),
                 new Command(GO, UP),
                 new Command(GO, DOWN),
-                new Command(QUIT)
+                new Command(QUIT, Noun.NONE)
         };
         AtomicInteger i = new AtomicInteger(0);
         CommandInterpreter interpreter = () -> commands[i.getAndIncrement()];
@@ -79,7 +79,7 @@ public class GameTest {
 
         Command[] commands = {
                 new Command(GO, DOWN),
-                new Command(QUIT)
+                new Command(QUIT, Noun.NONE)
         };
         AtomicInteger i = new AtomicInteger(0);
         CommandInterpreter interpreter = () -> commands[i.getAndIncrement()];

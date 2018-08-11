@@ -1,5 +1,7 @@
 package hartman.games.adventureland.engine;
 
+import java.util.StringJoiner;
+
 /**
  * The player's desired action represented by a two-word phrase made up of a verb and noun.
  */
@@ -14,16 +16,6 @@ public class Command {
         this.noun = noun;
     }
 
-    public Command(Verb verb) {
-        this.verb = verb;
-        this.noun = Noun.NONE;
-    }
-
-    public Command(Noun noun) {
-        this.verb = Verb.NONE;
-        this.noun = noun;
-    }
-
     public Verb getVerb() {
         return verb;
     }
@@ -34,9 +26,9 @@ public class Command {
 
     @Override
     public String toString() {
-        return "Command{" +
-                verb.getName() +
-                ", " + noun.getName() +
-                '}';
+        return new StringJoiner(", ", Command.class.getSimpleName() + "[", "]")
+                .add("verb=" + verb)
+                .add("noun=" + noun)
+                .toString();
     }
 }
