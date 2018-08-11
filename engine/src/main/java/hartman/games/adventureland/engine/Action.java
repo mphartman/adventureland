@@ -20,6 +20,11 @@ public class Action {
             return this;
         }
 
+        public Builder withNoVerb() {
+            this.verb = Verb.NONE;
+            return this;
+        }
+
         public Builder onUnrecognizedVerb() {
             this.verb = Verb.UNRECOGNIZED;
             return this;
@@ -41,8 +46,7 @@ public class Action {
         }
 
         public Builder the(Noun noun) {
-            this.noun = noun;
-            return this;
+            return with(noun);
         }
 
         public Builder withUnrecognizedNoun() {
@@ -121,8 +125,8 @@ public class Action {
         Display display = context.getDisplay();
         GameState gameState = context.getGameState();
 
-        if (verb.equals(command.getVerb())
-                && noun.equals(command.getNoun())
+        if (verb.matches(command.getVerb())
+                && noun.matches(command.getNoun())
                 && conditions.stream().allMatch(condition -> condition.matches(command, gameState))) {
 
             results.forEach(result -> result.execute(command, gameState, display));

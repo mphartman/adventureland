@@ -26,15 +26,4 @@ public final class Verbs {
 
     public static final Verb USE = new Verb("USE");
 
-    public static final Verb GO_NORTH = new Verb("North", "N");
-
-    public static final Verb GO_SOUTH = new Verb("South", "S");
-
-    public static final Verb GO_UP = new Verb("Up", "U");
-
-    public static final Verb GO_DOWN = new Verb("Down", "D");
-
-    public static final Verb GO_EAST = new Verb("East", "E");
-
-    public static final Verb GO_WEST = new Verb("West", "W");
 }

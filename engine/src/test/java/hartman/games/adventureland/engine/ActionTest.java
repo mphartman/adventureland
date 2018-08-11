@@ -11,14 +11,15 @@ public class ActionTest {
     public void shouldApplyResultWhenVerbMatches() {
         GameState gameState = new GameState(Room.NOWHERE);
 
-        Action action = new Action.Builder().on(new Verb("SLAP")).then((pc, gs, dsp) -> gs.setFlag("MESSAGE", "Ouch! That hurts!")).build();
+        Action action = new Action.Builder()
+                .on(new Verb("SLAP"))
+                .then((pc, gs, dsp) -> gs.setFlag("MESSAGE", "Ouch! That hurts!"))
+                .build();
 
-        Display noop = msg -> {};
-
-        action.run(new ActionContext(gameState, noop, new Command(new Verb("SHOUT"), Noun.NONE)));
+        action.run(new ActionContext(gameState, msg -> {}, new Command(new Verb("SHOUT"), Noun.NONE)));
         assertNull(gameState.getFlag("MESSAGE"));
 
-        action.run(new ActionContext(gameState, noop, new Command(new Verb("SLAP"), Noun.NONE)));
+        action.run(new ActionContext(gameState, msg -> {}, new Command(new Verb("SLAP"), Noun.NONE)));
         assertEquals("Ouch! That hurts!", gameState.getFlag("MESSAGE"));
     }
 }

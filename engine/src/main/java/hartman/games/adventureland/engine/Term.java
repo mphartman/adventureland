@@ -5,6 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 public abstract class Term {
     private final String name;
@@ -12,8 +13,8 @@ public abstract class Term {
 
     public Term(String name, String... synonyms) {
         Objects.requireNonNull(name, "name cannot be null");
-        this.name = name;
-        this.synonyms.addAll(Arrays.asList(synonyms));
+        this.name = name.toUpperCase();
+        this.synonyms.addAll(Arrays.stream(synonyms).map(String::toUpperCase).collect(Collectors.toSet()));
     }
 
     public String getName() {
@@ -23,8 +24,15 @@ public abstract class Term {
     @Override
     public String toString() {
         return new StringJoiner(", ", getClass().getSimpleName() + "[", "]")
-                .add("name='" + name + "'")
+                .add(name)
                 .toString();
+    }
+
+    public boolean matches(Term that) {
+        if (equals(that)) return true;
+        if (!that.getClass().isAssignableFrom(this.getClass())) return false;
+        if (name.equals(that.name)) return true;
+        return synonyms.stream().anyMatch(s -> s.equals(that.name));
     }
 
     @Override
@@ -34,10 +42,7 @@ public abstract class Term {
 
         Term term = (Term) o;
 
-        if (!name.equalsIgnoreCase(term.name)) {
-            return synonyms.stream().anyMatch(s -> s.equalsIgnoreCase(term.name));
-        }
-        return true;
+        return name.equals(term.name);
     }
 
     @Override

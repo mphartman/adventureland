@@ -51,12 +51,15 @@ public class Room implements GameElement {
 
             Exit exit = (Exit) o;
 
-            return direction.equals(exit.direction);
+            if (!direction.equals(exit.direction)) return false;
+            return room.equals(exit.room);
         }
 
         @Override
         public int hashCode() {
-            return direction.hashCode();
+            int result = direction.hashCode();
+            result = 31 * result + room.hashCode();
+            return result;
         }
     }
 
@@ -106,7 +109,7 @@ public class Room implements GameElement {
     }
 
     public boolean hasExit(Noun direction) {
-        return exits.stream().anyMatch(e -> e.getDirection().equals(direction));
+        return exits.stream().anyMatch(e -> e.getDirection().matches(direction));
     }
 
     public int numberOfExits() {
@@ -115,7 +118,7 @@ public class Room implements GameElement {
 
     public Room exit(Noun direction) {
         return exits.stream()
-                .filter(e -> e.getDirection().equals(direction))
+                .filter(e -> e.getDirection().matches(direction))
                 .findFirst()
                 .map(Exit::getRoom)
                 .orElseThrow(() -> new IllegalStateException(String.format("Invalid exit. There is no exit %s from this room.", direction)));

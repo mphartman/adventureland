@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -64,7 +63,7 @@ public class GameState {
      */
     public void putInInventory(Noun noun) {
         items.stream()
-                .filter(i -> i.equals(noun))
+                .filter(i -> i.matches(noun))
                 .filter(Item::isPortable)
                 .findFirst()
                 .ifPresent(Item::stow);
@@ -94,7 +93,7 @@ public class GameState {
      */
     public void drop(Noun noun) {
         items.stream()
-                .filter(item -> item.equals(noun))
+                .filter(item -> item.matches(noun))
                 .findFirst()
                 .ifPresent(item -> item.drop(currentRoom));
     }
@@ -103,17 +102,18 @@ public class GameState {
      * Removes item thus effectively destroying it from game.
      */
     public void destroy(Noun noun) {
-         Optional<Item> maybeItem = items.stream()
-                 .filter(item -> item.equals(noun))
-                 .findFirst();
-         maybeItem.ifPresent(Item::destroy);
+        items.stream()
+                .filter(item -> item.matches(noun))
+                .findFirst()
+                .ifPresent(Item::destroy);
     }
 
     /**
      * True if ITEM is in the game and not destroyed.
      */
     public boolean exists(Noun noun) {
-        return items.stream().anyMatch(item -> item.equals(noun) && !item.isDestroyed());
+        return items.stream()
+                .anyMatch(item -> item.matches(noun) && !item.isDestroyed());
     }
 
 }

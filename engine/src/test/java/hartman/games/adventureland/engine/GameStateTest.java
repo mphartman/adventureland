@@ -29,26 +29,49 @@ public class GameStateTest {
     }
 
     @Test
-    public void getShouldUpdateInventoryWhenItemIsPortable() {
+    public void putInInventoryShouldUpdateInventoryWhenItemIsPortable() {
         Items.ItemSet itemSet = Items.newItemSet();
-        Item icecreamCone = itemSet.newItem().named("cone").build();
-
-        assertFalse(icecreamCone.isCarried());
+        Item cup = itemSet.newItem().named("cup").alias("glass").build();
+        assertFalse(cup.isCarried());
 
         GameState gameState = new GameState(Room.NOWHERE);
-        gameState.putInInventory(icecreamCone);
+        gameState.putInInventory(cup);
+        assertFalse("cup wasn't registered with game state", cup.isCarried());
 
-        assertFalse("ice cream cone wasn't registered with gamestate", icecreamCone.isCarried());
-
-        gameState = new GameState(Room.NOWHERE, itemSet.copyOfItems());
-        gameState.putInInventory(icecreamCone);
-        assertFalse("ice cream cone isn't portable", icecreamCone.isCarried());
-
-        Item cup = itemSet.newItem().named("cup").portable().build();
-        assertFalse(cup.isCarried());
         gameState = new GameState(Room.NOWHERE, itemSet.copyOfItems());
         gameState.putInInventory(cup);
-        assertTrue(cup.isCarried());
+        assertFalse("cup isn't portable", cup.isCarried());
+
+        Item bowl = itemSet.newItem().named("bowl").portable().build();
+        assertFalse(bowl.isCarried());
+
+        gameState = new GameState(Room.NOWHERE, itemSet.copyOfItems());
+        gameState.putInInventory(bowl);
+        assertTrue(bowl.isCarried());
+
+        Item dog = itemSet.newItem().named("dog").alias("archie").portable().build();
+        gameState = new GameState(Room.NOWHERE, itemSet.copyOfItems());
+        gameState.putInInventory(new Noun("archie"));
+        assertTrue(dog.isCarried());
+
+        AtomicReference<Item> dogInInventory = new AtomicReference<>();
+        gameState.inventory(new GameElementVisitor() {
+            @Override
+            public void visit(Item item) {
+                dogInInventory.set(item);
+            }
+
+            @Override
+            public void visit(Room room) {
+
+            }
+
+            @Override
+            public void visit(Room.Exit exit) {
+
+            }
+        });
+        assertTrue(dog.matches(dogInInventory.get()));
     }
 
     @Test
@@ -128,7 +151,9 @@ public class GameStateTest {
         assertFalse(marker.isCarried());
         assertTrue(marker.isHere(conferenceRoom));
 
-        GameState gameState = new GameState(conferenceRoom, itemSet.copyOfItems());
+        GameState gameState;
+
+        gameState = new GameState(conferenceRoom, itemSet.copyOfItems());
         gameState.drop(marker);
         assertTrue("marker should already be here", marker.isHere(conferenceRoom));
 
@@ -145,6 +170,31 @@ public class GameStateTest {
         gameState = new GameState(conferenceRoom, itemSet.copyOfItems());
         gameState.drop(carrot);
         assertTrue(carrot.isHere(conferenceRoom));
+
+        Item candy = itemSet.newItem().named("pez").alias("candy").build();
+        gameState = new GameState(conferenceRoom, itemSet.copyOfItems());
+        gameState.drop(new Noun("candy"));
+        assertTrue(candy.isHere(conferenceRoom));
+
+        AtomicReference<Item> candyInRoom = new AtomicReference<>();
+        gameState.describe(new GameElementVisitor() {
+            @Override
+            public void visit(Item item) {
+                candyInRoom.set(item);
+            }
+
+            @Override
+            public void visit(Room room) {
+
+            }
+
+            @Override
+            public void visit(Room.Exit exit) {
+
+            }
+        });
+        assertTrue(candy.matches(candyInRoom.get()));
+
     }
 
     @Test
@@ -153,11 +203,22 @@ public class GameStateTest {
         Items.ItemSet itemSet = Items.newItemSet();
         Item hammer = itemSet.newItem().named("hammer").in(shed).build();
 
-        GameState gameState = new GameState(Room.NOWHERE, itemSet.copyOfItems());
+        GameState gameState;
+
+        gameState = new GameState(Room.NOWHERE, itemSet.copyOfItems());
         assertTrue(gameState.exists(hammer));
 
         gameState.destroy(hammer);
         assertFalse(gameState.exists(hammer));
         assertTrue(hammer.isDestroyed());
+
+        Item screwdriver = itemSet.newItem().named("screwdriver").alias("flathead screwdriver").in(shed).build();
+        gameState = new GameState(Room.NOWHERE, itemSet.copyOfItems());
+        assertTrue(gameState.exists(new Noun("flathead screwdriver")));
+
+        gameState.destroy(new Noun("flathead screwdriver"));
+        assertFalse(gameState.exists(new Noun("flathead screwdriver")));
+        assertTrue(screwdriver.isDestroyed());
+
     }
 }

@@ -6,6 +6,7 @@ import hartman.games.adventureland.engine.Noun;
 import hartman.games.adventureland.engine.Verb;
 import hartman.games.adventureland.engine.Vocabulary;
 
+import java.util.Optional;
 import java.util.Scanner;
 
 public class DefaultCommandInterpreter implements CommandInterpreter {
@@ -29,11 +30,27 @@ public class DefaultCommandInterpreter implements CommandInterpreter {
 
             if (lineScanner.hasNext()) {
                 String firstTerm = lineScanner.next();
-                verb = vocabulary.findVerb(firstTerm).orElse(Verb.UNRECOGNIZED);
 
-                if (lineScanner.hasNext()) {
-                    String secondTerm = lineScanner.next();
-                    noun = vocabulary.findNoun(secondTerm).orElse(Noun.UNRECOGNIZED);
+                Optional<Verb> maybeVerb = vocabulary.find(new Verb(firstTerm));
+                if (maybeVerb.isPresent()) {
+
+                    verb = maybeVerb.get();
+
+                    if (lineScanner.hasNext()) {
+                        noun = vocabulary.find(new Noun(lineScanner.next())).orElse(Noun.UNRECOGNIZED);
+                    }
+
+                } else {
+                    Optional<Noun> maybeNoun = vocabulary.find(new Noun(firstTerm));
+                    if (maybeNoun.isPresent()) {
+                        noun = maybeNoun.get();
+                    }
+                    else {
+                        verb = Verb.UNRECOGNIZED;
+                        if (lineScanner.hasNext()) {
+                            noun = vocabulary.find(new Noun(lineScanner.next())).orElse(Noun.UNRECOGNIZED);
+                        }
+                    }
                 }
             }
 

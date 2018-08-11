@@ -49,11 +49,9 @@ public final class Actions {
         }
 
         public ActionSet addAll(ActionSet actionSet) {
-            if (actionSet != null) {
-                verbs.addAll(actionSet.verbs);
-                nouns.addAll(actionSet.nouns);
-                actions.addAll(actionSet.actions);
-            }
+            verbs.addAll(actionSet.verbs);
+            nouns.addAll(actionSet.nouns);
+            actions.addAll(actionSet.actions);
             return this;
         }
 

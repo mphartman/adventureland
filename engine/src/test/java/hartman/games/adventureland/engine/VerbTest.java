@@ -11,38 +11,71 @@ import static org.junit.Assert.assertTrue;
 public class VerbTest {
 
     @Test
-    public void synonymsShouldEquateToTrue() {
-        Verb go = new Verb("go", "g", "run", "enter", "walk");
-        assertTrue(go.equals(new Verb("go")));
-        assertTrue(go.equals(new Verb("GO")));
-        assertTrue(go.equals(new Verb("g")));
-        assertTrue(go.equals(new Verb("run")));
-        assertTrue(go.equals(new Verb("enter")));
-        assertTrue(go.equals(new Verb("walk")));
-        assertFalse(go.equals(new Verb("stroll")));
-        assertTrue(go.equals(ANY));
-        assertFalse(go.equals(NONE));
+    public void verbEqualityIsCaseInsensitive() {
+        Verb swim = new Verb("swim", "s");
+        assertTrue(swim.equals(new Verb("swim")));
+        assertTrue(new Verb("swim").equals(swim));
+        assertTrue(swim.equals(new Verb("SWIM")));
+        assertTrue(new Verb("SWIM").equals(swim));
+    }
+
+    @Test
+    public void synonymousVerbsShouldMatch() {
+        Verb swim = new Verb("swim", "s");
+
+        assertFalse(swim.equals(new Verb("s")));
+
+        assertTrue(swim.matches(new Verb("s")));
+        assertTrue(swim.matches(new Verb("swim")));
+
+        assertFalse(swim.matches(new Verb("jump")));
+
+        assertTrue(swim.matches(ANY));
+        assertTrue(ANY.matches(swim));
+
+        assertFalse(swim.matches(NONE));
+        assertFalse(NONE.matches(swim));
     }
 
     @Test
     public void anyEqualsAnyVerb() {
-        assertTrue(ANY.equals(new Verb("any")));
-        assertTrue(ANY.equals(new Verb("jump")));
-        assertTrue(ANY.equals(new Verb("say", "yell", "scream")));
-        assertTrue(new Verb("ANY").equals(ANY));
         assertTrue(ANY.equals(ANY));
-        assertTrue(ANY.equals(UNRECOGNIZED));
-        assertTrue(UNRECOGNIZED.equals(ANY));
+
+        assertTrue(ANY.matches(ANY));
+
+        assertTrue(ANY.matches(new Verb("fall")));
+        assertTrue(ANY.matches(new Verb("jump", "leap", "spring")));
+
+        assertFalse(ANY.equals(new Verb("ANY")));
+        assertFalse(new Verb("ANY").equals(ANY));
+
+        assertTrue(new Verb("ANY").matches(ANY));
+
+        assertFalse(ANY.equals(UNRECOGNIZED));
+        assertFalse(UNRECOGNIZED.equals(ANY));
+
+        assertTrue(ANY.matches(UNRECOGNIZED));
+        assertTrue(UNRECOGNIZED.matches(ANY));
+
         assertFalse(ANY.equals(NONE));
+        assertFalse(ANY.matches(NONE));
     }
 
     @Test
     public void noneEqualsNoVerb() {
         assertTrue(NONE.equals(NONE));
+        assertTrue(NONE.matches(NONE));
+
         assertFalse(NONE.equals(ANY));
+        assertFalse(NONE.matches(ANY));
+
         assertFalse(NONE.equals(new Verb("NONE")));
-        assertFalse(NONE.equals(new Verb("Nil", "NONE")));
-        assertFalse(NONE.equals(new Verb("Jump")));
-        assertFalse(new Verb("Jump").equals(NONE));
+        assertFalse(NONE.matches(new Verb("NONE")));
+
+        assertFalse(NONE.equals(new Verb("poke")));
+        assertFalse(NONE.matches(new Verb("poke")));
+
+        assertFalse(new Verb("poke").matches(NONE));
+        assertFalse(new Verb("poke").equals(NONE));
     }
 }
