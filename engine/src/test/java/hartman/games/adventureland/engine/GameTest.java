@@ -39,7 +39,7 @@ public class GameTest {
         chamber.setExit(DOWN, dungeon);
         dungeon.setExit(UP, chamber);
 
-        Action goAction = new Action.Builder().on(GO).withAnyNoun().when(Conditions.currentRoomHasExit).then(Results.go).build();
+        Action goAction = new Action.Builder().on(GO).withAnyNoun().when(Conditions.roomHasExit).then(Results.go).build();
         Action quitAction = new Action.Builder().on(QUIT).then(Results.quit).build();
         Set<Action> actions = new LinkedHashSet<>(asList(quitAction, goAction));
 

@@ -33,28 +33,28 @@ public final class Conditions {
      * True if player's requested noun represents a valid direction and that the current room
      * she is in has an exit matching that direction.
      */
-    public static final Condition currentRoomHasExit = (command, gameState) -> gameState.getCurrentRoom().hasExit(command.getNoun());
+    public static final Condition roomHasExit = (command, gameState) -> gameState.getCurrentRoom().hasExit(command.getNoun());
 
     public static final Condition currentRoomHasExitByVerb = (command, gameState) -> gameState.getCurrentRoom().hasExit(new Noun(command.getVerb().getName()));
 
     /**
      * True if the player's current room is ROOM.
      */
-    public static Condition isInRoom(Room room) {
+    public static Condition in(Room room) {
         return (command, gameState) -> gameState.getCurrentRoom().equals(room);
     }
 
     /**
      * True if the player is carrying ITEM in their inventory.
      */
-    public static Condition isItemCarried(Item item) {
+    public static Condition carrying(Item item) {
         return (command, gameState) -> item.isCarried();
     }
 
     /**
      * True if ITEM is in the player's current room.
      */
-    public static Condition isItemHere(Item item) {
+    public static Condition here(Item item) {
         return (command, gameState) -> item.isHere(gameState.getCurrentRoom());
     }
 
@@ -62,8 +62,8 @@ public final class Conditions {
      * True if ITEM is either being carried by the player
      * or is in the player's current room.
      */
-    public static Condition isPresent(Item item) {
-        return or(isItemHere(item), isItemCarried(item));
+    public static Condition present(Item item) {
+        return or(here(item), carrying(item));
     }
 
     /**
@@ -87,7 +87,7 @@ public final class Conditions {
     /**
      * True if ITEM has moved from its original starting location.
      */
-    public static Condition hasItemMoved(Item item) {
+    public static Condition hasMoved(Item item) {
         return (command, gameState) -> item.hasMoved();
     }
 
@@ -109,7 +109,7 @@ public final class Conditions {
     /**
      * True if ITEM is in the ROOM
      */
-    public static Condition isItemInRoom(Item item, Room room) {
+    public static Condition there(Item item, Room room) {
         return (command, gameState) -> item.isHere(room);
     }
 

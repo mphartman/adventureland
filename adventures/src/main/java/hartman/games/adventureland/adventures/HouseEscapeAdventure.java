@@ -1,31 +1,32 @@
 package hartman.games.adventureland.adventures;
 
-import hartman.games.adventureland.engine.Action;
 import hartman.games.adventureland.engine.Adventure;
 import hartman.games.adventureland.engine.Item;
 import hartman.games.adventureland.engine.Noun;
 import hartman.games.adventureland.engine.Room;
 import hartman.games.adventureland.engine.Verb;
 import hartman.games.adventureland.engine.Vocabulary;
-import hartman.games.adventureland.engine.core.Actions;
 import hartman.games.adventureland.engine.core.Items;
 import hartman.games.adventureland.engine.core.Results;
 
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static hartman.games.adventureland.engine.Action.Builder;
+import static hartman.games.adventureland.engine.Action.Condition;
+import static hartman.games.adventureland.engine.Action.Result;
+import static hartman.games.adventureland.engine.core.Actions.ActionSet;
 import static hartman.games.adventureland.engine.core.Actions.newActionSet;
-import static hartman.games.adventureland.engine.core.Conditions.currentRoomHasExit;
+import static hartman.games.adventureland.engine.core.Conditions.carrying;
 import static hartman.games.adventureland.engine.core.Conditions.currentRoomHasExitByVerb;
-import static hartman.games.adventureland.engine.core.Conditions.isInRoom;
-import static hartman.games.adventureland.engine.core.Conditions.isItemCarried;
-import static hartman.games.adventureland.engine.core.Conditions.isItemHere;
-import static hartman.games.adventureland.engine.core.Conditions.isPresent;
+import static hartman.games.adventureland.engine.core.Conditions.here;
+import static hartman.games.adventureland.engine.core.Conditions.in;
 import static hartman.games.adventureland.engine.core.Conditions.not;
+import static hartman.games.adventureland.engine.core.Conditions.present;
 import static hartman.games.adventureland.engine.core.Conditions.random;
+import static hartman.games.adventureland.engine.core.Conditions.roomHasExit;
 import static hartman.games.adventureland.engine.core.Conditions.times;
 import static hartman.games.adventureland.engine.core.Nouns.DOWN;
 import static hartman.games.adventureland.engine.core.Nouns.EAST;
@@ -61,6 +62,7 @@ import static hartman.games.adventureland.engine.core.Verbs.QUIT;
 import static hartman.games.adventureland.engine.core.Verbs.USE;
 import static java.lang.String.format;
 import static java.lang.String.join;
+import static java.util.Arrays.asList;
 
 public class HouseEscapeAdventure {
 
@@ -72,11 +74,11 @@ public class HouseEscapeAdventure {
 
         Verb kill = new Verb("KILL", "SWAT", "HURT");
         Verb yell = new Verb("YELL", "SHOUT", "SCREAM");
-        Verb pet  = new Verb("PET", "PAT");
+        Verb pet = new Verb("PET", "PAT");
         Noun door = new Noun("Door");
 
-        Set<Noun> directionNouns = new LinkedHashSet<>(Arrays.asList(NORTH, SOUTH, UP, DOWN, EAST, WEST));
-        Set<Verb> directionVerbs = new LinkedHashSet<>(Arrays.asList(GO_NORTH, GO_SOUTH, GO_UP, GO_DOWN, GO_EAST, GO_WEST));
+        Set<Noun> directionNouns = new LinkedHashSet<>(asList(NORTH, SOUTH, UP, DOWN, EAST, WEST));
+        Set<Verb> directionVerbs = new LinkedHashSet<>(asList(GO_NORTH, GO_SOUTH, GO_UP, GO_DOWN, GO_EAST, GO_WEST));
         Vocabulary movement = new Vocabulary(directionVerbs, directionNouns);
 
         /*
@@ -120,62 +122,168 @@ public class HouseEscapeAdventure {
 
         // *** Occurs - actions which all run automatically at the start of every turn *** /
 
-        Actions.ActionSet occurs = newActionSet();
-        occurs.newAction().when(times(1)).then(look).build();
+        ActionSet occurs = newActionSet();
+        occurs.newAction()
+                .when(times(1))
+                .then(look)
+                .build();
 
         // the fly
-        occurs.newAction().when(isInRoom(kitchen)).and(not(isItemHere(fly))).and(random(50)).then(put(fly, kitchen)).andThen(printf("%nA fly buzzes past my ear!%n")).build();
+        occurs.newAction()
+                .when(in(kitchen)).and(not(here(fly))).and(random(50))
+                .then(put(fly, kitchen)).andThen(printf("%nA fly buzzes past my ear!%n"))
+                .build();
 
         // Archie the dog
-        occurs.newAction().when(isInRoom(kitchen)).and(random(30)).then(println("I hear a faint whimper as if from a dog coming from the West.")).build();
-        occurs.newAction().when(isItemHere(kennelWithDog)).then(println("I hear a whimper from the kennel. Something looks to be under the blankets.")).build();
-        occurs.newAction().when(isItemHere(dog)).and(random(75)).then(println("The little dog starts licking you.")).build();
+        occurs.newAction()
+                .when(in(kitchen)).and(random(30))
+                .then(println("I hear a faint whimper as if from a dog coming from the West."))
+                .build();
 
-        // must be last occurs
-        occurs.newAction().when(not(isInRoom(outside))).then(printf("%nWhat should I do? ")).build();
-        occurs.newAction().when(isInRoom(outside)).then(printf("%n*** Congratulations, you've escaped! ***")).andThen(quit).build();
+        occurs.newAction()
+                .when(here(kennelWithDog))
+                .then(println("I hear a whimper from the kennel. Something looks to be under the blankets."))
+                .build();
+
+        occurs.newAction()
+                .when(here(dog)).and(random(75))
+                .then(println("The little dog starts licking you."))
+                .build();
+
+        // *** these occurs must come last *** /
+
+        // user prompt
+        occurs.newAction()
+                .when(not(in(outside)))
+                .then(printf("%nWhat should I do? "))
+                .build();
+
+        // game end
+        occurs.newAction()
+                .when(in(outside))
+                .then(printf("%n*** Congratulations, you've escaped! ***"))
+                .andThen(quit)
+                .build();
 
 
-        // *** Actions which are triggered in response to the player's input *** /
+        // *** Actions which are triggered in response to the player's input.                                   *** /
+        // *** ORDER OF THE ACTIONS IS IMPORTANT                                                                *** /
+        // *** First one whose Verb, Noun, and Conditions are true will run and then the others are skipped.    *** /
 
-        Actions.ActionSet adventureActions = newActionSet();
+        ActionSet adventureActions = newActionSet();
 
-        adventureActions.newAction().on(OPEN).with(door).when(isItemHere(lockedDoor)).and(not(isPresent(key))).then(printf("%nIt's locked. I need some way to unlock it.%n")).build();
-        adventureActions.newAction().on(GO).with(door).when(isItemHere(lockedDoor)).then(printf("%nI can't. It's locked.%n")).build();
-        adventureActions.newAction().on(GET).with(key).when(isItemHere(key)).then(get).andThen(printf("%nOkay. I got the key. Type INVENTORY to see what I'm carrying.%n")).build();
-        adventureActions.newAction().on(DROP).with(key).when(isItemCarried(key)).then(drop).andThen(printf("%nI dropped the key.%n")).build();
-        Action.Builder lockedDoorWithKey = adventureActions.newAction().when(isItemHere(lockedDoor)).and(isPresent(key)).then(swap(lockedDoor, openDoor)).andThen(printf("<CLICK> That did it. It's unlocked.%n")).andThen(look);
-        lockedDoorWithKey.on(OPEN).with(door).build();
-        lockedDoorWithKey.on(USE).with(key).build();
+        adventureActions.newAction()
+                .on(OPEN).the(door)
+                .when(here(lockedDoor)).and(not(present(key)))
+                .then(printf("%nIt's locked. I need some way to unlock it.%n"))
+                .build();
 
-        adventureActions.newAction().on(GO).with(door).when(isItemHere(openDoor)).then(gotoRoom(outside)).andThen(printf("%nYeah! I've made it outside!%n")).build();
-        adventureActions.newAction().on(GET).with(flyswatter).when(isItemHere(flyswatter)).then(get).andThen(printf("%nOkay. I picked up the flyswatter.%n")).build();
-        adventureActions.newAction().on(kill).with(fly).when(isItemHere(fly)).and(not(isItemCarried(flyswatter))).then(printf("%nSmack! I tried but I'm not fast enough. I need some sort of tool.%n")).build();
-        adventureActions.newAction().on(kill).with(fly).when(isItemHere(fly)).then(swap(fly, deadFly)).andThen(printf("%nWHACK! I got 'em! It's dead.%n")).build();
+        adventureActions.newAction()
+                .on(GO).with(door)
+                .when(here(lockedDoor))
+                .then(printf("%nI can't. It's locked. Perhaps try using the key?%n"))
+                .build();
 
-        adventureActions.newAction().on(yell).withAnyNoun().then(printf("%n\"{noun}\"!!! Now what?%n")).build();
+        adventureActions.newAction()
+                .on(GET).the(key)
+                .when(here(key))
+                .then(get).andThen(printf("%nOkay. I got the key.%n"))
+                .build();
 
-        adventureActions.newAction().on(GET).with(redPanda).when(isItemHere(redPanda)).then(get).andThen(println("%nOkay. I picked up the toy. It's a bit smelly but it's soft and I feel better carrying it.")).andThen(inventory).build();
-        adventureActions.newAction().on(DROP).with(redPanda).when(isItemCarried(redPanda)).then(drop).andThen(look).build();
+        adventureActions.newAction()
+                .on(DROP).the(key)
+                .when(carrying(key))
+                .then(drop).andThen(printf("%nI dropped the key.%n"))
+                .build();
 
-        adventureActions.newAction().on(OPEN).with(kennelWithDog).when(isItemHere(kennelWithDog)).then(swap(kennelWithDog, emptyKennel)).andThen(putHere(dog)).andThen(println("A super cute little dog comes leaping out of the kennel!")).build();
-        adventureActions.newAction().on(GET).with(dog).when(isItemHere(dog)).then(println("He's a bit too excited and very fast. I can't catch him. Maybe when he calms down."));
-        adventureActions.newAction().on(pet).with(dog).when(isItemHere(dog)).then(println("The dog loves me. His leg starts thumping on the floor.")).build();
-        adventureActions.newAction().on(kill).with(dog).when(isItemHere(dog)).then(println("The dog lunges at me and chews my face off.  I'm dead.")).andThen(quit).build();
+        Builder lockedDoorWithKey = adventureActions.newAction()
+                .when(here(lockedDoor)).and(present(key))
+                .then(swap(lockedDoor, openDoor)).andThen(printf("<CLICK> That did it. It's unlocked.%n")).andThen(look);
+        lockedDoorWithKey
+                .on(OPEN).the(door)
+                .build();
+        lockedDoorWithKey
+                .on(USE).the(key)
+                .build();
+
+        adventureActions.newAction()
+                .on(GO).with(door)
+                .when(here(openDoor))
+                .then(gotoRoom(outside)).andThen(printf("%nYeah! I've made it outside!%n"))
+                .build();
+
+        adventureActions.newAction()
+                .on(GET).the(flyswatter)
+                .when(here(flyswatter))
+                .then(get).andThen(printf("%nOkay. I picked up the flyswatter.%n"))
+                .build();
+
+        adventureActions.newAction()
+                .on(kill).the(fly)
+                .when(here(fly)).and(not(carrying(flyswatter)))
+                .then(printf("%nSmack! I tried but I'm not fast enough. I need some sort of tool.%n"))
+                .build();
+
+        adventureActions.newAction()
+                .on(kill).the(fly)
+                .when(here(fly))
+                .then(swap(fly, deadFly)).andThen(printf("%nWHACK! I got 'em! It's dead.%n"))
+                .build();
+
+        adventureActions.newAction()
+                .on(yell).anything()
+                .then(printf("%n\"{noun}\"!!! Now what?%n"))
+                .build();
+
+        adventureActions.newAction()
+                .on(GET).the(redPanda)
+                .when(here(redPanda))
+                .then(get).andThen(println("%nOkay. I picked up the toy. It's a bit smelly but it's soft and I feel better carrying it.")).andThen(inventory)
+                .build();
+
+        adventureActions.newAction()
+                .on(DROP).the(redPanda)
+                .when(carrying(redPanda))
+                .then(drop).andThen(look)
+                .build();
+
+        adventureActions.newAction()
+                .on(OPEN).the(kennelWithDog)
+                .when(here(kennelWithDog))
+                .then(swap(kennelWithDog, emptyKennel)).andThen(putHere(dog)).andThen(println("A super cute little dog comes leaping out of the kennel!"))
+                .build();
+
+        adventureActions.newAction()
+                .on(GET).the(dog)
+                .when(here(dog))
+                .then(println("He's a bit too excited and very fast. I can't catch him. Maybe when he calms down."))
+                .build();
+
+        adventureActions.newAction()
+                .on(pet).the(dog)
+                .when(here(dog))
+                .then(println("The dog loves me. His leg starts thumping on the floor."))
+                .build();
+
+        adventureActions.newAction()
+                .on(kill).the(dog)
+                .when(here(dog))
+                .then(println("The dog lunges at me and chews my face off.  I'm dead.")).andThen(quit)
+                .build();
 
 
         // *** Standard game actions which apply to most games *** /
 
-        Actions.ActionSet standardActions = newActionSet();
+        ActionSet standardActions = newActionSet();
 
         // movement
-        Action.Condition isDirectionVerb = (command, gameState) -> directionVerbs.contains(command.getVerb());
-        Action.Builder moveByVerb = standardActions.newAction().onAnyVerb().withNoNoun();
+        Condition isDirectionVerb = (command, gameState) -> directionVerbs.contains(command.getVerb());
+        Builder moveByVerb = standardActions.newAction().onAnyVerb().withNoNoun();
         moveByVerb.when(isDirectionVerb).and(currentRoomHasExitByVerb).then(goUsingVerb).andThen(look).build();
         moveByVerb.when(isDirectionVerb).and(not(currentRoomHasExitByVerb)).then(println("That's not an exit from here. Try one of the obvious exits.")).build();
         standardActions.newAction().on(GO).withNoNoun().then(println("{verb} where?")).build();
         standardActions.newAction().on(GO).withUnrecognizedNoun().then(println("I can't go that direction. Try one of the obvious exits.")).build();
-        standardActions.newAction().on(GO).withAnyNoun().when(currentRoomHasExit).then(go).andThen(look).build();
+        standardActions.newAction().on(GO).withAnyNoun().when(roomHasExit).then(go).andThen(look).build();
         standardActions.newAction().on(GO).withAnyNoun().then(println("That's not an exit from here. Try one of the obvious exits.")).build();
 
         standardActions.newAction().on(LOOK).withAnyNoun().then(look).build();
@@ -194,7 +302,7 @@ public class HouseEscapeAdventure {
         /*
          * All the actions for this adventure
          */
-        Actions.ActionSet fullActionSet = adventureActions.addAll(standardActions);
+        ActionSet fullActionSet = adventureActions.addAll(standardActions);
 
         /*
          * Build a vocabulary based off the verbs and nouns used in the Actions.
@@ -204,14 +312,13 @@ public class HouseEscapeAdventure {
         return new Adventure(vocabulary, occurs.copyOfActions(), fullActionSet.copyOfActions(), itemSet.copyOfItems(), masterBedroom);
     }
 
-    private static Action.Result look = Results.look((room, exits, items) -> {
+    private static Result look = Results.look((room, exits, items) -> {
         StringBuilder buf = new StringBuilder();
         buf.append(format("%n%s%n", room.getDescription()));
         if (!items.isEmpty()) {
             if (items.size() == 1) {
                 buf.append(format("I can also see %s%n", items.get(0).getDescription()));
-            }
-            else {
+            } else {
                 buf.append(format("I can also see %d other things here: ", items.size()));
                 IntStream.range(0, items.size()).forEachOrdered(i -> {
                     if (i > 0) {
@@ -238,7 +345,7 @@ public class HouseEscapeAdventure {
         return buf.toString();
     });
 
-    private static Action.Result inventory = Results.inventory((items) -> {
+    private static Result inventory = Results.inventory((items) -> {
         StringBuilder buf = new StringBuilder();
         if (items.isEmpty()) {
             buf.append(format("%nI'm not carrying anything right now.%n"));
@@ -246,8 +353,7 @@ public class HouseEscapeAdventure {
             buf.append(format("%nI'm carrying "));
             if (items.size() == 1) {
                 buf.append(format("%s%n", items.get(0).getDescription()));
-            }
-            else {
+            } else {
                 buf.append(format("%d items: ", items.size()));
                 IntStream.range(0, items.size()).forEachOrdered(i -> {
                     buf.append(format("%n - %s", items.get(i).getDescription()));

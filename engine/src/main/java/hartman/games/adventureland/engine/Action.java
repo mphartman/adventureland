@@ -40,12 +40,22 @@ public class Action {
             return this;
         }
 
+        public Builder the(Noun noun) {
+            this.noun = noun;
+            return this;
+        }
+
         public Builder withUnrecognizedNoun() {
             this.noun = Noun.UNRECOGNIZED;
             return this;
         }
 
         public Builder withAnyNoun() {
+            this.noun = Noun.ANY;
+            return this;
+        }
+
+        public Builder anything() {
             this.noun = Noun.ANY;
             return this;
         }
