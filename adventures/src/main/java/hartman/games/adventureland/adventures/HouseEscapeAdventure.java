@@ -41,6 +41,7 @@ import static hartman.games.adventureland.engine.core.Results.gotoRoom;
 import static hartman.games.adventureland.engine.core.Results.printf;
 import static hartman.games.adventureland.engine.core.Results.println;
 import static hartman.games.adventureland.engine.core.Results.put;
+import static hartman.games.adventureland.engine.core.Results.putHere;
 import static hartman.games.adventureland.engine.core.Results.quit;
 import static hartman.games.adventureland.engine.core.Results.swap;
 import static hartman.games.adventureland.engine.core.Verbs.DROP;
@@ -69,9 +70,10 @@ public class HouseEscapeAdventure {
          * Vocabulary
          */
 
-        Verb kill = new Verb("KILL", "SWAT", "HIT");
+        Verb kill = new Verb("KILL", "SWAT", "HURT");
         Verb yell = new Verb("YELL", "SHOUT", "SCREAM");
-        Noun DOOR = new Noun("Door");
+        Verb pet  = new Verb("PET", "PAT");
+        Noun door = new Noun("Door");
 
         Set<Noun> directionNouns = new LinkedHashSet<>(Arrays.asList(NORTH, SOUTH, UP, DOWN, EAST, WEST));
         Set<Verb> directionVerbs = new LinkedHashSet<>(Arrays.asList(GO_NORTH, GO_SOUTH, GO_UP, GO_DOWN, GO_EAST, GO_WEST));
@@ -83,9 +85,9 @@ public class HouseEscapeAdventure {
 
         Room hallway = new Room("hallway", format("I'm in a short, narrow hallway.%nThere's a carpeted flight of stairs going up.%nThe hallway continues to the south."));
         Room upperStairs = new Room("upper_stairs", "I'm on the top of the stairs.");
-        Room masterBedroom = new Room("master_bedroom", "I'm in the master bedroom.");
+        Room masterBedroom = new Room("master_bedroom", "I'm in the master bedroom. There's a big king-size bed.");
         Room kitchen = new Room("kitchen", "I'm in the kitchen.");
-        Room livingRoom = new Room("living_room", "I'm in a living room with old couches.");
+        Room livingRoom = new Room("living_room", "I'm in a living room. There are some old couches.");
         Room outside = new Room("outside", "I'm outside the house.");
         Room isaacBedroom = new Room("isaac_bedroom", "I'm in what looks to be a little boy's room. It has posters of video games on the wall.");
         hallway.setExit(UP, upperStairs);
@@ -104,49 +106,65 @@ public class HouseEscapeAdventure {
          */
 
         Items.ItemSet itemSet = Items.newItemSet();
-        Item key = itemSet.newItem().named("key").describedAs("a brass key").portable().in(masterBedroom).build();
+        Item key = itemSet.newItem().named("key").describedAs("a brass key").portable().in(isaacBedroom).build();
         Item lockedDoor = itemSet.newItem().named("locked_door").describedAs("a locked door").in(kitchen).build();
         Item openDoor = itemSet.newItem().named("open_door").describedAs("an unlocked door").build();
         Item flyswatter = itemSet.newItem().named("flyswatter").alias("swatter").describedAs("a green fly swatter").portable().in(livingRoom).build();
         Item redPanda = itemSet.newItem().named("panda").describedAs("a red panda stuffed animal").portable().in(isaacBedroom).build();
         Item fly = itemSet.newItem().named("fly").describedAs("a large house fly").build();
         Item deadFly = itemSet.newItem().named("deadFly").describedAs("a smeared stain that was once a fly").build();
+        Item dog = itemSet.newItem().named("dog").describedAs("a cute little dachshund").build();
+        Item kennelWithDog = itemSet.newItem().named("kennelWithDog").alias("kennel").describedAs("a small dog kennel filled with blankets with a closed door").in(livingRoom).build();
+        Item emptyKennel = itemSet.newItem().named("emptyKennel").describedAs("an open dog kennel").build();
 
-        /*
-         * ACTIONS
-         */
 
-        // Occurs
+        // *** Occurs - actions which all run automatically at the start of every turn *** /
 
         Actions.ActionSet occurs = newActionSet();
         occurs.newAction().when(times(1)).then(look).build();
-        occurs.newAction().when(isInRoom(kitchen)).and(not(isItemHere(fly))).and(random(60)).then(put(fly, kitchen)).andThen(printf("%nA fly buzzes past my ear!%n")).build();
+
+        // the fly
+        occurs.newAction().when(isInRoom(kitchen)).and(not(isItemHere(fly))).and(random(50)).then(put(fly, kitchen)).andThen(printf("%nA fly buzzes past my ear!%n")).build();
+
+        // Archie the dog
+        occurs.newAction().when(isInRoom(kitchen)).and(random(30)).then(println("I hear a faint whimper as if from a dog coming from the West.")).build();
+        occurs.newAction().when(isItemHere(kennelWithDog)).then(println("I hear a whimper from the kennel. Something looks to be under the blankets.")).build();
+        occurs.newAction().when(isItemHere(dog)).and(random(75)).then(println("The little dog starts licking you.")).build();
+
+        // must be last occurs
         occurs.newAction().when(not(isInRoom(outside))).then(printf("%nWhat should I do? ")).build();
         occurs.newAction().when(isInRoom(outside)).then(printf("%n*** Congratulations, you've escaped! ***")).andThen(quit).build();
 
-        // Adventure-specific actions
+
+        // *** Actions which are triggered in response to the player's input *** /
 
         Actions.ActionSet adventureActions = newActionSet();
 
-        adventureActions.newAction().on(OPEN).with(DOOR).when(isItemHere(lockedDoor)).and(not(isPresent(key))).then(printf("%nIt's locked. I need some way to unlock it.%n")).build();
-        adventureActions.newAction().on(GO).with(DOOR).when(isItemHere(lockedDoor)).then(printf("%nI can't. It's locked.%n")).build();
+        adventureActions.newAction().on(OPEN).with(door).when(isItemHere(lockedDoor)).and(not(isPresent(key))).then(printf("%nIt's locked. I need some way to unlock it.%n")).build();
+        adventureActions.newAction().on(GO).with(door).when(isItemHere(lockedDoor)).then(printf("%nI can't. It's locked.%n")).build();
         adventureActions.newAction().on(GET).with(key).when(isItemHere(key)).then(get).andThen(printf("%nOkay. I got the key. Type INVENTORY to see what I'm carrying.%n")).build();
         adventureActions.newAction().on(DROP).with(key).when(isItemCarried(key)).then(drop).andThen(printf("%nI dropped the key.%n")).build();
         Action.Builder lockedDoorWithKey = adventureActions.newAction().when(isItemHere(lockedDoor)).and(isPresent(key)).then(swap(lockedDoor, openDoor)).andThen(printf("<CLICK> That did it. It's unlocked.%n")).andThen(look);
-        lockedDoorWithKey.on(OPEN).with(DOOR).build();
+        lockedDoorWithKey.on(OPEN).with(door).build();
         lockedDoorWithKey.on(USE).with(key).build();
 
-        adventureActions.newAction().on(GO).with(DOOR).when(isItemHere(openDoor)).then(gotoRoom(outside)).andThen(printf("%nYeah! I've made it outside!%n")).build();
+        adventureActions.newAction().on(GO).with(door).when(isItemHere(openDoor)).then(gotoRoom(outside)).andThen(printf("%nYeah! I've made it outside!%n")).build();
         adventureActions.newAction().on(GET).with(flyswatter).when(isItemHere(flyswatter)).then(get).andThen(printf("%nOkay. I picked up the flyswatter.%n")).build();
         adventureActions.newAction().on(kill).with(fly).when(isItemHere(fly)).and(not(isItemCarried(flyswatter))).then(printf("%nSmack! I tried but I'm not fast enough. I need some sort of tool.%n")).build();
         adventureActions.newAction().on(kill).with(fly).when(isItemHere(fly)).then(swap(fly, deadFly)).andThen(printf("%nWHACK! I got 'em! It's dead.%n")).build();
 
-        adventureActions.newAction().on(yell).withAnyNoun().then(printf("%nYou don't have to yell. I can hear you.%n")).build();
+        adventureActions.newAction().on(yell).withAnyNoun().then(printf("%n\"{noun}\"!!! Now what?%n")).build();
 
         adventureActions.newAction().on(GET).with(redPanda).when(isItemHere(redPanda)).then(get).andThen(println("%nOkay. I picked up the toy. It's a bit smelly but it's soft and I feel better carrying it.")).andThen(inventory).build();
         adventureActions.newAction().on(DROP).with(redPanda).when(isItemCarried(redPanda)).then(drop).andThen(look).build();
 
-        // *** Standard game actions ***
+        adventureActions.newAction().on(OPEN).with(kennelWithDog).when(isItemHere(kennelWithDog)).then(swap(kennelWithDog, emptyKennel)).andThen(putHere(dog)).andThen(println("A super cute little dog comes leaping out of the kennel!")).build();
+        adventureActions.newAction().on(GET).with(dog).when(isItemHere(dog)).then(println("He's a bit too excited and very fast. I can't catch him. Maybe when he calms down."));
+        adventureActions.newAction().on(pet).with(dog).when(isItemHere(dog)).then(println("The dog loves me. His leg starts thumping on the floor.")).build();
+        adventureActions.newAction().on(kill).with(dog).when(isItemHere(dog)).then(println("The dog lunges at me and chews my face off.  I'm dead.")).andThen(quit).build();
+
+
+        // *** Standard game actions which apply to most games *** /
 
         Actions.ActionSet standardActions = newActionSet();
 
@@ -173,6 +191,9 @@ public class HouseEscapeAdventure {
         standardActions.newAction().onAnyVerb().withNoNoun().then(println("{verb} what?")).build();
         standardActions.newAction().onAnyVerb().withAnyNoun().then(println("I can't do that here right now.")).build();
 
+        /*
+         * All the actions for this adventure
+         */
         Actions.ActionSet fullActionSet = adventureActions.addAll(standardActions);
 
         /*
@@ -180,7 +201,7 @@ public class HouseEscapeAdventure {
          */
         Vocabulary vocabulary = Vocabulary.merge(fullActionSet.buildVocabulary(), movement);
 
-        return new Adventure(vocabulary, occurs.copyOfActions(), fullActionSet.copyOfActions(), itemSet.copyOfItems(), hallway);
+        return new Adventure(vocabulary, occurs.copyOfActions(), fullActionSet.copyOfActions(), itemSet.copyOfItems(), masterBedroom);
     }
 
     private static Action.Result look = Results.look((room, exits, items) -> {
