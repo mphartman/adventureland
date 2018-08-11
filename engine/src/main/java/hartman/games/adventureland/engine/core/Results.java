@@ -15,6 +15,10 @@ import java.util.List;
 
 public final class Results {
 
+    private Results() {
+        throw new IllegalStateException("utility class");
+    }
+
     public static final Result quit = (command, gameState, display) -> gameState.quit();
 
     public static final Result go = (command, gameState, display) -> gameState.exitTowards(command.getNoun());
