@@ -11,12 +11,12 @@ import static org.junit.Assert.assertTrue;
 public class NounTest {
 
     @Test
-    public void nounEqualityIsCaseInsensitive() {
+    public void nounEqualityIsCaseSensitive() {
         Noun north = new Noun("north", "n");
         assertTrue(north.equals(new Noun("north")));
         assertTrue(new Noun("north").equals(north));
-        assertTrue(north.equals(new Noun("NORTH")));
-        assertTrue(new Noun("NORTH").equals(north));
+        assertFalse(north.equals(new Noun("NORTH")));
+        assertFalse(new Noun("NORTH").equals(north));
     }
 
     @Test

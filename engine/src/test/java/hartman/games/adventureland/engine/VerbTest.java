@@ -11,12 +11,12 @@ import static org.junit.Assert.assertTrue;
 public class VerbTest {
 
     @Test
-    public void verbEqualityIsCaseInsensitive() {
+    public void verbEqualityIsCaseSensitive() {
         Verb swim = new Verb("swim", "s");
         assertTrue(swim.equals(new Verb("swim")));
         assertTrue(new Verb("swim").equals(swim));
-        assertTrue(swim.equals(new Verb("SWIM")));
-        assertTrue(new Verb("SWIM").equals(swim));
+        assertFalse(swim.equals(new Verb("SWIM")));
+        assertFalse(new Verb("SWIM").equals(swim));
     }
 
     @Test
