@@ -1,37 +1,13 @@
 
 package hartman.games.adventureland.engine;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-
-public class Noun {
+public class Noun extends Term {
     public static final Noun UNRECOGNIZED = new Noun("Unrecognized");
-    public static final Noun ANY = new Noun("ANY");
+    public static final Noun ANY = new Noun("");
     public static final Noun NONE = new Noun("");
 
-    private String name;
-    private Set<String> synonyms = new HashSet<>();
-
-    private Noun(String name) {
-        Objects.requireNonNull(name, "Noun must have a name.");
-        this.name = name;
-    }
-
     public Noun(String name, String... synonyms) {
-        this(name);
-        this.synonyms.addAll(Arrays.asList(synonyms));
-        this.synonyms.add("ANY");
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String toString() {
-        return "Noun{" + "name='" + name + '\'' + ", synonyms=" + synonyms + '}';
+        super(name, synonyms);
     }
 
     @Override
@@ -39,18 +15,11 @@ public class Noun {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        if (this == ANY) return true;
+        if (this == NONE || o == NONE) return false;
 
-        Noun noun = (Noun) o;
+        if (this == ANY || o == ANY) return true;
 
-        if (!name.equalsIgnoreCase(noun.name)) {
-            return synonyms.stream().anyMatch(s -> s.equalsIgnoreCase(noun.name));
-        }
-        return true;
+        return super.equals(o);
     }
 
-    @Override
-    public int hashCode() {
-        return name.hashCode();
-    }
 }
