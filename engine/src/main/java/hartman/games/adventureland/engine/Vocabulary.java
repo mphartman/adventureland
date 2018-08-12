@@ -4,6 +4,7 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 /**
  * The language of the adventure. A vocabulary gives the player the options for the verbs and nouns she may use to
@@ -15,8 +16,20 @@ public class Vocabulary {
     private final Set<Noun> nouns = new LinkedHashSet<>();
 
     public Vocabulary(Set<Verb> verbs, Set<Noun> nouns) {
-        this.verbs.addAll(verbs);
-        this.nouns.addAll(nouns);
+        this.verbs.addAll(filterVerbs(verbs));
+        this.nouns.addAll(filterNouns(nouns));
+    }
+
+    private Set<Verb> filterVerbs(Set<Verb> verbs) {
+        return verbs.stream()
+                .filter(verb -> !(verb.equals(Verb.UNRECOGNIZED) || verb.equals(Verb.NONE) || verb.equals(Verb.ANY)))
+                .collect(Collectors.toSet());
+    }
+
+    private Set<Noun> filterNouns(Set<Noun> nouns) {
+        return nouns.stream()
+                .filter(noun -> !(noun.equals(Noun.UNRECOGNIZED) || noun.equals(Noun.NONE) || noun.equals(Noun.ANY)))
+                .collect(Collectors.toSet());
     }
 
     public Optional<Verb>find(Verb verb) {

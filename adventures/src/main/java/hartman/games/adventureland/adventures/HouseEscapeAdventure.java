@@ -16,7 +16,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static hartman.games.adventureland.engine.Action.Builder;
 import static hartman.games.adventureland.engine.Action.Result;
 import static hartman.games.adventureland.engine.core.Actions.newActionSet;
 import static hartman.games.adventureland.engine.core.Conditions.carrying;
@@ -187,14 +186,16 @@ public class HouseEscapeAdventure {
                 .then(drop).andThen(printf("%nI dropped the key.%n"))
                 .build();
 
-        Builder lockedDoorWithKey = adventureActions.newAction()
-                .when(here(lockedDoor)).and(present(key))
-                .then(swap(lockedDoor, openDoor)).andThen(printf("<CLICK> That did it. It's unlocked.%n")).andThen(look);
-        lockedDoorWithKey
+        adventureActions.newAction()
                 .on(OPEN).the(door)
+                .when(here(lockedDoor)).and(present(key))
+                .then(swap(lockedDoor, openDoor)).andThen(printf("<CLICK> That did it. It's unlocked.%n")).andThen(look)
                 .build();
-        lockedDoorWithKey
+
+        adventureActions.newAction()
                 .on(USE).the(key)
+                .when(here(lockedDoor)).and(present(key))
+                .then(swap(lockedDoor, openDoor)).andThen(printf("<CLICK> That did it. It's unlocked.%n")).andThen(look)
                 .build();
 
         adventureActions.newAction()
@@ -256,12 +257,6 @@ public class HouseEscapeAdventure {
                 .then(println("The dog loves me. His leg starts thumping on the floor."))
                 .build();
 
-        adventureActions.newAction()
-                .on(kill).the(dog)
-                .when(here(dog))
-                .then(println("The dog lunges at me and chews my face off.  I'm dead.")).andThen(quit)
-                .build();
-
 
         // *** Standard game actions which apply to most games *** /
 
@@ -290,8 +285,7 @@ public class HouseEscapeAdventure {
                 .build();
 
         standardActions.newAction()
-                .withNoVerb()
-                .withAnyNoun()
+                .withNoVerb().withAnyOf(NORTH, SOUTH, EAST, WEST, UP, DOWN)
                 .when(roomHasExit)
                 .then(go).andThen(look)
                 .build();

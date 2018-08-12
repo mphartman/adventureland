@@ -4,7 +4,9 @@ import hartman.games.adventureland.engine.Action.Condition;
 import hartman.games.adventureland.engine.Command;
 import hartman.games.adventureland.engine.GameState;
 import hartman.games.adventureland.engine.Item;
+import hartman.games.adventureland.engine.Noun;
 import hartman.games.adventureland.engine.Room;
+import hartman.games.adventureland.engine.Verb;
 
 import java.util.function.Supplier;
 
@@ -24,8 +26,29 @@ public final class Conditions {
     /**
      * Two Conditions combined with a 'logical OR'
      */
-    public static Condition or(Condition condition1, Condition condition2) {
-        return (command, gameState) -> condition1.matches(command, gameState) || condition2.matches(command, gameState);
+    public static Condition or(Condition c1, Condition c2) {
+        return (command, gameState) -> c1.matches(command, gameState) || c2.matches(command, gameState);
+    }
+
+    /**
+     * Two Conditions combined with a 'logical AND'
+     */
+    public static Condition and(Condition c1, Condition c2) {
+        return ((command, gameState) -> c1.matches(command, gameState) && c2.matches(command, gameState));
+    }
+
+    /**
+     * TRUE if verb matches Command verb
+     */
+    public static Condition verbMatches(Verb verb) {
+        return ((command, gameState) -> verb.matches(command.getVerb()));
+    }
+
+    /**
+     * TRUE if noun matches Command noun
+     */
+    public static Condition nounMatches(Noun noun) {
+        return ((command, gameState) -> noun.matches(command.getNoun()));
     }
 
     /**
@@ -112,7 +135,7 @@ public final class Conditions {
 
     /**
      * True if ITEM is somewhere in the game, i.e. not destroyed.
-     *
+     * <p>
      * An ITEM in NOWHERE is considered to exist.
      */
     public static Condition exists(Item item) {

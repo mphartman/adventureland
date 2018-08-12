@@ -51,8 +51,8 @@ public final class Actions {
     }
 
     public Actions addAll(Actions actions) {
-        verbs.addAll(actions.verbs);
-        nouns.addAll(actions.nouns);
+        this.verbs.addAll(actions.verbs);
+        this.nouns.addAll(actions.nouns);
         this.actions.addAll(actions.actions);
         return this;
     }
