@@ -214,7 +214,7 @@ public class ConditionsTest {
     @Test
     public void existsShouldReturnTrueForNonDestroyedGameItems() {
         Room desk = new Room("desk", "A school desk.");
-        Items.ItemSet itemSet = Items.newItemSet();
+        Items itemSet = Items.newItemSet();
         Item pencil = itemSet.newItem().named("pencil").in(desk).build();
 
         GameState gameState;

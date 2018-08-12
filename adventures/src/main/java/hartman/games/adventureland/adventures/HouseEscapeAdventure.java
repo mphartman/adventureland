@@ -6,6 +6,7 @@ import hartman.games.adventureland.engine.Noun;
 import hartman.games.adventureland.engine.Room;
 import hartman.games.adventureland.engine.Verb;
 import hartman.games.adventureland.engine.Vocabulary;
+import hartman.games.adventureland.engine.core.Actions;
 import hartman.games.adventureland.engine.core.Items;
 import hartman.games.adventureland.engine.core.Results;
 
@@ -17,7 +18,6 @@ import java.util.stream.IntStream;
 
 import static hartman.games.adventureland.engine.Action.Builder;
 import static hartman.games.adventureland.engine.Action.Result;
-import static hartman.games.adventureland.engine.core.Actions.ActionSet;
 import static hartman.games.adventureland.engine.core.Actions.newActionSet;
 import static hartman.games.adventureland.engine.core.Conditions.carrying;
 import static hartman.games.adventureland.engine.core.Conditions.here;
@@ -98,7 +98,7 @@ public class HouseEscapeAdventure {
          * ITEMS
          */
 
-        Items.ItemSet itemSet = Items.newItemSet();
+        Items itemSet = Items.newItemSet();
         Item key = itemSet.newItem().named("key").describedAs("a brass key").portable().in(isaacBedroom).build();
         Item lockedDoor = itemSet.newItem().named("locked_door").describedAs("a locked door").in(kitchen).build();
         Item openDoor = itemSet.newItem().named("open_door").describedAs("an unlocked door").build();
@@ -113,7 +113,7 @@ public class HouseEscapeAdventure {
 
         // *** Occurs - actions which all run automatically at the start of every turn *** /
 
-        ActionSet occurs = newActionSet();
+        Actions occurs = newActionSet();
         occurs.newAction()
                 .when(times(1))
                 .then(look)
@@ -161,7 +161,7 @@ public class HouseEscapeAdventure {
         // *** ORDER OF THE ACTIONS IS IMPORTANT                                                                *** /
         // *** First one whose Verb, Noun, and Conditions are true will run and then the others are skipped.    *** /
 
-        ActionSet adventureActions = newActionSet();
+        Actions adventureActions = newActionSet();
 
         adventureActions.newAction()
                 .on(OPEN).the(door)
@@ -265,7 +265,7 @@ public class HouseEscapeAdventure {
 
         // *** Standard game actions which apply to most games *** /
 
-        ActionSet standardActions = newActionSet();
+        Actions standardActions = newActionSet();
 
         // movement
         standardActions.newAction()
@@ -339,7 +339,7 @@ public class HouseEscapeAdventure {
         /*
          * All the actions for this adventure
          */
-        ActionSet fullActionSet = adventureActions.addAll(standardActions);
+        Actions fullActionSet = adventureActions.addAll(standardActions);
 
         /*
          * Build a vocabulary based off the verbs and nouns used in the Actions.

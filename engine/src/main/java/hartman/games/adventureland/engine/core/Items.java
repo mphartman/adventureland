@@ -7,30 +7,28 @@ import java.util.Set;
 
 public final class Items {
 
+    public static Items newItemSet() {
+        return new Items();
+    }
+
+    private final Set<Item> items = new LinkedHashSet<>();
+
     private Items() {
-        throw new IllegalStateException("utility class");
     }
 
-    public static class ItemSet {
-        private final Set<Item> items = new LinkedHashSet<>();
-
-        public Item.Builder newItem() {
-            return new Item.Builder() {
-                @Override
-                public Item build() {
-                    Item item = super.build();
-                    items.add(item);
-                    return item;
-                }
-            };
-        }
-
-        public Set<Item> copyOfItems() {
-            return new LinkedHashSet<>(items);
-        }
+    public Item.Builder newItem() {
+        return new Item.Builder() {
+            @Override
+            public Item build() {
+                Item item = super.build();
+                items.add(item);
+                return item;
+            }
+        };
     }
 
-    public static ItemSet newItemSet() {
-        return new ItemSet();
+    public Set<Item> copyOfItems() {
+        return new LinkedHashSet<>(items);
     }
+
 }

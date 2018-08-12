@@ -13,7 +13,7 @@ public class ActionsTest {
 
     @Test
     public void actionBuilderShouldCreateActionGivenConditionAndResult() {
-        Actions.ActionSet actionSet = Actions.newActionSet();
+        Actions actionSet = Actions.newActionSet();
         Action action = actionSet
                 .newAction()
                 .when((command, gameState) -> {

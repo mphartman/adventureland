@@ -30,7 +30,7 @@ public class GameStateTest {
 
     @Test
     public void putInInventoryShouldUpdateInventoryWhenItemIsPortable() {
-        Items.ItemSet itemSet = Items.newItemSet();
+        Items itemSet = Items.newItemSet();
         Item cup = itemSet.newItem().named("cup").alias("glass").build();
         assertFalse(cup.isCarried());
 
@@ -78,7 +78,7 @@ public class GameStateTest {
     public void describeShouldVisitRoomAndItems() {
         Room forest = new Room("forest", "I'm in a lush, green forest.");
 
-        Items.ItemSet itemSet = Items.newItemSet();
+        Items itemSet = Items.newItemSet();
         Item tree = itemSet.newItem().named("tree").alias("Tim").describedAs("An American Sycamore tree.").in(forest).build();
         Item key = itemSet.newItem().named("key").describedAs("A skeleton key.").build();
 
@@ -111,7 +111,7 @@ public class GameStateTest {
 
     @Test
     public void inventoryShouldVisitItems() {
-        Items.ItemSet itemSet = Items.newItemSet();
+        Items itemSet = Items.newItemSet();
         Item tree = itemSet.newItem().named("tree").alias("Tim").describedAs("An American Sycamore tree.").build();
         Item key = itemSet.newItem().named("key").describedAs("A skeleton key.").build();
         Item sandwich = itemSet.newItem().named("sandwich").describedAs("A ham and cheese sandwich on rye bread.").inInventory().build();
@@ -145,7 +145,7 @@ public class GameStateTest {
     public void dropShouldPlaceItemInCurrentRoom() {
         Room conferenceRoom = new Room("conferenceRoom", "A brightly lit corporate conference room");
 
-        Items.ItemSet itemSet = Items.newItemSet();
+        Items itemSet = Items.newItemSet();
         Item marker = itemSet.newItem().named("marker").in(conferenceRoom).portable().build();
 
         assertFalse(marker.isCarried());
@@ -200,7 +200,7 @@ public class GameStateTest {
     @Test
     public void destroyShouldRemoveItemFromGameState() {
         Room shed = new Room("shed", "A rickety old tool shed.");
-        Items.ItemSet itemSet = Items.newItemSet();
+        Items itemSet = Items.newItemSet();
         Item hammer = itemSet.newItem().named("hammer").in(shed).build();
 
         GameState gameState;

@@ -11,7 +11,7 @@ public class ItemsTest {
 
     @Test
     public void itemSetContainsItemsBuiltUsingIt() {
-        Items.ItemSet itemSet = Items.newItemSet();
+        Items itemSet = Items.newItemSet();
         Item mug = itemSet.newItem().named("mug").build();
         Item mouse = itemSet.newItem().named("mouse").build();
         Set<Item> items = itemSet.copyOfItems();

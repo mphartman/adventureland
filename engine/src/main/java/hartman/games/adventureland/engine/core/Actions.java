@@ -10,57 +10,55 @@ import java.util.Set;
 
 public final class Actions {
 
+    public static Actions newActionSet() {
+        return new Actions();
+    }
+
+    private Set<Action> actions = new LinkedHashSet<>();
+    private Set<Verb> verbs = new LinkedHashSet<>();
+    private Set<Noun> nouns = new LinkedHashSet<>();
+
     private Actions() {
-        throw new IllegalStateException("utility class");
+
     }
 
-    public static class ActionSet {
+    public Action.Builder newAction() {
+        return new Action.Builder() {
+            @Override
+            public Action.Builder on(Verb verb) {
+                verbs.add(verb);
+                return super.on(verb);
+            }
 
-        private Set<Action> actions = new LinkedHashSet<>();
-        private Set<Verb> verbs = new LinkedHashSet<>();
-        private Set<Noun> nouns = new LinkedHashSet<>();
+            @Override
+            public Action.Builder with(Noun noun) {
+                nouns.add(noun);
+                return super.with(noun);
+            }
 
-        public Action.Builder newAction() {
-            return new Action.Builder() {
-                @Override
-                public Action.Builder on(Verb verb) {
-                    verbs.add(verb);
-                    return super.on(verb);
-                }
+            @Override
+            public Action build() {
+                Action action = super.build();
+                actions.add(action);
+                return action;
+            }
 
-                @Override
-                public Action.Builder with(Noun noun) {
-                    nouns.add(noun);
-                    return super.with(noun);
-                }
-
-                @Override
-                public Action build() {
-                    Action action = super.build();
-                    actions.add(action);
-                    return action;
-                }
-
-            };
-        }
-
-        public Set<Action> copyOfActions() {
-            return new LinkedHashSet<>(actions);
-        }
-
-        public ActionSet addAll(ActionSet actionSet) {
-            verbs.addAll(actionSet.verbs);
-            nouns.addAll(actionSet.nouns);
-            actions.addAll(actionSet.actions);
-            return this;
-        }
-
-        public Vocabulary buildVocabulary() {
-            return new Vocabulary(verbs, nouns);
-        }
+        };
     }
 
-    public static ActionSet newActionSet() {
-        return new ActionSet();
+    public Set<Action> copyOfActions() {
+        return new LinkedHashSet<>(actions);
     }
+
+    public Actions addAll(Actions actions) {
+        verbs.addAll(actions.verbs);
+        nouns.addAll(actions.nouns);
+        this.actions.addAll(actions.actions);
+        return this;
+    }
+
+    public Vocabulary buildVocabulary() {
+        return new Vocabulary(verbs, nouns);
+    }
+
 }

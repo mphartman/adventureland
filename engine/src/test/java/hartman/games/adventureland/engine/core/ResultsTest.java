@@ -70,7 +70,7 @@ public class ResultsTest {
         Room garage = new Room("garage", "A two stall, attached garage.");
         garage.setExit(UP, house);
 
-        Items.ItemSet itemSet = Items.newItemSet();
+        Items itemSet = Items.newItemSet();
         Item car = itemSet.newItem().named("car").describedAs("A BMW 325XI sedan.").in(garage).build();
         Item mailbox = itemSet.newItem().named("mailbox").describedAs("A wooden mailbox.").build();
         GameState gameState = new GameState(garage, itemSet.copyOfItems());
@@ -119,7 +119,7 @@ public class ResultsTest {
     @Test
     public void inventoryShouldCollectItemsGivenItemsAreCarried() {
         Room house = new Room("house", "A little white house.");
-        Items.ItemSet itemSet = Items.newItemSet();
+        Items itemSet = Items.newItemSet();
         Item phone = itemSet.newItem().named("phone").describedAs("an iPhone 8").inInventory().build();
         Item vacuum = itemSet.newItem().named("vacuum").describedAs("A Hoover upright vacuum.").in(house).build();
         GameState gameState = new GameState(house, itemSet.copyOfItems());
@@ -183,7 +183,7 @@ public class ResultsTest {
 
     @Test
     public void getShouldUpdateInventoryGivenAnItem() {
-        Items.ItemSet itemSet = Items.newItemSet();
+        Items itemSet = Items.newItemSet();
         Item bowl = itemSet.newItem().named("bowl").describedAs("A wooden bowl.").portable().in(Room.NOWHERE).build();
         GameState gameState = new GameState(Room.NOWHERE, itemSet.copyOfItems());
 
@@ -232,7 +232,7 @@ public class ResultsTest {
     @Test
     public void destroyShouldAnnihilateItem() {
         Room xandar = new Room("xandar", "The plant Xandar");
-        Items.ItemSet itemSet = Items.newItemSet();
+        Items itemSet = Items.newItemSet();
         Item orb = itemSet.newItem().named("orb").in(xandar).build();
 
         GameState gameState = new GameState(Room.NOWHERE, itemSet.copyOfItems());
