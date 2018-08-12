@@ -23,7 +23,6 @@ public class ItemTest {
         assertTrue(dog.matches(new Noun("dog")));
         assertTrue(dog.matches(new Noun("archie")));
         assertFalse(new Noun("dog").matches(dog));
-        assertFalse(new Verb("dog").matches(dog));
         assertFalse(dog.equals(new Noun("dog")));
     }
 }

@@ -78,13 +78,6 @@ public class Room implements GameElement {
         this.exits.addAll(Arrays.asList(exits));
     }
 
-    /**
-     * Creates a new empty room with no exits.
-     */
-    public Room(String name, String description) {
-        this(name, description, new Exit[0]);
-    }
-
     public String getName() {
         return name;
     }
