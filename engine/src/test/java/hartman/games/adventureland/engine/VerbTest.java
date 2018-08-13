@@ -27,6 +27,11 @@ public class VerbTest {
 
         assertTrue(swim.matches(new Verb("s")));
         assertTrue(swim.matches(new Verb("swim")));
+        assertTrue(new Verb("s").matches(swim));
+        assertTrue(new Verb("swim").matches(swim));
+        assertTrue(new Verb("swim", "s").matches(swim));
+        assertTrue(new Verb("s", "swim").matches(swim));
+        assertTrue(new Verb("SWIM", "S").matches(swim));
 
         assertFalse(swim.matches(new Verb("jump")));
 

@@ -161,4 +161,26 @@ public class ActionsTest {
         assertNull(gameState.getFlag("shazam"));
 
     }
+
+    @Test
+    public void testActionOnVerbWithAnyNoun_CommandKnownVerbAndNoun() {
+
+        Action action = Actions.newActionSet().newAction()
+                .on(Verbs.GO)
+                .withAnyNoun()
+                .then((command, gameState, display) -> gameState.setFlag("shazam", true))
+                .build();
+
+        GameState gameState = new GameState(Room.NOWHERE);
+        action.run(gameState, m -> {}, new Command(new Verb("go"), Noun.NONE));
+        assertNull(gameState.getFlag("shazam"));
+
+        gameState = new GameState(Room.NOWHERE);
+        action.run(gameState, m -> {}, new Command(new Verb("go"), new Noun("dog")));
+        assertEquals(true, gameState.getFlag("shazam"));
+
+        gameState = new GameState(Room.NOWHERE);
+        action.run(gameState, m -> {}, new Command(new Verb("go"), Noun.UNRECOGNIZED));
+        assertEquals(true, gameState.getFlag("shazam"));
+    }
 }

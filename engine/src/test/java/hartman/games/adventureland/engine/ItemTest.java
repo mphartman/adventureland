@@ -22,7 +22,10 @@ public class ItemTest {
         Item dog = new Item.Builder().named("dog").alias("archie").build();
         assertTrue(dog.matches(new Noun("dog")));
         assertTrue(dog.matches(new Noun("archie")));
-        assertFalse(new Noun("dog").matches(dog));
+        assertTrue(new Noun("dog").matches(dog));
+        assertTrue(new Noun("archie").matches(dog));
+        assertTrue(Noun.ANY.matches(dog));
+        assertTrue(dog.matches(Noun.ANY));
         assertFalse(dog.equals(new Noun("dog")));
     }
 }

@@ -27,6 +27,11 @@ public class NounTest {
 
         assertTrue(north.matches(new Noun("n")));
         assertTrue(north.matches(new Noun("north")));
+        assertTrue(new Noun("n").matches(north));
+        assertTrue(new Noun("north").matches(north));
+        assertTrue(new Noun("north", "n").matches(north));
+        assertTrue(new Noun("n", "north").matches(north));
+        assertTrue(new Noun("NORTH", "N").matches(north));
 
         assertFalse(north.matches(new Noun("west")));
 
