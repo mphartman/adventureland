@@ -113,6 +113,8 @@ public class HouseEscapeAdventure {
         // *** Occurs - actions which all run automatically at the start of every turn *** /
 
         Actions occurs = newActionSet();
+
+        // `look` on game startup
         occurs.newAction()
                 .when(times(1))
                 .then(look)
@@ -151,7 +153,7 @@ public class HouseEscapeAdventure {
         // game end
         occurs.newAction()
                 .when(in(outside))
-                .then(printf("%n*** Congratulations, you've escaped! ***"))
+                .then(println("*** Congratulations, you've escaped! ***"))
                 .andThen(quit)
                 .build();
 
@@ -263,31 +265,32 @@ public class HouseEscapeAdventure {
         Actions standardActions = newActionSet();
 
         // movement
+
         standardActions.newAction()
                 .on(GO).withNoNoun()
                 .then(println("{verb} where?"))
                 .build();
 
         standardActions.newAction()
-                .on(GO).withUnrecognizedNoun()
-                .then(println("I don't even understand that word so I won't even try going in that direction."))
-                .build();
-
-        standardActions.newAction()
-                .on(GO).withAnyNoun()
+                .on(GO)
                 .when(roomHasExit)
                 .then(go).andThen(look)
                 .build();
 
         standardActions.newAction()
-                .on(GO).withAnyNoun()
-                .then(println("{noun} is not an exit from here. Try one of the obvious exits."))
+                .on(GO)
+                .then(println("I can't go that way. Try one of the obvious exits."))
                 .build();
 
         standardActions.newAction()
-                .withNoVerb().withAnyOf(NORTH, SOUTH, EAST, WEST, UP, DOWN)
+                .onNoVerb().withAnyOf(NORTH, SOUTH, EAST, WEST, UP, DOWN)
                 .when(roomHasExit)
                 .then(go).andThen(look)
+                .build();
+
+        standardActions.newAction()
+                .onNoVerb().withAnyOf(NORTH, SOUTH, EAST, WEST, UP, DOWN)
+                .then(println("I can't go {noun} from here."))
                 .build();
 
         standardActions.newAction()
@@ -322,7 +325,7 @@ public class HouseEscapeAdventure {
                 .then(println("A voice BOOOMS out:\nTry --> \"GO, LOOK, JUMP, SWIM, CLIMB, TAKE, DROP\"\nand any other verbs you can think of..."))
                 .build();
 
-        // unrecognized input
+        // handle unrecognized input
         standardActions.newAction().onUnrecognizedVerb().then(println("Sorry, I don't know how to do that.")).build();
         standardActions.newAction().onUnrecognizedVerb().withUnrecognizedNoun().then(println("Sorry, I don't know how to do that with that thing.")).build();
         standardActions.newAction().onUnrecognizedVerb().withAnyNoun().then(println("Sorry, I don't know how to that with a {noun}.")).build();
@@ -386,9 +389,7 @@ public class HouseEscapeAdventure {
                 buf.append(format("%s%n", items.get(0).getDescription()));
             } else {
                 buf.append(format("%d items: ", items.size()));
-                IntStream.range(0, items.size()).forEachOrdered(i -> {
-                    buf.append(format("%n - %s", items.get(i).getDescription()));
-                });
+                IntStream.range(0, items.size()).forEachOrdered(i -> buf.append(format("%n - %s", items.get(i).getDescription())));
             }
             buf.append('\n');
         }
