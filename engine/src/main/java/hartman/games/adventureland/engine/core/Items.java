@@ -11,7 +11,7 @@ public final class Items {
         return new Items();
     }
 
-    private final Set<Item> items = new LinkedHashSet<>();
+    private final Set<Item> itemSet = new LinkedHashSet<>();
 
     private Items() {
     }
@@ -21,14 +21,14 @@ public final class Items {
             @Override
             public Item build() {
                 Item item = super.build();
-                items.add(item);
+                itemSet.add(item);
                 return item;
             }
         };
     }
 
     public Set<Item> copyOfItems() {
-        return new LinkedHashSet<>(items);
+        return new LinkedHashSet<>(itemSet);
     }
 
 }
