@@ -17,60 +17,60 @@ public final class Actions {
         return new Actions();
     }
 
-    public class Builder extends Action.Builder {
+    public class ActionBuilder extends Action.Builder {
 
-        private Builder() {}
+        private ActionBuilder() {}
 
-        public Builder on(Verb verb) {
+        public ActionBuilder on(Verb verb) {
             verbs.add(verb);
             when(matches(verb));
             return this;
         }
 
-        public Builder onNoVerb() {
+        public ActionBuilder onNoVerb() {
             return on(Verb.NONE);
         }
 
-        public Builder onUnrecognizedVerb() {
+        public ActionBuilder onUnrecognizedVerb() {
             return on(Verb.UNRECOGNIZED);
         }
 
-        public Builder onAnyVerb() {
+        public ActionBuilder onAnyVerb() {
             return on(Verb.ANY);
         }
 
-        public Builder onAnyOf(Verb... verbs) {
+        public ActionBuilder onAnyOf(Verb... verbs) {
             when(anyMatches(verbs));
             return this;
         }
 
-        public Builder with(Noun noun) {
+        public ActionBuilder with(Noun noun) {
             nouns.add(noun);
             when(matches(noun));
             return this;
         }
 
-        public Builder the(Noun noun) {
+        public ActionBuilder the(Noun noun) {
             return with(noun);
         }
 
-        public Builder withNoNoun() {
+        public ActionBuilder withNoNoun() {
             return with(Noun.NONE);
         }
 
-        public Builder withUnrecognizedNoun() {
+        public ActionBuilder withUnrecognizedNoun() {
             return with(Noun.UNRECOGNIZED);
         }
 
-        public Builder withAnyNoun() {
+        public ActionBuilder withAnyNoun() {
             return with(Noun.ANY);
         }
 
-        public Builder anything() {
+        public ActionBuilder anything() {
             return withAnyNoun();
         }
 
-        public Builder withAnyOf(Noun... nouns) {
+        public ActionBuilder withAnyOf(Noun... nouns) {
             when(anyMatches(nouns));
             return this;
         }
@@ -92,8 +92,8 @@ public final class Actions {
 
     }
 
-    public Builder newAction() {
-        return new Builder();
+    public ActionBuilder newAction() {
+        return new ActionBuilder();
     }
 
     public Set<Action> copyOfActions() {
