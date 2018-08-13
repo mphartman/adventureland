@@ -31,24 +31,24 @@ public class DefaultCommandInterpreter implements CommandInterpreter {
             if (lineScanner.hasNext()) {
                 String firstTerm = lineScanner.next();
 
-                Optional<Verb> maybeVerb = vocabulary.find(new Verb(firstTerm));
+                Optional<Verb> maybeVerb = vocabulary.findMatch(new Verb(firstTerm));
                 if (maybeVerb.isPresent()) {
 
                     verb = maybeVerb.get();
 
                     if (lineScanner.hasNext()) {
-                        noun = vocabulary.find(new Noun(lineScanner.next())).orElse(Noun.UNRECOGNIZED);
+                        noun = vocabulary.findMatch(new Noun(lineScanner.next())).orElse(Noun.UNRECOGNIZED);
                     }
 
                 } else {
-                    Optional<Noun> maybeNoun = vocabulary.find(new Noun(firstTerm));
+                    Optional<Noun> maybeNoun = vocabulary.findMatch(new Noun(firstTerm));
                     if (maybeNoun.isPresent()) {
                         noun = maybeNoun.get();
                     }
                     else {
                         verb = Verb.UNRECOGNIZED;
                         if (lineScanner.hasNext()) {
-                            noun = vocabulary.find(new Noun(lineScanner.next())).orElse(Noun.UNRECOGNIZED);
+                            noun = vocabulary.findMatch(new Noun(lineScanner.next())).orElse(Noun.UNRECOGNIZED);
                         }
                     }
                 }

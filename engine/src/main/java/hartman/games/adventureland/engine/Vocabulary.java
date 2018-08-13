@@ -32,13 +32,13 @@ public class Vocabulary {
                 .collect(Collectors.toSet());
     }
 
-    public Optional<Verb>find(Verb verb) {
+    public Optional<Verb> findMatch(Verb verb) {
         return verbs.stream()
                 .filter(v -> v.matches(verb))
                 .findFirst();
     }
 
-    public Optional<Noun> find(Noun noun) {
+    public Optional<Noun> findMatch(Noun noun) {
         return nouns.stream()
                 .filter(n -> n.matches(noun))
                 .findFirst();

@@ -8,7 +8,7 @@ import java.util.StringJoiner;
 
 public class Verb {
     public static final Verb UNRECOGNIZED = new Verb("Unrecognized");
-    public static final Verb ANY = new Verb("*");
+    public static final Verb ANY = new Verb("");
     public static final Verb NONE = new Verb("nil");
 
     private final String name;
