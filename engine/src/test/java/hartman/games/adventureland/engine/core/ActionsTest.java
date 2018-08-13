@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class ActionsTest {
@@ -59,7 +60,10 @@ public class ActionsTest {
 
     @Test
     public void builderReturnsActionWithConditionCapableOfMatchingAnyNoun() {
-        Action action = Actions.newActionSet().newAction().onNoVerb().withAnyOf(Nouns.NORTH, Nouns.SOUTH, Nouns.EAST, Nouns.WEST).build();
+        Action action = Actions.newActionSet().newAction()
+                .onNoVerb()
+                .withAnyOf(Nouns.NORTH, Nouns.SOUTH, Nouns.EAST, Nouns.WEST)
+                .build();
         assertTrue(action.run(new GameState(Room.NOWHERE), m -> {}, new Command(Verb.NONE, new Noun("n"))));
         assertTrue(action.run(new GameState(Room.NOWHERE), m -> {}, new Command(Verb.NONE, new Noun("s"))));
         assertTrue(action.run(new GameState(Room.NOWHERE), m -> {}, new Command(Verb.NONE, new Noun("e"))));
@@ -74,6 +78,22 @@ public class ActionsTest {
         assertTrue(action.run(new GameState(Room.NOWHERE), m -> {}, new Command(Verb.NONE, Nouns.WEST)));
         assertFalse(action.run(new GameState(Room.NOWHERE), m -> {}, new Command(Verb.NONE, new Noun("u"))));
         assertFalse(action.run(new GameState(Room.NOWHERE), m -> {}, new Command(Verb.NONE, new Noun("d"))));
+    }
+
+    @Test
+    public void builderReturnsActionWithConditionCapableOfMatchingAnyVerb() {
+        Action action = Actions.newActionSet().newAction()
+                .onAnyOf(new Verb("kill", "k"), new Verb("slay", "s"), new Verb("murder", "m"))
+                .withNoNoun()
+                .build();
+        assertTrue(action.run(new GameState(Room.NOWHERE), m -> {}, new Command(new Verb("kill"), Noun.NONE)));
+        assertTrue(action.run(new GameState(Room.NOWHERE), m -> {}, new Command(new Verb("k"), Noun.NONE)));
+        assertTrue(action.run(new GameState(Room.NOWHERE), m -> {}, new Command(new Verb("slay"), Noun.NONE)));
+        assertTrue(action.run(new GameState(Room.NOWHERE), m -> {}, new Command(new Verb("s"), Noun.NONE)));
+        assertTrue(action.run(new GameState(Room.NOWHERE), m -> {}, new Command(new Verb("murder"), Noun.NONE)));
+        assertTrue(action.run(new GameState(Room.NOWHERE), m -> {}, new Command(new Verb("m"), Noun.NONE)));
+        assertFalse(action.run(new GameState(Room.NOWHERE), m -> {}, new Command(new Verb("hug"), Noun.NONE)));
+        assertFalse(action.run(new GameState(Room.NOWHERE), m -> {}, new Command(new Verb("kiss"), Noun.NONE)));
     }
 
     @Test
@@ -121,5 +141,24 @@ public class ActionsTest {
         assertFalse(actionSet2.copyOfActions().contains(a1));
         assertTrue(actionSet3.copyOfActions().contains(a1));
         assertTrue(actionSet3.copyOfActions().contains(a2));
+    }
+
+    @Test
+    public void testActionOnVerbWithNoNoun_CommandKnownVerbAndNoun() {
+
+        Action action = Actions.newActionSet().newAction()
+                .on(Verbs.GO)
+                .withNoNoun()
+                .then((command, gameState, display) -> gameState.setFlag("shazam", true))
+                .build();
+
+        GameState gameState = new GameState(Room.NOWHERE);
+        action.run(gameState, m -> {}, new Command(new Verb("go"), Noun.NONE));
+        assertEquals(true, gameState.getFlag("shazam"));
+
+        gameState = new GameState(Room.NOWHERE);
+        action.run(gameState, m -> {}, new Command(new Verb("go"), new Noun("dog")));
+        assertNull(gameState.getFlag("shazam"));
+
     }
 }

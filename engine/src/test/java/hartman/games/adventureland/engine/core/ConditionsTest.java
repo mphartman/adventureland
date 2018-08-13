@@ -11,12 +11,14 @@ import org.junit.Test;
 
 import java.util.stream.IntStream;
 
+import static hartman.games.adventureland.engine.core.Conditions.and;
 import static hartman.games.adventureland.engine.core.Conditions.carrying;
 import static hartman.games.adventureland.engine.core.Conditions.exists;
 import static hartman.games.adventureland.engine.core.Conditions.hasMoved;
 import static hartman.games.adventureland.engine.core.Conditions.here;
 import static hartman.games.adventureland.engine.core.Conditions.in;
 import static hartman.games.adventureland.engine.core.Conditions.not;
+import static hartman.games.adventureland.engine.core.Conditions.or;
 import static hartman.games.adventureland.engine.core.Conditions.present;
 import static hartman.games.adventureland.engine.core.Conditions.random;
 import static hartman.games.adventureland.engine.core.Conditions.roomHasExit;
@@ -227,5 +229,21 @@ public class ConditionsTest {
 
         gameState.destroy(pencil);
         assertFalse(exists(pencil).matches(Command.NONE, gameState));
+    }
+
+    @Test
+    public void orShouldReturnTrueGivenOneConditionReturnsTrue() {
+        assertTrue(or((command, gameState) -> true, (command, gameState) -> true).matches(Command.NONE, new GameState(Room.NOWHERE)));
+        assertTrue(or((command, gameState) -> false, (command, gameState) -> true).matches(Command.NONE, new GameState(Room.NOWHERE)));
+        assertTrue(or((command, gameState) -> true, (command, gameState) -> false).matches(Command.NONE, new GameState(Room.NOWHERE)));
+        assertFalse(or((command, gameState) -> false, (command, gameState) -> false).matches(Command.NONE, new GameState(Room.NOWHERE)));
+    }
+
+    @Test
+    public void andShouldReturnTrueGivenBothConditionsReturnTrue() {
+        assertTrue(and((command, gameState) -> true, (command, gameState) -> true).matches(Command.NONE, new GameState(Room.NOWHERE)));
+        assertFalse(and((command, gameState) -> false, (command, gameState) -> true).matches(Command.NONE, new GameState(Room.NOWHERE)));
+        assertFalse(and((command, gameState) -> true, (command, gameState) -> false).matches(Command.NONE, new GameState(Room.NOWHERE)));
+        assertFalse(and((command, gameState) -> false, (command, gameState) -> false).matches(Command.NONE, new GameState(Room.NOWHERE)));
     }
 }

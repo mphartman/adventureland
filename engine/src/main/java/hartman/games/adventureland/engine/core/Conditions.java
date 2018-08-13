@@ -10,6 +10,8 @@ import hartman.games.adventureland.engine.Verb;
 
 import java.util.function.Supplier;
 
+import static java.util.Arrays.stream;
+
 public final class Conditions {
 
     private Conditions() {
@@ -40,15 +42,23 @@ public final class Conditions {
     /**
      * TRUE if verb matches Command verb
      */
-    public static Condition verbMatches(Verb verb) {
+    public static Condition matches(Verb verb) {
         return ((command, gameState) -> verb.matches(command.getVerb()));
+    }
+
+    public static Condition anyMatches(Verb... verbs) {
+        return (command, gameState) -> stream(verbs).anyMatch(verb -> verb.matches(command.getVerb()));
     }
 
     /**
      * TRUE if noun matches Command noun
      */
-    public static Condition nounMatches(Noun noun) {
+    public static Condition matches(Noun noun) {
         return ((command, gameState) -> noun.matches(command.getNoun()));
+    }
+
+    public static Condition anyMatches(Noun... nouns) {
+        return (command, gameState) -> stream(nouns).anyMatch(noun -> noun.matches(command.getNoun()));
     }
 
     /**

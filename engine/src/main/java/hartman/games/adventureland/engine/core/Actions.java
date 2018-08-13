@@ -8,10 +8,8 @@ import hartman.games.adventureland.engine.Vocabulary;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import static hartman.games.adventureland.engine.Action.Condition;
-import static hartman.games.adventureland.engine.core.Conditions.nounMatches;
-import static hartman.games.adventureland.engine.core.Conditions.or;
-import static hartman.games.adventureland.engine.core.Conditions.verbMatches;
+import static hartman.games.adventureland.engine.core.Conditions.anyMatches;
+import static hartman.games.adventureland.engine.core.Conditions.matches;
 
 public final class Actions {
 
@@ -24,17 +22,13 @@ public final class Actions {
         private Builder() {}
 
         public Builder on(Verb verb) {
-            if (verb.equals(Verb.NONE)) {
-                return onNoVerb();
-            }
             verbs.add(verb);
-            when(verbMatches(verb));
+            when(matches(verb));
             return this;
         }
 
         public Builder onNoVerb() {
-            // no logical need for a condition to match nothing
-            return this;
+            return on(Verb.NONE);
         }
 
         public Builder onUnrecognizedVerb() {
@@ -45,22 +39,23 @@ public final class Actions {
             return on(Verb.ANY);
         }
 
-        public Builder with(Noun noun) {
-            if (noun.equals(Noun.NONE)) {
-                return withNoNoun();
-            }
-            nouns.add(noun);
-            when(nounMatches(noun));
+        public Builder onAnyOf(Verb... verbs) {
+            when(anyMatches(verbs));
             return this;
         }
 
-        public Builder withNoNoun() {
-            // no logical need for a condition to match nothing
+        public Builder with(Noun noun) {
+            nouns.add(noun);
+            when(matches(noun));
             return this;
         }
 
         public Builder the(Noun noun) {
             return with(noun);
+        }
+
+        public Builder withNoNoun() {
+            return with(Noun.NONE);
         }
 
         public Builder withUnrecognizedNoun() {
@@ -76,22 +71,7 @@ public final class Actions {
         }
 
         public Builder withAnyOf(Noun... nouns) {
-            if (nouns.length > 0) {
-                if (nouns.length == 1) {
-                    return with(nouns[0]);
-                }
-                Condition c1 = null;
-                for (Noun n : nouns) {
-                    Condition c2 = nounMatches(n);
-                    if (c1 == null) {
-                        c1 = c2;
-                    } else {
-                        c1 = or(c2, c1);
-                    }
-                }
-                when(c1);
-                return this;
-            }
+            when(anyMatches(nouns));
             return this;
         }
 
