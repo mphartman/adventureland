@@ -19,8 +19,7 @@ public class Action {
         }
 
         public Builder and(Condition condition) {
-            this.conditions.add(condition);
-            return this;
+            return when(condition);
         }
 
         public Builder then(Result result) {
@@ -29,8 +28,7 @@ public class Action {
         }
 
         public Builder andThen(Result result) {
-            this.results.add(result);
-            return this;
+            return then(result);
         }
 
         public Action build() {
