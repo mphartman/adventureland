@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/mphartman/adventureland.svg?branch=master)](https://travis-ci.org/mphartman/adventureland)
 
-[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=hartman.games%3Aadventureland-parent&metric=alert_status)](https://sonarcloud.io/dashboard?id=hartman.games%3Aadventureland-parent)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=hartman.games%3Aadventureland&metric=alert_status)](https://sonarcloud.io/api/project_badges/measure?project=hartman.games%3Aadventureland&metric=alert_status)
 
 Run adventure games in Scott Adams format using a Java-based game engine. 
 
