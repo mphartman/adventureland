@@ -10,7 +10,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class ActionsTest {
@@ -39,22 +38,22 @@ public class ActionsTest {
     public void builderReturnsActionWithVerbMatchingConditionGivenVerb() {
         Action action = Actions.newActionSet().newAction()
                 .on(new Word("beat"))
-                .then((command, gameState, display) -> gameState.setFlag("verb", command.getFirstWord()))
+                .then((command, gameState, display) -> gameState.setFlag("verb"))
                 .build();
         GameState gameState = new GameState(Room.NOWHERE);
         action.run(gameState, message -> {}, new Command(new Word("beat"), Word.NONE));
-        assertTrue(new Word("beat").equals(gameState.getFlag("verb")));
+        assertTrue(gameState.getFlag("verb"));
     }
 
     @Test
     public void builderReturnsActionWithNounMatchingConditionGivenNoun() {
         Action action = Actions.newActionSet().newAction()
                 .with(new Word("fork"))
-                .then((command, gameState, display) -> gameState.setFlag("noun", command.getSecondWord()))
+                .then((command, gameState, display) -> gameState.setFlag("noun"))
                 .build();
         GameState gameState = new GameState(Room.NOWHERE);
         action.run(gameState, message -> {}, new Command(Word.NONE, new Word("fork")));
-        assertTrue(new Word("fork").equals(gameState.getFlag("noun")));
+        assertTrue(gameState.getFlag("noun"));
     }
 
     @Test
@@ -151,16 +150,16 @@ public class ActionsTest {
         Action action = Actions.newActionSet().newAction()
                 .on(Words.GO)
                 .withNoSecondWord()
-                .then((command, gameState, display) -> gameState.setFlag("shazam", true))
+                .then((command, gameState, display) -> gameState.setString("trap", "sprung"))
                 .build();
 
         GameState gameState = new GameState(Room.NOWHERE);
         action.run(gameState, m -> {}, new Command(new Word("go"), Word.NONE));
-        assertEquals(true, gameState.getFlag("shazam"));
+        assertEquals("sprung", gameState.getString("trap"));
 
         gameState = new GameState(Room.NOWHERE);
         action.run(gameState, m -> {}, new Command(new Word("go"), new Word("dog")));
-        assertNull(gameState.getFlag("shazam"));
+        assertEquals("", gameState.getString("trap"));
 
     }
 
@@ -170,19 +169,19 @@ public class ActionsTest {
         Action action = Actions.newActionSet().newAction()
                 .on(Words.GO)
                 .withAnySecondWord()
-                .then((command, gameState, display) -> gameState.setFlag("shazam", true))
+                .then((command, gameState, display) -> gameState.setString("shazam", "bam"))
                 .build();
 
         GameState gameState = new GameState(Room.NOWHERE);
         action.run(gameState, m -> {}, new Command(new Word("go"), Word.NONE));
-        assertNull(gameState.getFlag("shazam"));
+        assertEquals("", gameState.getString("shazam"));
 
         gameState = new GameState(Room.NOWHERE);
         action.run(gameState, m -> {}, new Command(new Word("go"), new Word("dog")));
-        assertEquals(true, gameState.getFlag("shazam"));
+        assertEquals("bam", gameState.getString("shazam"));
 
         gameState = new GameState(Room.NOWHERE);
         action.run(gameState, m -> {}, new Command(new Word("go"), Word.UNRECOGNIZED));
-        assertEquals(true, gameState.getFlag("shazam"));
+        assertEquals("bam", gameState.getString("shazam"));
     }
 }

@@ -7,6 +7,7 @@ import hartman.games.adventureland.engine.Item;
 import hartman.games.adventureland.engine.Room;
 import hartman.games.adventureland.engine.Word;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static java.util.Arrays.stream;
@@ -45,6 +46,9 @@ public final class Conditions {
         return ((command, gameState) -> word.matches(command.getFirstWord()));
     }
 
+    /**
+     * TRUE if Command first word matches any of the given words.
+     */
     public static Condition anyMatchesFirstWord(Word... words) {
         return (command, gameState) -> stream(words).anyMatch(verb -> verb.matches(command.getFirstWord()));
     }
@@ -56,6 +60,9 @@ public final class Conditions {
         return ((command, gameState) -> word.matches(command.getSecondWord()));
     }
 
+    /**
+     * TRUE if Command second word matches any of the given words.
+     */
     public static Condition anyMatchesSecondWord(Word... words) {
         return (command, gameState) -> stream(words).anyMatch(noun -> noun.matches(command.getSecondWord()));
     }
@@ -143,12 +150,30 @@ public final class Conditions {
     }
 
     /**
-     * True if ITEM is somewhere in the game, i.e. not destroyed.
-     * <p>
-     * An ITEM in NOWHERE is considered to exist.
+     * True if ITEM is somewhere in the game, i.e. not "nowhere"
      */
     public static Condition exists(Item item) {
         return (command, gameState) -> gameState.exists(item);
     }
 
+    /**
+     * True if flag is set to true.
+     */
+    public static Condition isFlagSet(String name) {
+        return (command, gameState) -> gameState.getFlag(name);
+    }
+
+    /**
+     * Returns result of evaluating value of counter using given compare function.
+     */
+    public static Condition compareCounter(String name, Function<Integer, Boolean> compare) {
+        return ((command, gameState) -> compare.apply(gameState.getCounter(name)));
+    }
+
+    /**
+     * True if named string equals given value.
+     */
+    public static Condition stringEquals(String name, String value) {
+        return (command, gameState) -> gameState.getString(name).equals(value);
+    }
 }

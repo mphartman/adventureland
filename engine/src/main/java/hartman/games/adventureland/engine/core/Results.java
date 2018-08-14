@@ -182,4 +182,52 @@ public final class Results {
         return (command, gameState, display) -> gameState.destroy(item);
     }
 
+    /**
+     * Sets the specified flag to TRUE or FALSE.
+     */
+    public static Result setFlag(String name, Boolean value) {
+        return (command, gameState, display) -> gameState.setFlag(name, value);
+    }
+
+    /**
+     * Resets the specified flag to FALSE
+     */
+    public static Result resetFlag(String name) {
+        return (command, gameState, display) -> gameState.resetFlag(name);
+    }
+
+    /**
+     * Sets named counter to integer VALUE
+     */
+    public static Result setCounter(String name, Integer value) {
+       return (command, gameState, display) -> gameState.setCounter(name, value);
+    }
+
+    /**
+     * Increments named counter by 1
+     */
+    public static Result incrementCounter(String name) {
+        return (command, gameState, display) -> gameState.setCounter(name, gameState.getCounter(name) + 1);
+    }
+
+    /**
+     * Decrements named counter by 1
+     */
+    public static Result decrementCounter(String name) {
+        return (command, gameState, display) -> gameState.setCounter(name, gameState.getCounter(name) - 1);
+    }
+
+    /**
+     * Resets named counter to ZERO.
+     */
+    public static Result resetCounter(String name) {
+        return (command, gameState, display) -> gameState.resetCounter(name);
+    }
+
+    /**
+     * Sets named string to value
+     */
+    public static Result setString(String name, String value) {
+        return (command, gameState, display) -> gameState.setString(name, value);
+    }
 }

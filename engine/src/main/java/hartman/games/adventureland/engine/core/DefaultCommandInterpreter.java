@@ -22,22 +22,18 @@ public class DefaultCommandInterpreter implements CommandInterpreter {
     public Command nextCommand() {
         String line = scanner.nextLine();
         try (Scanner lineScanner = new Scanner(line)) {
-
             LinkedList<Word> words = new LinkedList<>();
             while (lineScanner.hasNext()) {
                 words.add(vocabulary.findMatch(lineScanner.next()).orElse(Word.UNRECOGNIZED));
             }
-
-            Word firstWord = Word.NONE;
-            Word secondWord = Word.NONE;
-            if (!words.isEmpty()) {
-                firstWord = words.removeFirst();
-                if (!words.isEmpty()) {
-                    secondWord = words.removeFirst();
-                }
-            }
-
+            Word firstWord = pop(words, Word.NONE);
+            Word secondWord = pop(words, Word.NONE);
             return new Command(firstWord, secondWord);
         }
+    }
+
+    private Word pop(LinkedList<Word> words, Word defaultWord) {
+        if (words.isEmpty()) return defaultWord;
+        return words.removeFirst();
     }
 }

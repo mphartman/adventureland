@@ -11,7 +11,9 @@ import java.util.Set;
  * and a toSet of flags which the adventure's actions may toSet and interpret.
  */
 public class GameState {
-    private final Map<String, Object> flags = new HashMap<>();
+    private final Map<String, Boolean> flags = new HashMap<>();
+    private final Map<String, Integer> counters = new HashMap<>();
+    private final Map<String, String> strings = new HashMap<>();
     private final Set<Item> items = new LinkedHashSet<>();
     private boolean running;
     private Room currentRoom;
@@ -26,12 +28,40 @@ public class GameState {
         this(startRoom, Collections.emptySet());
     }
 
-    public void setFlag(String key, Object value) {
-        flags.put(key, value);
+    public void setFlag(String name, boolean value) {
+        flags.put(name, value);
     }
 
-    public Object getFlag(String key) {
-        return flags.get(key);
+    public void setFlag(String name) {
+        flags.put(name, Boolean.TRUE);
+    }
+
+    public boolean getFlag(String name) {
+        return flags.getOrDefault(name, Boolean.FALSE);
+    }
+
+    public void resetFlag(String name) {
+        flags.remove(name);
+    }
+
+    public void setCounter(String name, int value) {
+        counters.put(name, value);
+    }
+
+    public int getCounter(String name) {
+        return counters.getOrDefault(name, 0);
+    }
+
+    public void resetCounter(String name) {
+        counters.remove(name);
+    }
+
+    public String getString(String name) {
+        return strings.getOrDefault(name, "");
+    }
+
+    public void setString(String name, String value) {
+        strings.put(name, value);
     }
 
     public boolean isRunning() {

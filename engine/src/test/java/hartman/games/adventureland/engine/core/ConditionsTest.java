@@ -12,15 +12,18 @@ import java.util.stream.IntStream;
 
 import static hartman.games.adventureland.engine.core.Conditions.and;
 import static hartman.games.adventureland.engine.core.Conditions.carrying;
+import static hartman.games.adventureland.engine.core.Conditions.compareCounter;
 import static hartman.games.adventureland.engine.core.Conditions.exists;
 import static hartman.games.adventureland.engine.core.Conditions.hasMoved;
 import static hartman.games.adventureland.engine.core.Conditions.here;
 import static hartman.games.adventureland.engine.core.Conditions.in;
+import static hartman.games.adventureland.engine.core.Conditions.isFlagSet;
 import static hartman.games.adventureland.engine.core.Conditions.not;
 import static hartman.games.adventureland.engine.core.Conditions.or;
 import static hartman.games.adventureland.engine.core.Conditions.present;
 import static hartman.games.adventureland.engine.core.Conditions.random;
 import static hartman.games.adventureland.engine.core.Conditions.roomHasExit;
+import static hartman.games.adventureland.engine.core.Conditions.stringEquals;
 import static hartman.games.adventureland.engine.core.Conditions.there;
 import static hartman.games.adventureland.engine.core.Conditions.times;
 import static hartman.games.adventureland.engine.core.Words.DOWN;
@@ -244,5 +247,40 @@ public class ConditionsTest {
         assertFalse(and((command, gameState) -> false, (command, gameState) -> true).matches(Command.NONE, new GameState(Room.NOWHERE)));
         assertFalse(and((command, gameState) -> true, (command, gameState) -> false).matches(Command.NONE, new GameState(Room.NOWHERE)));
         assertFalse(and((command, gameState) -> false, (command, gameState) -> false).matches(Command.NONE, new GameState(Room.NOWHERE)));
+    }
+
+    @Test
+    public void isFlagSetReturnsFalseGivenFlagHasNotBeenSet() {
+        assertFalse(isFlagSet("light_is_green").matches(Command.NONE, new GameState(Room.NOWHERE)));
+    }
+
+    @Test
+    public void isFlagSetReturnsTrueGivenFlagHasBeenSet() {
+        GameState gameState  = new GameState(Room.NOWHERE);
+
+        gameState.setFlag("happy", true);
+        assertTrue(isFlagSet("happy").matches(Command.NONE, gameState));
+
+        gameState.setFlag("happy", false);
+        assertFalse(isFlagSet("happy").matches(Command.NONE, gameState));
+    }
+
+    @Test
+    public void compareCounterReturnsResultOfComparisonFunction() {
+        GameState gameState = new GameState(Room.NOWHERE);
+
+        assertTrue(compareCounter("flies_killed", i -> i == 0).matches(Command.NONE, gameState));
+        assertFalse(compareCounter("flies_killed", i -> i > 0).matches(Command.NONE, gameState));
+
+        gameState.setCounter("flies_killed", 1);
+        assertFalse(compareCounter("flies_killed", i -> i == 0).matches(Command.NONE, gameState));
+        assertTrue(compareCounter("flies_killed", i -> i > 0).matches(Command.NONE, gameState));
+    }
+
+    @Test
+    public void stringEqualsReturnsTrueIfStringsAreEqual() {
+        GameState gameState = new GameState(Room.NOWHERE);
+        gameState.setString("bar", "foo");
+        assertTrue(stringEquals("bar", "foo").matches(Command.NONE, gameState));
     }
 }

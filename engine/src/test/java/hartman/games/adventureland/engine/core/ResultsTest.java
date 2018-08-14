@@ -15,18 +15,26 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static hartman.games.adventureland.engine.Word.NONE;
+import static hartman.games.adventureland.engine.core.Results.decrementCounter;
 import static hartman.games.adventureland.engine.core.Results.destroy;
 import static hartman.games.adventureland.engine.core.Results.drop;
 import static hartman.games.adventureland.engine.core.Results.get;
 import static hartman.games.adventureland.engine.core.Results.go;
 import static hartman.games.adventureland.engine.core.Results.gotoRoom;
+import static hartman.games.adventureland.engine.core.Results.incrementCounter;
 import static hartman.games.adventureland.engine.core.Results.inventory;
 import static hartman.games.adventureland.engine.core.Results.look;
 import static hartman.games.adventureland.engine.core.Results.print;
 import static hartman.games.adventureland.engine.core.Results.put;
 import static hartman.games.adventureland.engine.core.Results.putWith;
 import static hartman.games.adventureland.engine.core.Results.quit;
+import static hartman.games.adventureland.engine.core.Results.resetCounter;
+import static hartman.games.adventureland.engine.core.Results.resetFlag;
+import static hartman.games.adventureland.engine.core.Results.setCounter;
+import static hartman.games.adventureland.engine.core.Results.setFlag;
+import static hartman.games.adventureland.engine.core.Results.setString;
 import static hartman.games.adventureland.engine.core.Results.swap;
+import static hartman.games.adventureland.engine.core.Words.DOWN;
 import static hartman.games.adventureland.engine.core.Words.DROP;
 import static hartman.games.adventureland.engine.core.Words.GET;
 import static hartman.games.adventureland.engine.core.Words.GO;
@@ -50,25 +58,28 @@ public class ResultsTest {
         Room tower_second_floor = new Room("tower_second_floor", "Second story room of the tower.");
         Room tower_first_floor = new Room("tower_first_floor", "The first floor of a tall stone tower.");
         tower_first_floor.setExit(UP, tower_second_floor);
-        GameState gameState = new GameState(tower_first_floor);
-        Command command = new Command(GO, UP);
 
-        go.execute(command, gameState, msg -> {});
+        GameState gameState = new GameState(tower_first_floor);
+
+        go.execute(new Command(GO, UP), gameState, msg -> {});
 
         assertEquals(tower_second_floor, gameState.getCurrentRoom());
     }
 
     @Test
     public void goShouldMovePlayerInDirectionOfFirstWordGivenSecondWordIsNone() {
-        Room tower_second_floor = new Room("tower_second_floor", "Second story room of the tower.");
-        Room tower_first_floor = new Room("tower_first_floor", "The first floor of a tall stone tower.");
-        tower_first_floor.setExit(UP, tower_second_floor);
-        GameState gameState = new GameState(tower_first_floor);
-        Command command = new Command(UP, NONE);
+        Room secondFloor = new Room("tower_second_floor", "Second story room of the tower.");
+        Room firstFloor = new Room("tower_first_floor", "The first floor of a tall stone tower.");
+        firstFloor.setExit(UP, secondFloor);
+        secondFloor.setExit(DOWN, firstFloor);
 
-        go.execute(command, gameState, msg -> {});
+        GameState gameState = new GameState(firstFloor);
 
-        assertEquals(tower_second_floor, gameState.getCurrentRoom());
+        go.execute(new Command(UP, NONE), gameState, msg -> {});
+        assertEquals(secondFloor, gameState.getCurrentRoom());
+
+        go.execute(new Command(DOWN, NONE), gameState, msg -> {});
+        assertEquals(firstFloor, gameState.getCurrentRoom());
     }
 
     @Test(expected = IllegalStateException.class)
@@ -258,5 +269,86 @@ public class ResultsTest {
         destroy(orb).execute(Command.NONE, gameState, msg -> {});
         assertFalse(gameState.exists(orb));
         assertTrue(orb.isDestroyed());
+    }
+
+    @Test
+    public void setFlagShouldSetFlagToTrue() {
+        GameState gameState = new GameState(Room.NOWHERE);
+
+        assertFalse(gameState.getFlag("hostile"));
+        setFlag("hostile", true).execute(Command.NONE, gameState, message -> {});
+        assertTrue(gameState.getFlag("hostile"));
+
+        setFlag("hostile", false).execute(Command.NONE, gameState, message -> {});
+        assertFalse(gameState.getFlag("hostile"));
+    }
+
+    @Test
+    public void resetFlagShouldSetFlagToFalse() {
+        GameState gameState = new GameState(Room.NOWHERE);
+
+        gameState.setFlag("hostile");
+        assertTrue(gameState.getFlag("hostile"));
+
+        resetFlag("hostile").execute(Command.NONE, gameState, message -> {});
+        assertFalse(gameState.getFlag("hostile"));
+    }
+
+    @Test
+    public void setCounterShouldSetCounterToGivenInteger() {
+        GameState gameState = new GameState(Room.NOWHERE);
+
+        assertEquals(0, gameState.getCounter("kills"));
+
+        setCounter("kills", 100).execute(Command.NONE, gameState, message -> {});
+        assertEquals(100, gameState.getCounter("kills"));
+    }
+
+    @Test
+    public void incrementCounterShouldIncreaseCounterValueByOne() {
+        GameState gameState = new GameState(Room.NOWHERE);
+
+        assertEquals(0, gameState.getCounter("kills"));
+
+        incrementCounter("kills").execute(Command.NONE, gameState, message -> {});
+        assertEquals(1, gameState.getCounter("kills"));
+
+        incrementCounter("kills").execute(Command.NONE, gameState, message -> {});
+        assertEquals(2, gameState.getCounter("kills"));
+    }
+
+    @Test
+    public void decrementCounterShouldDecreaseCounterValueByOne() {
+        GameState gameState = new GameState(Room.NOWHERE);
+
+        gameState.setCounter("kills", 1);
+        assertEquals(1, gameState.getCounter("kills"));
+
+        decrementCounter("kills").execute(Command.NONE, gameState, message -> {});
+        assertEquals(0, gameState.getCounter("kills"));
+
+        decrementCounter("kills").execute(Command.NONE, gameState, message -> {});
+        assertEquals(-1, gameState.getCounter("kills"));
+    }
+
+    @Test
+    public void resetCounterShouldSetCounterToZero() {
+        GameState gameState = new GameState(Room.NOWHERE);
+
+        gameState.setCounter("kills", 1);
+        assertEquals(1, gameState.getCounter("kills"));
+
+        resetCounter("kills").execute(Command.NONE, gameState, message -> {});
+        assertEquals(0, gameState.getCounter("kills"));
+    }
+
+    @Test
+    public void setStringShouldSetStringToGivenValue() {
+        GameState gameState = new GameState(Room.NOWHERE);
+
+        assertEquals("", gameState.getString("sign"));
+
+        setString("sign", "BEWARE OF DOG").execute(Command.NONE, gameState, message -> {});
+        assertEquals("BEWARE OF DOG", gameState.getString("sign"));
     }
 }

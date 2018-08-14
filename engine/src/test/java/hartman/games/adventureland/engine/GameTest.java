@@ -10,7 +10,6 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 
 public class GameTest {
 
@@ -21,28 +20,28 @@ public class GameTest {
 
         Action occurs1 = new Action.Builder()
                 .when((command, gameState) -> {
-                    gameState.setFlag("occurs1", sequence.incrementAndGet());
+                    gameState.setCounter("occurs1", sequence.incrementAndGet());
                     return true;
                 })
                 .build();
 
         Action occurs2 = new Action.Builder()
                 .when((command, gameState) -> {
-                    gameState.setFlag("occurs2", sequence.incrementAndGet());
+                    gameState.setCounter("occurs2", sequence.incrementAndGet());
                     return false;
                 })
                 .build();
 
         Action occurs3 = new Action.Builder()
                 .when((command, gameState) -> {
-                    gameState.setFlag("occurs3", sequence.incrementAndGet());
+                    gameState.setCounter("occurs3", sequence.incrementAndGet());
                     return true;
                 })
                 .build();
 
         Action quit = new Action.Builder()
                 .when((command, gameState) -> {
-                    gameState.setFlag("quit", sequence.incrementAndGet());
+                    gameState.setCounter("quit", sequence.incrementAndGet());
                     return true;
                 })
                 .then((command, gameState, display) -> gameState.quit())
@@ -56,10 +55,10 @@ public class GameTest {
         GameState gameState = game.run();
 
         assertFalse(gameState.isRunning());
-        assertEquals(1, gameState.getFlag("occurs1"));
-        assertEquals(2, gameState.getFlag("occurs2"));
-        assertEquals(3, gameState.getFlag("occurs3"));
-        assertEquals(4, gameState.getFlag("quit"));
+        assertEquals(1, gameState.getCounter("occurs1"));
+        assertEquals(2, gameState.getCounter("occurs2"));
+        assertEquals(3, gameState.getCounter("occurs3"));
+        assertEquals(4, gameState.getCounter("quit"));
     }
 
     @Test
@@ -70,7 +69,7 @@ public class GameTest {
                 .build();
 
         Action action = new Action.Builder()
-                .then((command, gameState, display) -> gameState.setFlag("action", "Should not have been called."))
+                .then((command, gameState, display) -> gameState.setString("action", "Should not have been called."))
                 .build();
 
         Vocabulary vocabulary = new Vocabulary(emptySet());
@@ -80,7 +79,7 @@ public class GameTest {
         GameState gameState = game.run();
 
         assertFalse(gameState.isRunning());
-        assertNull(gameState.getFlag("action"));
+        assertEquals("", gameState.getString("action"));
     }
 
 
