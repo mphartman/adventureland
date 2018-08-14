@@ -10,7 +10,6 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class GameTest {
 
@@ -51,11 +50,9 @@ public class GameTest {
         Vocabulary vocabulary = new Vocabulary(Collections.emptySet(), Collections.emptySet());
         Adventure adventure = new Adventure(vocabulary, new LinkedHashSet<>(asList(occurs1, occurs2, occurs3)), Collections.singleton(quit), Collections.emptySet(), Room.NOWHERE);
 
-        GameState gameState = new GameState(adventure.getStartRoom());
-        assertTrue(gameState.isRunning());
 
-        Game game = new Game(adventure, () -> Command.NONE, gameState, message -> {});
-        game.run();
+        Game game = new Game(adventure, () -> Command.NONE, message -> {});
+        GameState gameState = game.run();
 
         assertFalse(gameState.isRunning());
         assertEquals(1, gameState.getFlag("occurs1"));
@@ -78,11 +75,8 @@ public class GameTest {
         Vocabulary vocabulary = new Vocabulary(Collections.emptySet(), Collections.emptySet());
         Adventure adventure = new Adventure(vocabulary, Collections.singleton(occurs), Collections.singleton(action), Collections.emptySet(), Room.NOWHERE);
 
-        GameState gameState = new GameState(adventure.getStartRoom());
-        assertTrue(gameState.isRunning());
-
-        Game game = new Game(adventure, () -> Command.NONE, gameState, message -> {});
-        game.run();
+        Game game = new Game(adventure, () -> Command.NONE, message -> {});
+        GameState gameState = game.run();
 
         assertFalse(gameState.isRunning());
         assertNull(gameState.getFlag("action"));

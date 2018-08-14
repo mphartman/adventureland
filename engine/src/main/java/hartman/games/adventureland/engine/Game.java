@@ -6,30 +6,30 @@ package hartman.games.adventureland.engine;
 public class Game {
     private final Adventure adventure;
     private final CommandInterpreter interpreter;
-    private final GameState gameState;
     private final Display display;
 
-    public Game(Adventure adventure, CommandInterpreter interpreter, GameState gameState, Display display) {
+    public Game(Adventure adventure, CommandInterpreter interpreter, Display display) {
         this.adventure = adventure;
         this.interpreter = interpreter;
-        this.gameState = gameState;
         this.display = display;
     }
 
-    public void run() {
+    public GameState run() {
+        GameState gameState = new GameState(adventure.getStartRoom(), adventure.getItems());
         while (gameState.isRunning()) {
-            runOccurs();
+            runOccurs(gameState);
             if (gameState.isRunning()) {
-                runActions(interpreter.nextCommand());
+                runActions(gameState, interpreter.nextCommand());
             }
         }
+        return gameState;
     }
 
-    private void runOccurs() {
+    private void runOccurs(GameState gameState) {
         adventure.getOccurs().forEach(occur -> occur.run(gameState, display));
     }
 
-    private void runActions(Command command) {
+    private void runActions(GameState gameState, Command command) {
         for (Action action : adventure.getActions())
             if (action.run(gameState, display, command)) return;
     }
