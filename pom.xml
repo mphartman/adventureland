@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>hartman.games</groupId>
-	<artifactId>adventureland-game</artifactId>
+	<artifactId>adventureland-parent</artifactId>
 	<version>1.0.0</version>
 	<packaging>pom</packaging>
 
@@ -12,6 +12,7 @@
         <module>engine</module>
 		<module>adventures</module>
         <module>app-cli</module>
+        <module>dsl</module>
     </modules>    
 
 </project>
