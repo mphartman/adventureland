@@ -2,9 +2,8 @@ package hartman.games.adventureland.engine.core;
 
 import hartman.games.adventureland.engine.Command;
 import hartman.games.adventureland.engine.CommandInterpreter;
-import hartman.games.adventureland.engine.Noun;
-import hartman.games.adventureland.engine.Verb;
 import hartman.games.adventureland.engine.Vocabulary;
+import hartman.games.adventureland.engine.Word;
 
 import java.util.Optional;
 import java.util.Scanner;
@@ -25,30 +24,30 @@ public class DefaultCommandInterpreter implements CommandInterpreter {
         String line = scanner.nextLine();
         try (Scanner lineScanner = new Scanner(line)) {
 
-            Verb verb = Verb.NONE;
-            Noun noun = Noun.NONE;
+            Word verb = Word.NONE;
+            Word noun = Word.NONE;
 
             if (lineScanner.hasNext()) {
                 String firstTerm = lineScanner.next();
 
-                Optional<Verb> maybeVerb = vocabulary.findMatch(new Verb(firstTerm));
+                Optional<Word> maybeVerb = vocabulary.findMatchingVerb(new Word(firstTerm));
                 if (maybeVerb.isPresent()) {
 
                     verb = maybeVerb.get();
 
                     if (lineScanner.hasNext()) {
-                        noun = vocabulary.findMatch(new Noun(lineScanner.next())).orElse(Noun.UNRECOGNIZED);
+                        noun = vocabulary.findMatchingNoun(new Word(lineScanner.next())).orElse(Word.UNRECOGNIZED);
                     }
 
                 } else {
-                    Optional<Noun> maybeNoun = vocabulary.findMatch(new Noun(firstTerm));
+                    Optional<Word> maybeNoun = vocabulary.findMatchingNoun(new Word(firstTerm));
                     if (maybeNoun.isPresent()) {
                         noun = maybeNoun.get();
                     }
                     else {
-                        verb = Verb.UNRECOGNIZED;
+                        verb = Word.UNRECOGNIZED;
                         if (lineScanner.hasNext()) {
-                            noun = vocabulary.findMatch(new Noun(lineScanner.next())).orElse(Noun.UNRECOGNIZED);
+                            noun = vocabulary.findMatchingNoun(new Word(lineScanner.next())).orElse(Word.UNRECOGNIZED);
                         }
                     }
                 }

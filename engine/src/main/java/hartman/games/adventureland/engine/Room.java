@@ -17,17 +17,17 @@ public class Room implements GameElement {
     public static final Room NOWHERE = new Room("nowhere", "I am no where.  It's dark and I am alone.");
 
     public static class Exit implements GameElement {
-        private final Noun direction;
+        private final Word direction;
         private final Room room;
 
-        public Exit(Noun direction, Room room) {
+        public Exit(Word direction, Room room) {
             Objects.requireNonNull(direction, "Exit must have a direction.");
             Objects.requireNonNull(room, "Exit must have a target room.");
             this.direction = direction;
             this.room = room;
         }
 
-        public Noun getDirection() {
+        public Word getDirection() {
             return direction;
         }
 
@@ -86,11 +86,11 @@ public class Room implements GameElement {
         return description;
     }
 
-    public void setExitTowardsSelf(Noun direction) {
+    public void setExitTowardsSelf(Word direction) {
         setExit(direction, this);
     }
 
-    public void setExit(Noun direction, Room towards) {
+    public void setExit(Word direction, Room towards) {
         setExit(new Exit(direction, towards));
     }
 
@@ -101,11 +101,11 @@ public class Room implements GameElement {
         }
     }
 
-    public boolean hasExit(Noun direction) {
+    public boolean hasExit(Word direction) {
         return exits.stream().anyMatch(e -> e.getDirection().matches(direction));
     }
 
-    public Room exit(Noun direction) {
+    public Room exit(Word direction) {
         return exits.stream()
                 .filter(e -> e.getDirection().matches(direction))
                 .findFirst()

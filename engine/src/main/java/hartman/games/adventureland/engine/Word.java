@@ -7,15 +7,15 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
-public class Verb {
-    public static final Verb UNRECOGNIZED = new Verb("Unrecognized");
-    public static final Verb ANY = new Verb("");
-    public static final Verb NONE = new Verb("nil");
+public class Word {
+    public static final Word UNRECOGNIZED = new Word("Unrecognized");
+    public static final Word ANY = new Word("");
+    public static final Word NONE = new Word("nil");
 
     private final String name;
     private final Set<String> synonyms = new LinkedHashSet<>();
 
-    public Verb(String name, String... synonyms) {
+    public Word(String name, String... synonyms) {
         Objects.requireNonNull(name, "name cannot be null");
         this.name = name;
         this.synonyms.add(name.toUpperCase());
@@ -26,7 +26,7 @@ public class Verb {
         return name;
     }
 
-    public boolean matches(Verb that) {
+    public boolean matches(Word that) {
         if (equals(that)) return true;
         if (this == NONE && that == NONE) return true;
         if (this == NONE || that == NONE) return false;
@@ -48,9 +48,9 @@ public class Verb {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Verb v = (Verb) o;
+        Word word = (Word) o;
 
-        return name.equals(v.name);
+        return name.equals(word.name);
     }
 
     @Override

@@ -4,9 +4,8 @@ import hartman.games.adventureland.engine.Action.Condition;
 import hartman.games.adventureland.engine.Command;
 import hartman.games.adventureland.engine.GameState;
 import hartman.games.adventureland.engine.Item;
-import hartman.games.adventureland.engine.Noun;
 import hartman.games.adventureland.engine.Room;
-import hartman.games.adventureland.engine.Verb;
+import hartman.games.adventureland.engine.Word;
 import org.junit.Test;
 
 import java.util.stream.IntStream;
@@ -24,7 +23,7 @@ import static hartman.games.adventureland.engine.core.Conditions.random;
 import static hartman.games.adventureland.engine.core.Conditions.roomHasExit;
 import static hartman.games.adventureland.engine.core.Conditions.there;
 import static hartman.games.adventureland.engine.core.Conditions.times;
-import static hartman.games.adventureland.engine.core.Nouns.DOWN;
+import static hartman.games.adventureland.engine.core.Words.DOWN;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -35,9 +34,9 @@ public class ConditionsTest {
     public void hasExitShouldReturnFalseWhenRoomHasNoExits() {
         Room start = new Room("start", "start");
         GameState gameState = new GameState(start);
-        Command command = new Command(Verbs.GO, DOWN);
+        Command command = new Command(Words.GO, DOWN);
         assertFalse(roomHasExit.matches(command, gameState));
-        command = new Command(Verbs.GO, Nouns.UP);
+        command = new Command(Words.GO, Words.UP);
         assertFalse(roomHasExit.matches(command, gameState));
     }
 
@@ -47,9 +46,9 @@ public class ConditionsTest {
         Room start = new Room("start", "start");
         start.setExit(DOWN, end);
         GameState gameState = new GameState(start);
-        Command command = new Command(Verbs.GO, DOWN);
+        Command command = new Command(Words.GO, DOWN);
         assertTrue(roomHasExit.matches(command, gameState));
-        command = new Command(Verbs.GO, Nouns.UP);
+        command = new Command(Words.GO, Words.UP);
         assertFalse(roomHasExit.matches(command, gameState));
     }
 
@@ -57,7 +56,7 @@ public class ConditionsTest {
     public void inRoomShouldReturnFalseWhenPlayerIsNotInRoom() {
         Room start = new Room("start", "start");
         GameState gameState = new GameState(start);
-        Command command = new Command(Verbs.GO, Noun.ANY);
+        Command command = new Command(Words.GO, Word.ANY);
         Condition inRoom = in(Room.NOWHERE);
         assertFalse(inRoom.matches(command, gameState));
     }
@@ -66,7 +65,7 @@ public class ConditionsTest {
     public void inRoomShouldReturnTrueWhenPlayerIsInRoom() {
         Room start = new Room("start", "start");
         GameState gameState = new GameState(start);
-        Command command = new Command(Verbs.GO, Noun.ANY);
+        Command command = new Command(Words.GO, Word.ANY);
         Condition inRoom = in(start);
         assertTrue(inRoom.matches(command, gameState));
     }
@@ -75,7 +74,7 @@ public class ConditionsTest {
     public void itemCarriedShouldReturnFalseWhenPlayerInventoryDoesNotHaveItem() {
         Item dagger = new Item.Builder().named("dagger").describedAs("A dull, chipped blade.").portable().in(Room.NOWHERE).build();
         GameState gameState = new GameState(Room.NOWHERE);
-        Command command = new Command(Verbs.GO, Noun.ANY);
+        Command command = new Command(Words.GO, Word.ANY);
         Condition itemCarried = carrying(dagger);
         assertFalse(itemCarried.matches(command, gameState));
     }
@@ -84,7 +83,7 @@ public class ConditionsTest {
     public void itemCarriedShouldReturnTrueWhenPlayerInventoryHasItem() {
         Item torch = new Item.Builder().named("torch").describedAs("An unlit wooden torch dipped in pitch.").inInventory().build();
         GameState gameState = new GameState(Room.NOWHERE);
-        Command command = new Command(Verbs.GO, Noun.ANY);
+        Command command = new Command(Words.GO, Word.ANY);
         Condition itemCarried = carrying(torch);
         assertTrue(itemCarried.matches(command, gameState));
     }
@@ -94,7 +93,7 @@ public class ConditionsTest {
         Room entryway = new Room("entryway", "A dark, narrow entry way into the house.");
         Item dog = new Item.Builder().named("dog").describedAs("A large, rapid dog growls at me.").in(entryway).build();
         GameState gameState = new GameState(entryway);
-        Command command = new Command(Verbs.GO, Noun.ANY);
+        Command command = new Command(Words.GO, Word.ANY);
         Condition itemHere = here(dog);
         assertTrue(itemHere.matches(command, gameState));
     }
@@ -104,7 +103,7 @@ public class ConditionsTest {
         Room bathroom = new Room("bathroom", "A luxurious master bathroom with a claw-foot tub.");
         Item microwave = new Item.Builder().named("microwave").describedAs("A 1200-watt microwave.").build();
         GameState gameState = new GameState(bathroom);
-        Command command = new Command(Verbs.GO, Noun.ANY);
+        Command command = new Command(Words.GO, Word.ANY);
         Condition itemHere = here(microwave);
         assertFalse(itemHere.matches(command, gameState));
     }
@@ -114,7 +113,7 @@ public class ConditionsTest {
         Room doghouse = new Room("doghouse", "A cozy, warm kennel.");
         Item dog = new Item.Builder().named("dog").describedAs("A small sleeps here.").in(doghouse).build();
         GameState gameState = new GameState(doghouse);
-        Command command = new Command(Verbs.GO, Noun.ANY);
+        Command command = new Command(Words.GO, Word.ANY);
         Condition isPresent = present(dog);
         assertTrue(isPresent.matches(command, gameState));
     }
@@ -123,7 +122,7 @@ public class ConditionsTest {
     public void isPresentShouldReturnTrueWhenItemIsInInventory() {
         Item key = new Item.Builder().named("key").describedAs("A tarnished brass skeleton key.").inInventory().build();
         GameState gameState = new GameState(Room.NOWHERE);
-        Command command = new Command(Verbs.GO, Noun.ANY);
+        Command command = new Command(Words.GO, Word.ANY);
         Condition isPresent = present(key);
         assertTrue(isPresent.matches(command, gameState));
     }
@@ -133,7 +132,7 @@ public class ConditionsTest {
         Room cell = new Room("cell", "A filthy, tiny prison cell.");
         Item key = new Item.Builder().named("key").describedAs("A small key").portable().build();
         GameState gameState = new GameState(cell);
-        Command command = new Command(Verbs.GO, Nouns.NORTH);
+        Command command = new Command(Words.GO, Words.NORTH);
         Condition isPresent = present(key);
         assertFalse(isPresent.matches(command, gameState));
     }
@@ -143,7 +142,7 @@ public class ConditionsTest {
         Room cell = new Room("cell", "A filthy, tiny prison cell.");
         Item key = new Item.Builder().named("key").describedAs("A small key.").in(cell).build();
         GameState gameState = new GameState(cell);
-        Command command = new Command(Verbs.GO, Nouns.NORTH);
+        Command command = new Command(Words.GO, Words.NORTH);
         Condition isPresent = present(key);
         Condition isNotPresent = not(isPresent);
         assertEquals(!isPresent.matches(command, gameState), isNotPresent.matches(command, gameState));
@@ -152,7 +151,7 @@ public class ConditionsTest {
     @Test
     public void randomShouldReturnTrueGiven100PercentProbability() {
         GameState gameState = new GameState(Room.NOWHERE);
-        Command command = new Command(Verb.ANY, Noun.UNRECOGNIZED);
+        Command command = new Command(Word.ANY, Word.UNRECOGNIZED);
 
         IntStream.range(0, 100).forEachOrdered(i -> assertTrue(random(100, () -> i).matches(command, gameState)));
     }
@@ -160,7 +159,7 @@ public class ConditionsTest {
     @Test
     public void randomShouldReturnFalseGivenZeroPercentProbability() {
         GameState gameState = new GameState(Room.NOWHERE);
-        Command command = new Command(Verb.ANY, Noun.UNRECOGNIZED);
+        Command command = new Command(Word.ANY, Word.UNRECOGNIZED);
 
         IntStream.range(0, 100).forEachOrdered(i -> assertFalse(random(0, () -> i).matches(command, gameState)));
     }
@@ -168,7 +167,7 @@ public class ConditionsTest {
     @Test
     public void randomShouldReturnTrueGivenSuppliedNumberIsLessThenProbability() {
         GameState gameState = new GameState(Room.NOWHERE);
-        Command command = new Command(Verb.ANY, Noun.UNRECOGNIZED);
+        Command command = new Command(Word.ANY, Word.UNRECOGNIZED);
 
         IntStream.range(0, 100).forEachOrdered(i ->
                 assertTrue(random(i + 1, () -> i).matches(command, gameState)));
@@ -177,7 +176,7 @@ public class ConditionsTest {
     @Test
     public void itemMovedShouldReturnTrueIfItemsCurrentLocationDoesNotMatchItsStartingLocation() {
         Item item = new Item.Builder().named("chalice").describedAs("A jewel-encrusted golden chalice.").portable().build();
-        Command command = new Command(new Verb("PICKUP"), new Noun("chalice"));
+        Command command = new Command(new Word("PICKUP"), new Word("chalice"));
         GameState gameState = new GameState(Room.NOWHERE);
         assertFalse(hasMoved(item).matches(command, gameState));
         item.stow();

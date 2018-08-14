@@ -2,10 +2,9 @@ package hartman.games.adventureland.adventures;
 
 import hartman.games.adventureland.engine.Adventure;
 import hartman.games.adventureland.engine.Item;
-import hartman.games.adventureland.engine.Noun;
 import hartman.games.adventureland.engine.Room;
-import hartman.games.adventureland.engine.Verb;
 import hartman.games.adventureland.engine.Vocabulary;
+import hartman.games.adventureland.engine.Word;
 import hartman.games.adventureland.engine.core.Actions;
 import hartman.games.adventureland.engine.core.Items;
 import hartman.games.adventureland.engine.core.Results;
@@ -26,12 +25,6 @@ import static hartman.games.adventureland.engine.core.Conditions.present;
 import static hartman.games.adventureland.engine.core.Conditions.random;
 import static hartman.games.adventureland.engine.core.Conditions.roomHasExit;
 import static hartman.games.adventureland.engine.core.Conditions.times;
-import static hartman.games.adventureland.engine.core.Nouns.DOWN;
-import static hartman.games.adventureland.engine.core.Nouns.EAST;
-import static hartman.games.adventureland.engine.core.Nouns.NORTH;
-import static hartman.games.adventureland.engine.core.Nouns.SOUTH;
-import static hartman.games.adventureland.engine.core.Nouns.UP;
-import static hartman.games.adventureland.engine.core.Nouns.WEST;
 import static hartman.games.adventureland.engine.core.Results.drop;
 import static hartman.games.adventureland.engine.core.Results.get;
 import static hartman.games.adventureland.engine.core.Results.go;
@@ -42,15 +35,21 @@ import static hartman.games.adventureland.engine.core.Results.put;
 import static hartman.games.adventureland.engine.core.Results.putHere;
 import static hartman.games.adventureland.engine.core.Results.quit;
 import static hartman.games.adventureland.engine.core.Results.swap;
-import static hartman.games.adventureland.engine.core.Verbs.DROP;
-import static hartman.games.adventureland.engine.core.Verbs.GET;
-import static hartman.games.adventureland.engine.core.Verbs.GO;
-import static hartman.games.adventureland.engine.core.Verbs.HELP;
-import static hartman.games.adventureland.engine.core.Verbs.INVENTORY;
-import static hartman.games.adventureland.engine.core.Verbs.LOOK;
-import static hartman.games.adventureland.engine.core.Verbs.OPEN;
-import static hartman.games.adventureland.engine.core.Verbs.QUIT;
-import static hartman.games.adventureland.engine.core.Verbs.USE;
+import static hartman.games.adventureland.engine.core.Words.DOWN;
+import static hartman.games.adventureland.engine.core.Words.DROP;
+import static hartman.games.adventureland.engine.core.Words.EAST;
+import static hartman.games.adventureland.engine.core.Words.GET;
+import static hartman.games.adventureland.engine.core.Words.GO;
+import static hartman.games.adventureland.engine.core.Words.HELP;
+import static hartman.games.adventureland.engine.core.Words.INVENTORY;
+import static hartman.games.adventureland.engine.core.Words.LOOK;
+import static hartman.games.adventureland.engine.core.Words.NORTH;
+import static hartman.games.adventureland.engine.core.Words.OPEN;
+import static hartman.games.adventureland.engine.core.Words.QUIT;
+import static hartman.games.adventureland.engine.core.Words.SOUTH;
+import static hartman.games.adventureland.engine.core.Words.UP;
+import static hartman.games.adventureland.engine.core.Words.USE;
+import static hartman.games.adventureland.engine.core.Words.WEST;
 import static java.lang.String.format;
 import static java.lang.String.join;
 import static java.util.Arrays.asList;
@@ -63,13 +62,13 @@ public class HouseEscapeAdventure {
          * Vocabulary
          */
 
-        Verb kill = new Verb("KILL", "SWAT", "HURT");
-        Verb yell = new Verb("YELL", "SHOUT", "SCREAM");
-        Verb pet = new Verb("PET", "PAT");
-        Noun door = new Noun("Door");
+        Word kill = new Word("KILL", "SWAT", "HURT");
+        Word yell = new Word("YELL", "SHOUT", "SCREAM");
+        Word pet = new Word("PET", "PAT");
+        Word door = new Word("Door");
 
-        Set<Noun> directionNouns = new LinkedHashSet<>(asList(NORTH, SOUTH, UP, DOWN, EAST, WEST));
-        Vocabulary movement = new Vocabulary(Collections.emptySet(), directionNouns);
+        Set<Word> directionWords = new LinkedHashSet<>(asList(NORTH, SOUTH, UP, DOWN, EAST, WEST));
+        Vocabulary movement = new Vocabulary(Collections.emptySet(), directionWords);
 
         /*
          *  ROOMS

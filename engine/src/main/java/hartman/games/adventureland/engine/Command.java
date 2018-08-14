@@ -6,21 +6,21 @@ import java.util.StringJoiner;
  * The player's desired action represented by a two-word phrase made up of a verb and noun.
  */
 public class Command {
-    public static final Command NONE = new Command(Verb.NONE, Noun.NONE);
+    public static final Command NONE = new Command(Word.NONE, Word.NONE);
 
-    private final Verb verb;
-    private final Noun noun;
+    private final Word verb;
+    private final Word noun;
 
-    public Command(Verb verb, Noun noun) {
+    public Command(Word verb, Word noun) {
         this.verb = verb;
         this.noun = noun;
     }
 
-    public Verb getVerb() {
+    public Word getVerb() {
         return verb;
     }
 
-    public Noun getNoun() {
+    public Word getNoun() {
         return noun;
     }
 

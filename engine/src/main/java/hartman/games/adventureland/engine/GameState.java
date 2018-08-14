@@ -42,7 +42,7 @@ public class GameState {
         return currentRoom;
     }
 
-    public Room exitTowards(Noun direction) {
+    public Room exitTowards(Word direction) {
         Room nextRoom = currentRoom.exit(direction);
         return moveTo(nextRoom);
     }
@@ -61,9 +61,9 @@ public class GameState {
      * Places item represented here as a Noun, in the inventory.
      * Item only needs to exist and be portable, it does not need to be in the current room.
      */
-    public void putInInventory(Noun noun) {
+    public void putInInventory(Word word) {
         items.stream()
-                .filter(i -> i.matches(noun))
+                .filter(i -> i.matches(word))
                 .filter(Item::isPortable)
                 .findFirst()
                 .ifPresent(Item::stow);
@@ -91,9 +91,9 @@ public class GameState {
     /**
      * Places the item in the current room.
      */
-    public void drop(Noun noun) {
+    public void drop(Word word) {
         items.stream()
-                .filter(item -> item.matches(noun))
+                .filter(item -> item.matches(word))
                 .findFirst()
                 .ifPresent(item -> item.drop(currentRoom));
     }
@@ -101,9 +101,9 @@ public class GameState {
     /**
      * Removes item thus effectively destroying it from game.
      */
-    public void destroy(Noun noun) {
+    public void destroy(Word word) {
         items.stream()
-                .filter(item -> item.matches(noun))
+                .filter(item -> item.matches(word))
                 .findFirst()
                 .ifPresent(Item::destroy);
     }
@@ -111,9 +111,9 @@ public class GameState {
     /**
      * True if ITEM is in the game and not destroyed.
      */
-    public boolean exists(Noun noun) {
+    public boolean exists(Word word) {
         return items.stream()
-                .anyMatch(item -> item.matches(noun) && !item.isDestroyed());
+                .anyMatch(item -> item.matches(word) && !item.isDestroyed());
     }
 
 }

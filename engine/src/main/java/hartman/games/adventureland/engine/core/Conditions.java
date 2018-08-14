@@ -4,9 +4,8 @@ import hartman.games.adventureland.engine.Action.Condition;
 import hartman.games.adventureland.engine.Command;
 import hartman.games.adventureland.engine.GameState;
 import hartman.games.adventureland.engine.Item;
-import hartman.games.adventureland.engine.Noun;
 import hartman.games.adventureland.engine.Room;
-import hartman.games.adventureland.engine.Verb;
+import hartman.games.adventureland.engine.Word;
 
 import java.util.function.Supplier;
 
@@ -42,23 +41,23 @@ public final class Conditions {
     /**
      * TRUE if verb matches Command verb
      */
-    public static Condition matches(Verb verb) {
+    public static Condition verbMatches(Word verb) {
         return ((command, gameState) -> verb.matches(command.getVerb()));
     }
 
-    public static Condition anyMatches(Verb... verbs) {
+    public static Condition anyVerbMatches(Word... verbs) {
         return (command, gameState) -> stream(verbs).anyMatch(verb -> verb.matches(command.getVerb()));
     }
 
     /**
      * TRUE if noun matches Command noun
      */
-    public static Condition matches(Noun noun) {
-        return ((command, gameState) -> noun.matches(command.getNoun()));
+    public static Condition matches(Word word) {
+        return ((command, gameState) -> word.matches(command.getNoun()));
     }
 
-    public static Condition anyMatches(Noun... nouns) {
-        return (command, gameState) -> stream(nouns).anyMatch(noun -> noun.matches(command.getNoun()));
+    public static Condition anyMatches(Word... words) {
+        return (command, gameState) -> stream(words).anyMatch(noun -> noun.matches(command.getNoun()));
     }
 
     /**

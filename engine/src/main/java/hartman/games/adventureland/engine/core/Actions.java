@@ -1,15 +1,16 @@
 package hartman.games.adventureland.engine.core;
 
 import hartman.games.adventureland.engine.Action;
-import hartman.games.adventureland.engine.Noun;
-import hartman.games.adventureland.engine.Verb;
 import hartman.games.adventureland.engine.Vocabulary;
+import hartman.games.adventureland.engine.Word;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static hartman.games.adventureland.engine.core.Conditions.anyMatches;
+import static hartman.games.adventureland.engine.core.Conditions.anyVerbMatches;
 import static hartman.games.adventureland.engine.core.Conditions.matches;
+import static hartman.games.adventureland.engine.core.Conditions.verbMatches;
 
 public final class Actions {
 
@@ -21,57 +22,57 @@ public final class Actions {
 
         private ActionBuilder() {}
 
-        public ActionBuilder on(Verb verb) {
+        public ActionBuilder on(Word verb) {
             verbs.add(verb);
-            when(matches(verb));
+            when(verbMatches(verb));
             return this;
         }
 
         public ActionBuilder onNoVerb() {
-            return on(Verb.NONE);
+            return on(Word.NONE);
         }
 
         public ActionBuilder onUnrecognizedVerb() {
-            return on(Verb.UNRECOGNIZED);
+            return on(Word.UNRECOGNIZED);
         }
 
         public ActionBuilder onAnyVerb() {
-            return on(Verb.ANY);
+            return on(Word.ANY);
         }
 
-        public ActionBuilder onAnyOf(Verb... verbs) {
-            when(anyMatches(verbs));
+        public ActionBuilder onAnyOf(Word... verbs) {
+            when(anyVerbMatches(verbs));
             return this;
         }
 
-        public ActionBuilder with(Noun noun) {
-            nouns.add(noun);
-            when(matches(noun));
+        public ActionBuilder with(Word word) {
+            nouns.add(word);
+            when(matches(word));
             return this;
         }
 
-        public ActionBuilder the(Noun noun) {
-            return with(noun);
+        public ActionBuilder the(Word word) {
+            return with(word);
         }
 
         public ActionBuilder withNoNoun() {
-            return with(Noun.NONE);
+            return with(Word.NONE);
         }
 
         public ActionBuilder withUnrecognizedNoun() {
-            return with(Noun.UNRECOGNIZED);
+            return with(Word.UNRECOGNIZED);
         }
 
         public ActionBuilder withAnyNoun() {
-            return with(Noun.ANY);
+            return with(Word.ANY);
         }
 
         public ActionBuilder anything() {
             return withAnyNoun();
         }
 
-        public ActionBuilder withAnyOf(Noun... nouns) {
-            when(anyMatches(nouns));
+        public ActionBuilder withAnyOf(Word... words) {
+            when(anyMatches(words));
             return this;
         }
 
@@ -85,8 +86,8 @@ public final class Actions {
     }
 
     private Set<Action> actions = new LinkedHashSet<>();
-    private Set<Verb> verbs = new LinkedHashSet<>();
-    private Set<Noun> nouns = new LinkedHashSet<>();
+    private Set<Word> verbs = new LinkedHashSet<>();
+    private Set<Word> nouns = new LinkedHashSet<>();
 
     private Actions() {
 

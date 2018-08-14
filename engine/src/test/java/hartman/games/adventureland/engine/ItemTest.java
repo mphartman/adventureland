@@ -20,12 +20,12 @@ public class ItemTest {
     @Test
     public void itemShouldMatchNounOfSameName() {
         Item dog = new Item.Builder().named("dog").alias("archie").build();
-        assertTrue(dog.matches(new Noun("dog")));
-        assertTrue(dog.matches(new Noun("archie")));
-        assertTrue(new Noun("dog").matches(dog));
-        assertTrue(new Noun("archie").matches(dog));
-        assertTrue(Noun.ANY.matches(dog));
-        assertTrue(dog.matches(Noun.ANY));
-        assertFalse(dog.equals(new Noun("dog")));
+        assertTrue(dog.matches(new Word("dog")));
+        assertTrue(dog.matches(new Word("archie")));
+        assertTrue(new Word("dog").matches(dog));
+        assertTrue(new Word("archie").matches(dog));
+        assertTrue(Word.ANY.matches(dog));
+        assertTrue(dog.matches(Word.ANY));
+        assertFalse(dog.equals(new Word("dog")));
     }
 }

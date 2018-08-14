@@ -12,51 +12,51 @@ import java.util.stream.Collectors;
  */
 public class Vocabulary {
 
-    private final Set<Verb> verbs = new LinkedHashSet<>();
-    private final Set<Noun> nouns = new LinkedHashSet<>();
+    private final Set<Word> verbs = new LinkedHashSet<>();
+    private final Set<Word> words = new LinkedHashSet<>();
 
-    public Vocabulary(Set<Verb> verbs, Set<Noun> nouns) {
+    public Vocabulary(Set<Word> verbs, Set<Word> nouns) {
         this.verbs.addAll(filterVerbs(verbs));
-        this.nouns.addAll(filterNouns(nouns));
+        this.words.addAll(filterNouns(nouns));
     }
 
-    private Set<Verb> filterVerbs(Set<Verb> verbs) {
+    private Set<Word> filterVerbs(Set<Word> verbs) {
         return verbs.stream()
-                .filter(verb -> !(verb.equals(Verb.UNRECOGNIZED) || verb.equals(Verb.NONE) || verb.equals(Verb.ANY)))
+                .filter(verb -> !(verb.equals(Word.UNRECOGNIZED) || verb.equals(Word.NONE) || verb.equals(Word.ANY)))
                 .collect(Collectors.toSet());
     }
 
-    private Set<Noun> filterNouns(Set<Noun> nouns) {
-        return nouns.stream()
-                .filter(noun -> !(noun.equals(Noun.UNRECOGNIZED) || noun.equals(Noun.NONE) || noun.equals(Noun.ANY)))
+    private Set<Word> filterNouns(Set<Word> words) {
+        return words.stream()
+                .filter(noun -> !(noun.equals(Word.UNRECOGNIZED) || noun.equals(Word.NONE) || noun.equals(Word.ANY)))
                 .collect(Collectors.toSet());
     }
 
-    public Optional<Verb> findMatch(Verb verb) {
+    public Optional<Word> findMatchingVerb(Word verb) {
         return verbs.stream()
                 .filter(v -> v.matches(verb))
                 .findFirst();
     }
 
-    public Optional<Noun> findMatch(Noun noun) {
-        return nouns.stream()
-                .filter(n -> n.matches(noun))
+    public Optional<Word> findMatchingNoun(Word word) {
+        return words.stream()
+                .filter(n -> n.matches(word))
                 .findFirst();
     }
 
     public Vocabulary merge(Vocabulary vocab) {
-        Set<Verb> mergedVerbSet = new LinkedHashSet<>(this.verbs);
+        Set<Word> mergedVerbSet = new LinkedHashSet<>(this.verbs);
         mergedVerbSet.addAll(vocab.verbs);
-        Set<Noun> mergedNounSet = new LinkedHashSet<>(this.nouns);
-        mergedNounSet.addAll(vocab.nouns);
-        return new Vocabulary(mergedVerbSet, mergedNounSet);
+        Set<Word> mergedWordSet = new LinkedHashSet<>(this.words);
+        mergedWordSet.addAll(vocab.words);
+        return new Vocabulary(mergedVerbSet, mergedWordSet);
     }
 
     @Override
     public String toString() {
         return new StringJoiner(", ", Vocabulary.class.getSimpleName() + "[", "]")
                 .add("verbs=" + verbs)
-                .add("nouns=" + nouns)
+                .add("nouns=" + words)
                 .toString();
     }
 }

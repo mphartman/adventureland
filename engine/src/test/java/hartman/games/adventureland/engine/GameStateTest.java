@@ -19,10 +19,10 @@ public class GameStateTest {
     public void exitTowardsShouldUpdateCurrentRoomGivenValidExit() {
         Room start = new Room("start", "I am here.");
         Room end = new Room("end", "I am here now.");
-        start.setExit(new Noun("LEFT"), end);
+        start.setExit(new Word("LEFT"), end);
 
         GameState gameState = new GameState(start);
-        Room former = gameState.exitTowards(new Noun("LEFT"));
+        Room former = gameState.exitTowards(new Word("LEFT"));
 
         assertEquals(former, start);
         assertEquals(end, gameState.getCurrentRoom());
@@ -51,7 +51,7 @@ public class GameStateTest {
 
         Item dog = itemSet.newItem().named("dog").alias("archie").portable().build();
         gameState = new GameState(Room.NOWHERE, itemSet.copyOfItems());
-        gameState.putInInventory(new Noun("archie"));
+        gameState.putInInventory(new Word("archie"));
         assertTrue(dog.isCarried());
 
         AtomicReference<Item> dogInInventory = new AtomicReference<>();
@@ -173,7 +173,7 @@ public class GameStateTest {
 
         Item candy = itemSet.newItem().named("pez").alias("candy").build();
         gameState = new GameState(conferenceRoom, itemSet.copyOfItems());
-        gameState.drop(new Noun("candy"));
+        gameState.drop(new Word("candy"));
         assertTrue(candy.isHere(conferenceRoom));
 
         AtomicReference<Item> candyInRoom = new AtomicReference<>();
@@ -214,10 +214,10 @@ public class GameStateTest {
 
         Item screwdriver = itemSet.newItem().named("screwdriver").alias("flathead screwdriver").in(shed).build();
         gameState = new GameState(Room.NOWHERE, itemSet.copyOfItems());
-        assertTrue(gameState.exists(new Noun("flathead screwdriver")));
+        assertTrue(gameState.exists(new Word("flathead screwdriver")));
 
-        gameState.destroy(new Noun("flathead screwdriver"));
-        assertFalse(gameState.exists(new Noun("flathead screwdriver")));
+        gameState.destroy(new Word("flathead screwdriver"));
+        assertFalse(gameState.exists(new Word("flathead screwdriver")));
         assertTrue(screwdriver.isDestroyed());
 
     }
