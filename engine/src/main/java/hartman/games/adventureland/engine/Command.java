@@ -1,34 +1,50 @@
 package hartman.games.adventureland.engine;
 
-import java.util.StringJoiner;
+import java.util.Objects;
 
 /**
- * The player's desired action represented by a two-word phrase made up of a verb and noun.
+ * The player's desired action represented by a two-word phrase.
  */
 public class Command {
     public static final Command NONE = new Command(Word.NONE, Word.NONE);
 
-    private final Word verb;
-    private final Word noun;
+    private final Word first;
+    private final Word second;
 
-    public Command(Word verb, Word noun) {
-        this.verb = verb;
-        this.noun = noun;
+    public Command(Word first, Word second) {
+        Objects.requireNonNull(first, "First word cannot be null.");
+        Objects.requireNonNull(second, "Second word cannot be null.");
+        this.first = first;
+        this.second = second;
     }
 
-    public Word getVerb() {
-        return verb;
+    public Word getSecondThenFirst() {
+        return !second.equals(Word.NONE) ? second : first;
     }
 
-    public Word getNoun() {
-        return noun;
+    public Word getFirstWord() {
+        return first;
+    }
+
+    public Word getSecondWord() {
+        return second;
     }
 
     @Override
-    public String toString() {
-        return new StringJoiner(", ", Command.class.getSimpleName() + "[", "]")
-                .add("verb=" + verb)
-                .add("noun=" + noun)
-                .toString();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Command command = (Command) o;
+
+        if (!first.equals(command.first)) return false;
+        return second.equals(command.second);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = first.hashCode();
+        result = 31 * result + second.hashCode();
+        return result;
     }
 }

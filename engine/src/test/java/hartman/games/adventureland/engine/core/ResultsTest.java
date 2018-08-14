@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static hartman.games.adventureland.engine.Word.NONE;
 import static hartman.games.adventureland.engine.core.Results.destroy;
 import static hartman.games.adventureland.engine.core.Results.drop;
 import static hartman.games.adventureland.engine.core.Results.get;
@@ -26,6 +27,9 @@ import static hartman.games.adventureland.engine.core.Results.put;
 import static hartman.games.adventureland.engine.core.Results.putWith;
 import static hartman.games.adventureland.engine.core.Results.quit;
 import static hartman.games.adventureland.engine.core.Results.swap;
+import static hartman.games.adventureland.engine.core.Words.DROP;
+import static hartman.games.adventureland.engine.core.Words.GET;
+import static hartman.games.adventureland.engine.core.Words.GO;
 import static hartman.games.adventureland.engine.core.Words.UP;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -47,7 +51,20 @@ public class ResultsTest {
         Room tower_first_floor = new Room("tower_first_floor", "The first floor of a tall stone tower.");
         tower_first_floor.setExit(UP, tower_second_floor);
         GameState gameState = new GameState(tower_first_floor);
-        Command command = new Command(Words.GO, UP);
+        Command command = new Command(GO, UP);
+
+        go.execute(command, gameState, msg -> {});
+
+        assertEquals(tower_second_floor, gameState.getCurrentRoom());
+    }
+
+    @Test
+    public void goShouldMovePlayerInDirectionOfFirstWordGivenSecondWordIsNone() {
+        Room tower_second_floor = new Room("tower_second_floor", "Second story room of the tower.");
+        Room tower_first_floor = new Room("tower_first_floor", "The first floor of a tall stone tower.");
+        tower_first_floor.setExit(UP, tower_second_floor);
+        GameState gameState = new GameState(tower_first_floor);
+        Command command = new Command(UP, NONE);
 
         go.execute(command, gameState, msg -> {});
 
@@ -58,7 +75,7 @@ public class ResultsTest {
     public void goShouldThrowExceptionIfDirectionIsNotValidExitFromCurrentRoom() {
         Room sealed_tomb = new Room("sealed_tomb", "There is no escape.");
         GameState gameState = new GameState(sealed_tomb);
-        Command command = new Command(Words.GO, UP);
+        Command command = new Command(GO, UP);
 
         go.execute(command, gameState, msg -> {});
     }
@@ -106,12 +123,12 @@ public class ResultsTest {
     public void printShouldValuesWhenGivenTemplateMessage() {
         StringBuilder buf = new StringBuilder();
 
-        print("This is the noun \"{noun}\"").execute(new Command(Word.NONE, new Word("pop")), new GameState(Room.NOWHERE), buf::append);
+        print("This is the noun \"{noun}\"").execute(new Command(NONE, new Word("pop")), new GameState(Room.NOWHERE), buf::append);
         assertEquals("This is the noun \"pop\"", buf.toString());
 
         buf.setLength(0); // clears it
 
-        print("I don't know how to \"{verb}\"").execute(new Command(new Word("Dance"), Word.NONE), new GameState(Room.NOWHERE), buf::append);
+        print("I don't know how to \"{verb}\"").execute(new Command(new Word("Dance"), NONE), new GameState(Room.NOWHERE), buf::append);
         assertEquals("I don't know how to \"Dance\"", buf.toString());
     }
 
@@ -189,7 +206,7 @@ public class ResultsTest {
         assertTrue(bowl.isPortable());
         assertFalse(bowl.isCarried());
 
-        get.execute(new Command(Words.GET, bowl), gameState, msg -> {});
+        get.execute(new Command(GET, bowl), gameState, msg -> {});
 
         assertFalse(bowl.isHere(Room.NOWHERE));
         assertTrue(bowl.isCarried());
@@ -206,7 +223,7 @@ public class ResultsTest {
         assertTrue(potato.isCarried());
         assertFalse(potato.isHere(cellar));
 
-        drop.execute(new Command(Words.DROP, potato), gameState, msg -> {});
+        drop.execute(new Command(DROP, potato), gameState, msg -> {});
 
         assertFalse(potato.isCarried());
         assertTrue(potato.isHere(cellar));

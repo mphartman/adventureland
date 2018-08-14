@@ -39,32 +39,32 @@ public final class Conditions {
     }
 
     /**
-     * TRUE if verb matches Command verb
+     * TRUE if word matches Command first word
      */
-    public static Condition verbMatches(Word verb) {
-        return ((command, gameState) -> verb.matches(command.getVerb()));
+    public static Condition firstWordMatches(Word word) {
+        return ((command, gameState) -> word.matches(command.getFirstWord()));
     }
 
-    public static Condition anyVerbMatches(Word... verbs) {
-        return (command, gameState) -> stream(verbs).anyMatch(verb -> verb.matches(command.getVerb()));
+    public static Condition anyMatchesFirstWord(Word... words) {
+        return (command, gameState) -> stream(words).anyMatch(verb -> verb.matches(command.getFirstWord()));
     }
 
     /**
-     * TRUE if noun matches Command noun
+     * TRUE if word matches Command second word
      */
-    public static Condition matches(Word word) {
-        return ((command, gameState) -> word.matches(command.getNoun()));
+    public static Condition secondWordMatches(Word word) {
+        return ((command, gameState) -> word.matches(command.getSecondWord()));
     }
 
-    public static Condition anyMatches(Word... words) {
-        return (command, gameState) -> stream(words).anyMatch(noun -> noun.matches(command.getNoun()));
+    public static Condition anyMatchesSecondWord(Word... words) {
+        return (command, gameState) -> stream(words).anyMatch(noun -> noun.matches(command.getSecondWord()));
     }
 
     /**
      * True if player's requested noun represents a valid direction and that the current room
      * she is in has an exit matching that direction.
      */
-    public static final Condition roomHasExit = (command, gameState) -> gameState.getCurrentRoom().hasExit(command.getNoun());
+    public static final Condition roomHasExit = (command, gameState) -> gameState.getCurrentRoom().hasExit(command.getSecondThenFirst());
 
     /**
      * True if the player's current room is ROOM.

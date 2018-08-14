@@ -22,9 +22,9 @@ public final class Results {
     public static final Result quit = (command, gameState, display) -> gameState.quit();
 
     /**
-     * Change current room based on the given Command's Noun.
+     * Change current room based on the given Command's second word if it's not NONE, otherwise the first word
      */
-    public static final Result go = (command, gameState, display) -> gameState.exitTowards(command.getNoun());
+    public static final Result go = (command, gameState, display) -> gameState.exitTowards(command.getSecondThenFirst());
 
     @FunctionalInterface
     public interface LookCallback {
@@ -72,8 +72,8 @@ public final class Results {
      */
     public static Result print(String message) {
         return (command, gameState, display) -> {
-            String output = message.replaceAll("\\Q{noun}\\E", command.getNoun().getName());
-            output = output.replaceAll("\\Q{verb}\\E", command.getVerb().getName());
+            String output = message.replaceAll("\\Q{noun}\\E", command.getSecondWord().getName());
+            output = output.replaceAll("\\Q{verb}\\E", command.getFirstWord().getName());
             display.print(output);
         };
     }
@@ -161,12 +161,12 @@ public final class Results {
     /**
      * Put item mentioned in Command Noun in Inventory.
      */
-    public static final Result get = ((command, gameState, display) -> gameState.putInInventory(command.getNoun()));
+    public static final Result get = ((command, gameState, display) -> gameState.putInInventory(command.getSecondWord()));
 
     /**
      * Drop item mentioned in Command Noun in current room.
      */
-    public static final Result drop = ((command, gameState, display) -> gameState.drop(command.getNoun()));
+    public static final Result drop = ((command, gameState, display) -> gameState.drop(command.getSecondWord()));
 
     /**
      * Puts the first-specified item into the same location as the second.

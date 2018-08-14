@@ -7,10 +7,14 @@ import hartman.games.adventureland.engine.Word;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import static hartman.games.adventureland.engine.core.Conditions.anyMatches;
-import static hartman.games.adventureland.engine.core.Conditions.anyVerbMatches;
-import static hartman.games.adventureland.engine.core.Conditions.matches;
-import static hartman.games.adventureland.engine.core.Conditions.verbMatches;
+import static hartman.games.adventureland.engine.Word.ANY;
+import static hartman.games.adventureland.engine.Word.NONE;
+import static hartman.games.adventureland.engine.Word.UNRECOGNIZED;
+import static hartman.games.adventureland.engine.core.Conditions.anyMatchesFirstWord;
+import static hartman.games.adventureland.engine.core.Conditions.anyMatchesSecondWord;
+import static hartman.games.adventureland.engine.core.Conditions.firstWordMatches;
+import static hartman.games.adventureland.engine.core.Conditions.secondWordMatches;
+import static java.util.Arrays.asList;
 
 public final class Actions {
 
@@ -23,31 +27,32 @@ public final class Actions {
         private ActionBuilder() {}
 
         public ActionBuilder on(Word verb) {
-            verbs.add(verb);
-            when(verbMatches(verb));
+            words.add(verb);
+            when(firstWordMatches(verb));
             return this;
         }
 
-        public ActionBuilder onNoVerb() {
-            return on(Word.NONE);
+        public ActionBuilder onNoFirstWord() {
+            return on(NONE);
         }
 
-        public ActionBuilder onUnrecognizedVerb() {
-            return on(Word.UNRECOGNIZED);
+        public ActionBuilder onUnrecognizedFirstWord() {
+            return on(UNRECOGNIZED);
         }
 
-        public ActionBuilder onAnyVerb() {
-            return on(Word.ANY);
+        public ActionBuilder onAnyFirstWord() {
+            return on(ANY);
         }
 
-        public ActionBuilder onAnyOf(Word... verbs) {
-            when(anyVerbMatches(verbs));
+        public ActionBuilder onAnyFirstWords(Word... verbs) {
+            words.addAll(asList(verbs));
+            when(anyMatchesFirstWord(verbs));
             return this;
         }
 
         public ActionBuilder with(Word word) {
-            nouns.add(word);
-            when(matches(word));
+            words.add(word);
+            when(secondWordMatches(word));
             return this;
         }
 
@@ -55,24 +60,25 @@ public final class Actions {
             return with(word);
         }
 
-        public ActionBuilder withNoNoun() {
-            return with(Word.NONE);
+        public ActionBuilder withNoSecondWord() {
+            return with(NONE);
         }
 
-        public ActionBuilder withUnrecognizedNoun() {
-            return with(Word.UNRECOGNIZED);
+        public ActionBuilder withUnrecognizedSecondWord() {
+            return with(UNRECOGNIZED);
         }
 
-        public ActionBuilder withAnyNoun() {
-            return with(Word.ANY);
+        public ActionBuilder withAnySecondWord() {
+            return with(ANY);
         }
 
         public ActionBuilder anything() {
-            return withAnyNoun();
+            return withAnySecondWord();
         }
 
-        public ActionBuilder withAnyOf(Word... words) {
-            when(anyMatches(words));
+        public ActionBuilder withAnySecondWords(Word... nouns) {
+            words.addAll(asList(nouns));
+            when(anyMatchesSecondWord(nouns));
             return this;
         }
 
@@ -86,8 +92,7 @@ public final class Actions {
     }
 
     private Set<Action> actions = new LinkedHashSet<>();
-    private Set<Word> verbs = new LinkedHashSet<>();
-    private Set<Word> nouns = new LinkedHashSet<>();
+    private Set<Word> words = new LinkedHashSet<>();
 
     private Actions() {
 
@@ -101,15 +106,17 @@ public final class Actions {
         return new LinkedHashSet<>(actions);
     }
 
-    public Actions addAll(Actions actions) {
-        this.verbs.addAll(actions.verbs);
-        this.nouns.addAll(actions.nouns);
-        this.actions.addAll(actions.actions);
-        return this;
+    public Actions merge(Actions that) {
+        Actions mergedActions = new Actions();
+        mergedActions.actions.addAll(this.actions);
+        mergedActions.actions.addAll(that.actions);
+        mergedActions.words.addAll(this.words);
+        mergedActions.words.addAll(that.words);
+        return mergedActions;
     }
 
     public Vocabulary buildVocabulary() {
-        return new Vocabulary(verbs, nouns);
+        return new Vocabulary(words);
     }
 
 }

@@ -9,7 +9,6 @@ import hartman.games.adventureland.engine.core.Actions;
 import hartman.games.adventureland.engine.core.Items;
 import hartman.games.adventureland.engine.core.Results;
 
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -68,7 +67,7 @@ public class HouseEscapeAdventure {
         Word door = new Word("Door");
 
         Set<Word> directionWords = new LinkedHashSet<>(asList(NORTH, SOUTH, UP, DOWN, EAST, WEST));
-        Vocabulary movement = new Vocabulary(Collections.emptySet(), directionWords);
+        Vocabulary movement = new Vocabulary(directionWords);
 
         /*
          *  ROOMS
@@ -266,8 +265,8 @@ public class HouseEscapeAdventure {
         // movement
 
         standardActions.newAction()
-                .on(GO).withNoNoun()
-                .then(println("{verb} where?"))
+                .on(GO).withNoSecondWord()
+                .then(println("Where do you want me to go?"))
                 .build();
 
         standardActions.newAction()
@@ -282,14 +281,9 @@ public class HouseEscapeAdventure {
                 .build();
 
         standardActions.newAction()
-                .onNoVerb().withAnyOf(NORTH, SOUTH, EAST, WEST, UP, DOWN)
+                .onAnyFirstWord().withNoSecondWord()
                 .when(roomHasExit)
                 .then(go).andThen(look)
-                .build();
-
-        standardActions.newAction()
-                .onNoVerb().withAnyOf(NORTH, SOUTH, EAST, WEST, UP, DOWN)
-                .then(println("I can't go {noun} from here."))
                 .build();
 
         standardActions.newAction()
@@ -299,7 +293,7 @@ public class HouseEscapeAdventure {
 
         standardActions.newAction()
                 .on(LOOK)
-                .withAnyNoun()
+                .withAnySecondWord()
                 .then(look)
                 .build();
 
@@ -310,7 +304,7 @@ public class HouseEscapeAdventure {
 
         standardActions.newAction()
                 .on(INVENTORY)
-                .withAnyNoun()
+                .withAnySecondWord()
                 .then(inventory)
                 .build();
 
@@ -325,17 +319,17 @@ public class HouseEscapeAdventure {
                 .build();
 
         // handle unrecognized input
-        standardActions.newAction().onUnrecognizedVerb().then(println("Sorry, I don't know how to do that.")).build();
-        standardActions.newAction().onUnrecognizedVerb().withUnrecognizedNoun().then(println("Sorry, I don't know how to do that with that thing.")).build();
-        standardActions.newAction().onUnrecognizedVerb().withAnyNoun().then(println("Sorry, I don't know how to that with a {noun}.")).build();
-        standardActions.newAction().onAnyVerb().withUnrecognizedNoun().then(println("I don't know how to {verb} with that thing.")).build();
-        standardActions.newAction().onAnyVerb().withNoNoun().then(println("{verb} what?")).build();
-        standardActions.newAction().onAnyVerb().withAnyNoun().then(println("I can't do that here right now.")).build();
+        standardActions.newAction().onUnrecognizedFirstWord().then(println("Sorry, I don't know how to do that.")).build();
+        standardActions.newAction().onUnrecognizedFirstWord().withUnrecognizedSecondWord().then(println("Sorry, I don't know how to do that with that thing.")).build();
+        standardActions.newAction().onUnrecognizedFirstWord().withAnySecondWord().then(println("Sorry, I don't know how to that with a {noun}.")).build();
+        standardActions.newAction().onAnyFirstWord().withUnrecognizedSecondWord().then(println("I don't know how to {verb} with that thing.")).build();
+        standardActions.newAction().onAnyFirstWord().withNoSecondWord().then(println("{verb} what?")).build();
+        standardActions.newAction().onAnyFirstWord().withAnySecondWord().then(println("I can't do that here right now.")).build();
 
         /*
          * All the actions for this adventure
          */
-        Actions fullActionSet = adventureActions.addAll(standardActions);
+        Actions fullActionSet = adventureActions.merge(standardActions);
 
         /*
          * Build a vocabulary based off the verbs and nouns used in the Actions.

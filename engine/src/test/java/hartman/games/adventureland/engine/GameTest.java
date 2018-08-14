@@ -2,11 +2,12 @@ package hartman.games.adventureland.engine;
 
 import org.junit.Test;
 
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -47,8 +48,8 @@ public class GameTest {
                 .then((command, gameState, display) -> gameState.quit())
                 .build();
 
-        Vocabulary vocabulary = new Vocabulary(Collections.emptySet(), Collections.emptySet());
-        Adventure adventure = new Adventure(vocabulary, new LinkedHashSet<>(asList(occurs1, occurs2, occurs3)), Collections.singleton(quit), Collections.emptySet(), Room.NOWHERE);
+        Vocabulary vocabulary = new Vocabulary(emptySet());
+        Adventure adventure = new Adventure(vocabulary, new LinkedHashSet<>(asList(occurs1, occurs2, occurs3)), singleton(quit), emptySet(), Room.NOWHERE);
 
 
         Game game = new Game(adventure, () -> Command.NONE, message -> {});
@@ -72,8 +73,8 @@ public class GameTest {
                 .then((command, gameState, display) -> gameState.setFlag("action", "Should not have been called."))
                 .build();
 
-        Vocabulary vocabulary = new Vocabulary(Collections.emptySet(), Collections.emptySet());
-        Adventure adventure = new Adventure(vocabulary, Collections.singleton(occurs), Collections.singleton(action), Collections.emptySet(), Room.NOWHERE);
+        Vocabulary vocabulary = new Vocabulary(emptySet());
+        Adventure adventure = new Adventure(vocabulary, singleton(occurs), singleton(action), emptySet(), Room.NOWHERE);
 
         Game game = new Game(adventure, () -> Command.NONE, message -> {});
         GameState gameState = game.run();
