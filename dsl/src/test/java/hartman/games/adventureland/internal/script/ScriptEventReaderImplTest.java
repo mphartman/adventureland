@@ -27,4 +27,19 @@ public class ScriptEventReaderImplTest {
         assertFalse(reader.hasNext());
     }
 
+    @Test
+    public void nextReturnsRoomEventGivenNameAndDescriptionAndExits() {
+        ScriptEventReader reader = new ScriptEventReaderImpl(new InputStreamReader(getClass().getResourceAsStream("/scripts/002adventure.txt")));
+        RoomEvent roomEvent;
+
+        roomEvent = (RoomEvent) reader.next();
+        assertEquals("bedroom", roomEvent.getName());
+        assertEquals("A small room with a large bed", roomEvent.getDescription());
+
+        roomEvent = (RoomEvent) reader.next();
+        assertEquals("hallway", roomEvent.getName());
+        assertEquals("A short narrow hallway.", roomEvent.getDescription());
+
+    }
+
 }

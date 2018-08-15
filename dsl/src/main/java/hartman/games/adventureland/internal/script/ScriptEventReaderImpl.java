@@ -5,43 +5,69 @@ import hartman.games.adventureland.script.events.RoomEvent;
 import hartman.games.adventureland.script.events.ScriptEvent;
 
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.util.Spliterator;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
-public class ScriptEventReaderImpl implements ScriptEventReader {
-    private Scanner scanner;
-    private ScriptEvent event = null;
+import static java.util.Arrays.asList;
 
+public class ScriptEventReaderImpl implements ScriptEventReader {
+
+    private List<ScriptEvent> events;
+    private Scanner scanner;
     private Pattern lineWithQuotes = Pattern.compile("[^\"\\s]+|\"(\\\\.|[^\\\\\"])*\"");
+    private int cursor;
 
     public ScriptEventReaderImpl(Reader reader) {
         this.scanner = new Scanner(reader);
     }
 
     @Override
-    public void close() {
-        scanner.close();
+    public Iterator<ScriptEvent> iterator() {
+        return events.iterator();
     }
 
     @Override
-    public Iterator<ScriptEvent> iterator() {
-        return this;
+    public void forEach(Consumer<? super ScriptEvent> action) {
+        events.forEach(action);
+    }
+
+    @Override
+    public Spliterator<ScriptEvent> spliterator() {
+        return events.spliterator();
     }
 
     @Override
     public boolean hasNext() {
-        return peek();
+        if (events == null) {
+            parse();
+        }
+        return cursor < events.size();
     }
 
-    private boolean peek() {
-        event = null;
-        while (scanner.hasNextLine()) {
-            String line = scanner.nextLine();
-            if (line.isEmpty()) break;
-            if (line.startsWith("room")) event = doRoom(line);
+    @Override
+    public ScriptEvent next() {
+        if (!hasNext()) {
+            throw new NoSuchElementException();
         }
-        return event != null;
+        return events.get(cursor++);
+    }
+
+    private List<String> KEYWORDS = asList( "room" );
+
+    private void parse() {
+        this.events = new ArrayList<>();
+        this.cursor = 0;
+
+        while (scanner.hasNextLine()) {
+            System.out.println(scanner.nextLine());
+        }
+
     }
 
     private RoomEvent doRoom(String line) {
@@ -61,8 +87,13 @@ public class ScriptEventReaderImpl implements ScriptEventReader {
         return roomEvent;
     }
 
-    @Override
-    public ScriptEvent next() {
-        return event;
+    interface ScriptEventBuilder {
+        boolean accept(String line);
+
+        void start(String keyword);
+
+        ScriptEvent build();
     }
+
+
 }
