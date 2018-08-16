@@ -14,8 +14,7 @@ public class Game {
         this.display = display;
     }
 
-    public GameState run() {
-        GameState gameState = new GameState(adventure.getStartRoom(), adventure.getItems());
+    public GameState run(GameState gameState) {
         while (gameState.isRunning()) {
             runOccurs(gameState);
             if (gameState.isRunning()) {

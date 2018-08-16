@@ -49,10 +49,10 @@ public class GameTest {
 
         Vocabulary vocabulary = new Vocabulary(emptySet());
         Adventure adventure = new Adventure(vocabulary, new LinkedHashSet<>(asList(occurs1, occurs2, occurs3)), singleton(quit), emptySet(), Room.NOWHERE);
-
+        GameState gameState = new GameState(adventure.getStartRoom(), adventure.getItems());
 
         Game game = new Game(adventure, () -> Command.NONE, message -> {});
-        GameState gameState = game.run();
+        gameState = game.run(gameState);
 
         assertFalse(gameState.isRunning());
         assertEquals(1, gameState.getCounter("occurs1"));
@@ -74,9 +74,10 @@ public class GameTest {
 
         Vocabulary vocabulary = new Vocabulary(emptySet());
         Adventure adventure = new Adventure(vocabulary, singleton(occurs), singleton(action), emptySet(), Room.NOWHERE);
+        GameState gameState = new GameState(adventure.getStartRoom(), adventure.getItems());
 
         Game game = new Game(adventure, () -> Command.NONE, message -> {});
-        GameState gameState = game.run();
+        gameState = game.run(gameState);
 
         assertFalse(gameState.isRunning());
         assertEquals("", gameState.getString("action"));
