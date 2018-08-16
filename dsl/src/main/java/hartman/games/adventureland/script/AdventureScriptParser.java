@@ -3,7 +3,7 @@ package hartman.games.adventureland.script;
 import hartman.games.adventureland.engine.Adventure;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 
 /**
  * Interface for reading Adventureland adventure scripts.
@@ -15,8 +15,8 @@ public interface AdventureScriptParser {
      *
      * @param is the input stream for the script
      * @return A new instance of an Adventure object
-     * @throws IOException If an IO error occurs interacting with the InputStream.
+     * @throws IOException If an IO error occurs interacting with the Reader.
      */
-    Adventure parse(InputStream is) throws IOException;
+    Adventure parse(Reader is) throws IOException;
 
 }

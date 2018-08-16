@@ -1,0 +1,8 @@
+// Tests all exits
+room bedroom "I'm in a large room with a small bed."
+    exit north
+    exit south
+    exit east
+    exit west
+    exit up
+    exit down

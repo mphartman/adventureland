@@ -34,7 +34,6 @@ roomName
 
 roomDescription
     :   StringLiteral
-    |
     ;
 
 roomExits
@@ -42,25 +41,21 @@ roomExits
     ;
 
 roomExit
-    :   EXIT exitDirection roomName
+    :   EXIT exitDirection roomName?
     ;
 
 exitDirection
-    :   NORTH
-    |   SOUTH
-    |   EAST
-    |   WEST
-    |   UP
-    |   DOWN
+    :   NORTH   #exitNorth
+    |   SOUTH   #exitSouth
+    |   EAST    #exitEast
+    |   WEST    #exitWest
+    |   UP      #exitUp
+    |   DOWN    #exitDown
     ;
 
 Identifier
 	:	Letter LetterOrDigit*
 	;
-
-//
-// String literals
-//
 
 StringLiteral
 	:	'"' StringCharacters? '"'
