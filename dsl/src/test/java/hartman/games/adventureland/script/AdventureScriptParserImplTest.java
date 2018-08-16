@@ -100,4 +100,10 @@ public class AdventureScriptParserImplTest {
         assertEquals("swamp", expectedSwamp.getName());
     }
 
+    @Test
+    @AdventureScriptResource("/scripts/070adventure.txt")
+    public void startSpecifiesWhichRoomAdventureStartsIn() {
+        Adventure adventure = adventureScriptParsingRule.parse();
+        assertEquals(new Room("meadow", "I'm in a beautiful meadow."), adventure.getStartRoom());
+    }
 }

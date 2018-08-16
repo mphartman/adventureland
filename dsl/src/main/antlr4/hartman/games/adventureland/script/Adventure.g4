@@ -19,9 +19,10 @@ EAST            : 'east';
 WEST            : 'west';
 UP              : 'up';
 DOWN            : 'down';
+START           : 'start';
 
 adventure
-    :   roomDeclaration+ EOF
+    :   roomDeclaration+ start? EOF
     ;
 
 roomDeclaration
@@ -51,6 +52,10 @@ exitDirection
     |   WEST    #exitWest
     |   UP      #exitUp
     |   DOWN    #exitDown
+    ;
+
+start
+    :   START roomName
     ;
 
 Identifier

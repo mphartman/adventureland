@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
@@ -56,7 +57,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
             setExits(roomDefs);
 
-            Room startingRoom = roomDefs.get(0).getRoom();
+            Room startingRoom = getStartingRoom(roomDefs, ctx.start());
 
             return new Adventure(new Vocabulary(emptySet()), emptySet(), emptySet(), emptySet(), startingRoom);
         }
@@ -77,6 +78,22 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
                 }
             }));
         }
+
+        // find the room specified by the START keyword, otherwise use the first ROOM listed in the script
+        private Room getStartingRoom(List<RoomDef> roomDefs, AdventureParser.StartContext ctx) {
+            return Optional.ofNullable(ctx)
+                    .flatMap(startContext -> startContext.accept(new AdventureBaseVisitor<Optional<Room>>() {
+                        @Override
+                        public Optional<Room> visitStart(AdventureParser.StartContext startContext) {
+                            return roomDefs.stream()
+                                    .filter(roomDef -> roomDef.getRoomName().equals(startContext.roomName().getText()))
+                                    .findFirst()
+                                    .map(RoomDef::getRoom);
+                        }
+                    }))
+                    .orElse(roomDefs.get(0).getRoom());
+        }
+
     }
 
     private static class RoomDef {
