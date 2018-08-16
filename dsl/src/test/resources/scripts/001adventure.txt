@@ -1,1 +1,1 @@
-room bedroom "A small room with a large bed"
+room kitchen

@@ -1,11 +1,31 @@
 grammar Adventure;
 
+//
+// Keywords
+//
+
+ROOM            : 'room';
+EXIT            : 'exit';
+ITEM            : 'item';
+AT              : 'at';
+NOWHERE         : 'nowhere';
+CALLED          : 'called';
+ACTION          : 'action';
+WHEN            : 'when';
+OCCURS          : 'occurs';
+NORTH           : 'north';
+SOUTH           : 'south';
+EAST            : 'east';
+WEST            : 'west';
+UP              : 'up';
+DOWN            : 'down';
+
 adventure
     :   roomDeclaration+ EOF
     ;
 
 roomDeclaration
-    :   ROOM roomName roomDescription
+    :   ROOM roomName roomDescription roomExits?
     ;
 
 roomName
@@ -14,6 +34,7 @@ roomName
 
 roomDescription
     :   StringLiteral
+    |
     ;
 
 roomExits
@@ -73,30 +94,10 @@ fragment Letter
     ;
 
 //
-// Keywords
-//
-
-ROOM            : 'room';
-EXIT            : 'exit';
-ITEM            : 'item';
-AT              : 'at';
-NOWHERE         : 'nowhere';
-CALLED          : 'called';
-ACTION          : 'action';
-WHEN            : 'when';
-OCCURS          : 'occurs';
-NORTH           : 'north';
-SOUTH           : 'south';
-EAST            : 'east';
-WEST            : 'west';
-UP              : 'up';
-DOWN            : 'down';
-
-//
 // Whitespace and comments
 //
 
-WS
+WHITESPACE
     :  [ \t\r\n]+ -> skip
     ;
 

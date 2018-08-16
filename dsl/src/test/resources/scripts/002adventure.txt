@@ -1,4 +1,1 @@
-room bedroom "A small room with a large bed" exit north hallway
-
-room hallway "A short narrow hallway."
-    exit south bedroom
+room "A small room with a large bed"
