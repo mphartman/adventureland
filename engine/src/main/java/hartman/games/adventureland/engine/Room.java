@@ -51,15 +51,12 @@ public class Room implements GameElement {
 
             Exit exit = (Exit) o;
 
-            if (!direction.equals(exit.direction)) return false;
-            return room.equals(exit.room);
+            return direction.equals(exit.direction);
         }
 
         @Override
         public int hashCode() {
-            int result = direction.hashCode();
-            result = 31 * result + room.hashCode();
-            return result;
+            return direction.hashCode();
         }
     }
 

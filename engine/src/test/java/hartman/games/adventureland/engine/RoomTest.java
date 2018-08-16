@@ -51,4 +51,18 @@ public class RoomTest {
 
         hallway.exit(EAST);
     }
+
+    @Test
+    public void setExitShouldOverwriteGivenSameDirection() {
+        Room hallway = new Room("hallway", "A long stone corridor.");
+        Room kitchen = new Room("kitchen", "A huge kitchen.");
+        Room diningRoom = new Room("diningRoom", "A dining room.");
+
+        hallway.setExit(new Word("left"), diningRoom);
+        hallway.setExit(new Word("right"), kitchen);
+        hallway.setExit(new Word("left"), kitchen);
+
+        assertEquals(kitchen, hallway.exit(new Word("left")));
+
+    }
 }
