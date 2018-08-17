@@ -126,4 +126,16 @@ public class AdventureScriptParserImplTest {
         Adventure adventure = adventureScriptParsingRule.parse();
         assertTrue(adventure.getItems().contains(new Item.Builder().named("key").build()));
     }
+    @Test
+    @AdventureScriptResource("/scripts/103adventure.txt")
+    public void simpleItemWithAliases() {
+        Adventure adventure = adventureScriptParsingRule.parse();
+        Item item = adventure.getItems().stream()
+                .filter(i -> i.getName().equals("sword"))
+                .findFirst()
+                .orElseThrow(AssertionError::new);
+        assertTrue(new Item.Builder().named("excalibur").build().matches(item));
+        assertTrue(new Item.Builder().named("nightblade").build().matches(item));
+        assertTrue(new Item.Builder().named("sharpie").build().matches(item));
+    }
 }

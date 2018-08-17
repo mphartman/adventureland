@@ -12,6 +12,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 import java.io.IOException;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static hartman.games.adventureland.script.AdventureParser.AdventureContext;
 import static hartman.games.adventureland.script.AdventureParser.ExitDownContext;
@@ -208,7 +210,21 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         public Item visitItemDeclaration(ItemDeclarationContext ctx) {
             String name = ctx.itemName().getText();
             String description = ctx.itemDescription().getText();
-            return new Item.Builder().named(name).describedAs(description).build();
+
+            Item.Builder builder = new Item.Builder().named(name).describedAs(description);
+
+            getAliases(ctx).forEach(builder::alias);
+
+            return builder.build();
+        }
+
+        private List<String> getAliases(ItemDeclarationContext ctx) {
+            if (ctx.itemAliases() != null && ctx.itemAliases().itemAlias() != null) {
+                return ctx.itemAliases().itemAlias().stream()
+                        .map(RuleContext::getText)
+                        .collect(Collectors.toList());
+            }
+            return emptyList();
         }
     }
 

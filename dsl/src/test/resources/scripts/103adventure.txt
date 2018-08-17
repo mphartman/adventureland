@@ -1,0 +1,3 @@
+// Tests an item with aliases
+item sword "A greatsword"
+    called excalibur, nightblade, sharpie
