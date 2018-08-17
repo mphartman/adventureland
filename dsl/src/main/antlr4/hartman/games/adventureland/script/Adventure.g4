@@ -22,7 +22,16 @@ DOWN            : 'down';
 START           : 'start';
 
 adventure
-    :   roomDeclaration+ start? EOF
+    :   gameElement+ globalParameter* EOF
+    ;
+
+gameElement
+    :   roomDeclaration
+    |   itemDeclaration
+    ;
+
+globalParameter
+    :   startParameter      #globalParameterStart
     ;
 
 roomDeclaration
@@ -54,8 +63,33 @@ exitDirection
     |   DOWN    #exitDown
     ;
 
-start
+startParameter
     :   START roomName
+    ;
+
+itemDeclaration
+    :   ITEM itemName itemDescription itemLocation? itemAliases?
+    ;
+
+itemName
+    :   Identifier
+    ;
+
+itemLocation
+    :   AT roomName     #itemInRoom
+    |   NOWHERE         #itemIsNowhere
+    ;
+
+itemAliases
+    :   CALLED itemAlias (',' itemAlias)*
+    ;
+
+itemAlias
+    :   Identifier
+    ;
+
+itemDescription
+    :   StringLiteral
     ;
 
 Identifier

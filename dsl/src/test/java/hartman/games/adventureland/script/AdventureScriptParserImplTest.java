@@ -1,6 +1,7 @@
 package hartman.games.adventureland.script;
 
 import hartman.games.adventureland.engine.Adventure;
+import hartman.games.adventureland.engine.Item;
 import hartman.games.adventureland.engine.Room;
 import hartman.games.adventureland.engine.Word;
 import hartman.games.adventureland.engine.core.Words;
@@ -105,5 +106,24 @@ public class AdventureScriptParserImplTest {
     public void startSpecifiesWhichRoomAdventureStartsIn() {
         Adventure adventure = adventureScriptParsingRule.parse();
         assertEquals(new Room("meadow", "I'm in a beautiful meadow."), adventure.getStartRoom());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    @AdventureScriptResource("/scripts/100adventure.txt")
+    public void itemMustHaveDescription() {
+        adventureScriptParsingRule.parse();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    @AdventureScriptResource("/scripts/101adventure.txt")
+    public void itemMustHaveName() {
+        adventureScriptParsingRule.parse();
+    }
+
+    @Test
+    @AdventureScriptResource("/scripts/102adventure.txt")
+    public void simpleItem() {
+        Adventure adventure = adventureScriptParsingRule.parse();
+        assertTrue(adventure.getItems().contains(new Item.Builder().named("key").build()));
     }
 }
