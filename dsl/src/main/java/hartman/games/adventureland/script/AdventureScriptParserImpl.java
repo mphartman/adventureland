@@ -78,20 +78,12 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
             setExits(roomDefs);
 
-            return adventureContext.globalParameter().stream()
-                    .map(globalParameterContext -> globalParameterContext.accept(new AdventureBaseVisitor<Room>() {
-                        @Override
-                        public Room visitGlobalParameterStart(GlobalParameterStartContext ctx) {
-                            String startRoomName = ctx.startParameter().roomName().getText();
-                            return roomDefs.stream()
-                                    .filter(roomDef -> roomDef.getRoomName().equals(startRoomName))
-                                    .findFirst()
-                                    .map(RoomDef::getRoom)
-                                    .orElse(Room.NOWHERE);
-                        }
-                    }))
-                    .findFirst()
-                    .orElseGet(() -> roomDefs.isEmpty() ? Room.NOWHERE : roomDefs.get(0).getRoom());
+            return getGlobalParameterStart(adventureContext)
+                    .flatMap(roomName -> roomDefs.stream()
+                            .filter(roomDef -> roomDef.getRoomName().equals(roomName))
+                            .map(RoomDef::getRoom)
+                            .findFirst())
+                    .orElse(roomDefs.isEmpty() ? Room.NOWHERE : roomDefs.get(0).getRoom());
         }
 
         private void setExits(List<RoomDef> roomDefs) {
@@ -109,6 +101,16 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
                     roomDef.getRoom().setExit(exitDef.getDirection(), roomsByName.get(exitRoomName));
                 }
             }));
+        }
+
+        private Optional<String> getGlobalParameterStart(AdventureContext adventureContext) {
+            return adventureContext.globalParameter().stream()
+                    .map(globalParameterContext -> globalParameterContext.accept(new AdventureBaseVisitor<String>() {
+                        @Override
+                        public String visitGlobalParameterStart(GlobalParameterStartContext ctx) {
+                            return ctx.startParameter().roomName().getText();
+                        }
+                    })).findFirst();
         }
 
         private Set<Item> getItems(AdventureContext adventureContext) {
