@@ -1,0 +1,19 @@
+// Tests an item at a location
+item lamp "a lamp"
+    // should end up 'nowhere'
+
+room hallway "hallway"
+
+room kitchen "a kitchen"
+
+item fork "a fork"
+    // should end up in kitchen
+
+item chest "a chest"
+    at hallway
+
+item spoon "a spoon"
+    // should end up in kitchen
+
+item knife "a knife"
+    nowhere

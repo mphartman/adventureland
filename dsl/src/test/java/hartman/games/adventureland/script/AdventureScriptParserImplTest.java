@@ -8,6 +8,8 @@ import hartman.games.adventureland.engine.core.Words;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.Set;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -126,9 +128,10 @@ public class AdventureScriptParserImplTest {
         Adventure adventure = adventureScriptParsingRule.parse();
         assertTrue(adventure.getItems().contains(new Item.Builder().named("key").build()));
     }
+
     @Test
     @AdventureScriptResource("/scripts/103adventure.txt")
-    public void simpleItemWithAliases() {
+    public void itemWithAliases() {
         Adventure adventure = adventureScriptParsingRule.parse();
         Item item = adventure.getItems().stream()
                 .filter(i -> i.getName().equals("sword"))
@@ -138,4 +141,38 @@ public class AdventureScriptParserImplTest {
         assertTrue(new Item.Builder().named("nightblade").build().matches(item));
         assertTrue(new Item.Builder().named("sharpie").build().matches(item));
     }
+
+    @Test
+    @AdventureScriptResource("/scripts/104adventure.txt")
+    public void itemsInValidLocations() {
+        Adventure adventure = adventureScriptParsingRule.parse();
+
+        Room kitchen = new Room("kitchen", "A kitchen.");
+
+        Item fork = getItemOrFail(adventure.getItems(), "fork");
+        assertTrue(fork.isHere(kitchen));
+
+        Item spoon = getItemOrFail(adventure.getItems(), "spoon");
+        assertTrue(spoon.isHere(kitchen));
+
+        Item lamp = getItemOrFail(adventure.getItems(), "lamp");
+        assertTrue(lamp.isHere(Room.NOWHERE));
+
+        Item knife = getItemOrFail(adventure.getItems(), "knife");
+        assertTrue(knife.isHere(Room.NOWHERE));
+
+        Item chest = getItemOrFail(adventure.getItems(), "chest");
+        assertTrue(chest.isHere(new Room("hallway", "hallway")));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    @AdventureScriptResource("/scripts/105adventure.txt")
+    public void itemMustBeInExistingRoom() {
+        adventureScriptParsingRule.parse();
+    }
+
+    private Item getItemOrFail(Set<Item> items, String itemName) {
+        return items.stream().filter(i -> i.getName().equals(itemName)).findFirst().orElseThrow(AssertionError::new);
+    }
+
 }

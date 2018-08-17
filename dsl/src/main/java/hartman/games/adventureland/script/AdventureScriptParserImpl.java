@@ -14,6 +14,7 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.antlr.v4.runtime.tree.RuleNode;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -21,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static hartman.games.adventureland.script.AdventureParser.AdventureContext;
 import static hartman.games.adventureland.script.AdventureParser.ExitDownContext;
@@ -32,6 +32,8 @@ import static hartman.games.adventureland.script.AdventureParser.ExitUpContext;
 import static hartman.games.adventureland.script.AdventureParser.ExitWestContext;
 import static hartman.games.adventureland.script.AdventureParser.GlobalParameterStartContext;
 import static hartman.games.adventureland.script.AdventureParser.ItemDeclarationContext;
+import static hartman.games.adventureland.script.AdventureParser.ItemInRoomContext;
+import static hartman.games.adventureland.script.AdventureParser.RoomDeclarationContext;
 import static hartman.games.adventureland.script.AdventureParser.RoomExitContext;
 import static hartman.games.adventureland.script.AdventureParser.RoomExitsContext;
 import static java.util.Collections.emptyList;
@@ -65,13 +67,13 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         @Override
         public Adventure visitAdventure(AdventureContext adventureContext) {
-            Room startingRoom = getStartingRoom(adventureContext);
-            Set<Item> items = getItems(adventureContext);
+            List<Room> rooms = getRooms(adventureContext);
+            Room startingRoom = getStartingRoom(adventureContext, rooms);
+            Set<Item> items = getItems(adventureContext, rooms);
             return new Adventure(new Vocabulary(emptySet()), emptySet(), emptySet(), items, startingRoom);
         }
 
-        private Room getStartingRoom(AdventureContext adventureContext) {
-
+        private List<Room> getRooms(AdventureContext adventureContext) {
             RoomDeclarationVisitor visitor = new RoomDeclarationVisitor();
             List<RoomDef> roomDefs = adventureContext.gameElement().stream()
                     .filter(gameElementContext -> null != gameElementContext.roomDeclaration())
@@ -80,12 +82,18 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
             setExits(roomDefs);
 
+            return roomDefs.stream().map(RoomDef::getRoom).collect(toList());
+        }
+
+        private Room getStartingRoom(AdventureContext adventureContext, List<Room> rooms) {
+            if (rooms.isEmpty()) {
+                return Room.NOWHERE;
+            }
             return getGlobalParameterStart(adventureContext)
-                    .flatMap(roomName -> roomDefs.stream()
-                            .filter(roomDef -> roomDef.getRoomName().equals(roomName))
-                            .map(RoomDef::getRoom)
+                    .flatMap(roomName -> rooms.stream()
+                            .filter(room -> room.getName().equals(roomName))
                             .findFirst())
-                    .orElse(roomDefs.isEmpty() ? Room.NOWHERE : roomDefs.get(0).getRoom());
+                    .orElse(rooms.get(0));
         }
 
         private void setExits(List<RoomDef> roomDefs) {
@@ -115,8 +123,8 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
                     })).findFirst();
         }
 
-        private Set<Item> getItems(AdventureContext adventureContext) {
-            ItemDeclarationVisitor visitor = new ItemDeclarationVisitor();
+        private Set<Item> getItems(AdventureContext adventureContext, List<Room> rooms) {
+            ItemDeclarationVisitor visitor = new ItemDeclarationVisitor(rooms);
             return adventureContext.gameElement().stream()
                     .filter(gameElementContext -> null != gameElementContext.itemDeclaration())
                     .map(gameElementContext -> gameElementContext.itemDeclaration().accept(visitor))
@@ -126,7 +134,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
     private static class RoomDeclarationVisitor extends AdventureBaseVisitor<RoomDef> {
         @Override
-        public RoomDef visitRoomDeclaration(AdventureParser.RoomDeclarationContext ctx) {
+        public RoomDef visitRoomDeclaration(RoomDeclarationContext ctx) {
             Room room = newRoom(ctx);
             List<ExitDef> exitDefs = Optional.ofNullable(ctx.roomExits())
                     .map(roomExits -> roomExits.accept(new RoomExitsVisitor()))
@@ -134,7 +142,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
             return new RoomDef(room, exitDefs);
         }
 
-        private Room newRoom(AdventureParser.RoomDeclarationContext ctx) {
+        private Room newRoom(RoomDeclarationContext ctx) {
             String name = ctx.roomName().getText();
             String description = ctx.roomDescription().getText();
             if (description.startsWith("\"")) {
@@ -147,7 +155,6 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
             description = description.replaceAll("\\\\\\\"", "\"");
             return new Room(name, description);
         }
-
     }
 
     private static class RoomExitsVisitor extends AdventureBaseVisitor<List<ExitDef>> {
@@ -206,14 +213,21 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
     }
 
     private static class ItemDeclarationVisitor extends AdventureBaseVisitor<Item> {
+        private List<Room> rooms;
+
+        private ItemDeclarationVisitor(List<Room> rooms) {
+            this.rooms = rooms;
+        }
+
         @Override
         public Item visitItemDeclaration(ItemDeclarationContext ctx) {
-            String name = ctx.itemName().getText();
-            String description = ctx.itemDescription().getText();
-
-            Item.Builder builder = new Item.Builder().named(name).describedAs(description);
+            Item.Builder builder = new Item.Builder()
+                    .named(ctx.itemName().getText())
+                    .describedAs(ctx.itemDescription().getText());
 
             getAliases(ctx).forEach(builder::alias);
+
+            getLocation(ctx).ifPresent(builder::in);
 
             return builder.build();
         }
@@ -222,9 +236,61 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
             if (ctx.itemAliases() != null && ctx.itemAliases().itemAlias() != null) {
                 return ctx.itemAliases().itemAlias().stream()
                         .map(RuleContext::getText)
-                        .collect(Collectors.toList());
+                        .collect(toList());
             }
             return emptyList();
+        }
+
+        private Optional<Room> getLocation(ItemDeclarationContext thisItemCtx) {
+
+            if (null != thisItemCtx.itemLocation()) {
+                return Optional.of(thisItemCtx.itemLocation().accept(
+                        new AdventureBaseVisitor<Room>() {
+                            @Override
+                            public Room visitItemInRoom(ItemInRoomContext itemInRoomCtx) {
+                                return rooms.stream()
+                                        .filter(room -> room.getName().equals(itemInRoomCtx.roomName().getText())).findFirst()
+                                        .orElseThrow(ParseCancellationException::new);
+                            }
+
+                            @Override
+                            public Room visitItemIsNowhere(AdventureParser.ItemIsNowhereContext ctx) {
+                                return Room.NOWHERE;
+                            }
+                        }));
+            } else {
+                // find the closest previous room
+                return Optional.ofNullable(thisItemCtx.getParent().getParent().accept(
+                        new AdventureBaseVisitor<String>() {
+
+                            private String roomName = null;
+                            private boolean shouldVisitNextChild = true;
+
+                            @Override
+                            public String visitRoomDeclaration(RoomDeclarationContext thatRoomCtx) {
+                                roomName = thatRoomCtx.roomName().getText();
+                                return super.visitRoomDeclaration(thatRoomCtx);
+                            }
+
+                            @Override
+                            public String visitItemDeclaration(ItemDeclarationContext thatItemCtx) {
+                                if (thisItemCtx.equals(thatItemCtx)) {
+                                    shouldVisitNextChild = false;
+                                    return roomName;
+                                }
+                                return super.visitItemDeclaration(thatItemCtx);
+                            }
+
+                            @Override
+                            protected boolean shouldVisitNextChild(RuleNode node, String currentResult) {
+                                return shouldVisitNextChild;
+                            }
+                        }
+                )).flatMap(roomName -> rooms.stream()
+                        .filter(room -> room.getName().equals(roomName))
+                        .findFirst());
+            }
+
         }
     }
 
