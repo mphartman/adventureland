@@ -17,3 +17,6 @@ item spoon "a spoon"
 
 item knife "a knife"
     nowhere
+
+item flint "flint & steel"
+    inventory

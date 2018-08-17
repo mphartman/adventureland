@@ -137,6 +137,7 @@ public class AdventureScriptParserImplTest {
                 .filter(i -> i.getName().equals("sword"))
                 .findFirst()
                 .orElseThrow(AssertionError::new);
+        assertTrue(item.isPortable());
         assertTrue(new Item.Builder().named("excalibur").build().matches(item));
         assertTrue(new Item.Builder().named("nightblade").build().matches(item));
         assertTrue(new Item.Builder().named("sharpie").build().matches(item));
@@ -163,6 +164,9 @@ public class AdventureScriptParserImplTest {
 
         Item chest = getItemOrFail(adventure.getItems(), "chest");
         assertTrue(chest.isHere(new Room("hallway", "hallway")));
+
+        Item flintAndSteel = getItemOrFail(adventure.getItems(), "flint");
+        assertTrue(flintAndSteel.isCarried());
     }
 
     @Test(expected = IllegalStateException.class)

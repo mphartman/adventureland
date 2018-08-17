@@ -8,6 +8,8 @@ ROOM            : 'room';
 EXIT            : 'exit';
 ITEM            : 'item';
 AT              : 'at';
+IN              : 'in';
+INVENTORY       : 'inventory';
 NOWHERE         : 'nowhere';
 CALLED          : 'called';
 ACTION          : 'action';
@@ -76,8 +78,9 @@ itemName
     ;
 
 itemLocation
-    :   AT roomName     #itemInRoom
-    |   NOWHERE         #itemIsNowhere
+    :   (AT | IN)   roomName        #itemInRoom
+    |   NOWHERE                     #itemIsNowhere
+    |   INVENTORY                   #itemIsInInventory
     ;
 
 itemAliases
