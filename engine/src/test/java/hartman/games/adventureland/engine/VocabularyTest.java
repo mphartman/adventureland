@@ -40,8 +40,8 @@ public class VocabularyTest {
     }
 
     @Test
-    public void vocabularyShouldNotContainAnyNoneOrUnrecognized() {
-        Vocabulary vocabulary = new Vocabulary(new LinkedHashSet<>(asList(new Word("collect"), Word.NONE, Word.ANY, Word.UNRECOGNIZED)));
+    public void vocabularyShouldNotContainNullOrNoneOrUnrecognized() {
+        Vocabulary vocabulary = new Vocabulary(new LinkedHashSet<>(asList(null, new Word("collect"), Word.NONE, Word.ANY, Word.UNRECOGNIZED)));
 
         assertFalse(vocabulary.findMatch(Word.NONE).isPresent());
         assertTrue("Any matches Any so this is always true", vocabulary.findMatch(Word.ANY).isPresent());

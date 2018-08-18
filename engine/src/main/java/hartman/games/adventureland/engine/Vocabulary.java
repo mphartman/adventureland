@@ -14,13 +14,13 @@ public class Vocabulary {
 
     private final Set<Word> words = new LinkedHashSet<>();
 
-    public Vocabulary(Set<Word> nouns) {
-        this.words.addAll(filter(nouns));
+    public Vocabulary(Set<Word> words) {
+        this.words.addAll(filter(words));
     }
 
     private Set<Word> filter(Set<Word> words) {
         return words.stream()
-                .filter(noun -> !(noun.equals(Word.UNRECOGNIZED) || noun.equals(Word.NONE) || noun.equals(Word.ANY)))
+                .filter(word -> !(word == null || word.equals(Word.UNRECOGNIZED) || word.equals(Word.NONE) || word.equals(Word.ANY)))
                 .collect(Collectors.toSet());
     }
 
