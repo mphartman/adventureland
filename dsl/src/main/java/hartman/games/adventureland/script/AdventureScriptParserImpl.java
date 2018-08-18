@@ -109,23 +109,6 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
                     .map(gameElementContext -> gameElementContext.roomDeclaration().accept(visitor))
                     .collect(toList());
 
-            setExits(roomDefs);
-
-            return roomDefs.stream().map(RoomDef::getRoom).collect(toList());
-        }
-
-        private Room getStartingRoom(AdventureContext adventureContext, List<Room> rooms) {
-            if (rooms.isEmpty()) {
-                return Room.NOWHERE;
-            }
-            return getGlobalParameterStart(adventureContext)
-                    .flatMap(roomName -> rooms.stream()
-                            .filter(room -> room.getName().equals(roomName))
-                            .findFirst())
-                    .orElse(rooms.get(0));
-        }
-
-        private void setExits(List<RoomDef> roomDefs) {
             Map<String, Room> roomsByName = roomDefs.stream()
                     .collect(toMap(RoomDef::getRoomName, RoomDef::getRoom));
 
@@ -140,6 +123,19 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
                     roomDef.getRoom().setExit(exitDef.getDirection(), roomsByName.get(exitRoomName));
                 }
             }));
+
+            return roomDefs.stream().map(RoomDef::getRoom).collect(toList());
+        }
+
+        private Room getStartingRoom(AdventureContext adventureContext, List<Room> rooms) {
+            if (rooms.isEmpty()) {
+                return Room.NOWHERE;
+            }
+            return getGlobalParameterStart(adventureContext)
+                    .flatMap(roomName -> rooms.stream()
+                            .filter(room -> room.getName().equals(roomName))
+                            .findFirst())
+                    .orElse(rooms.get(0));
         }
 
         private Optional<String> getGlobalParameterStart(AdventureContext adventureContext) {
