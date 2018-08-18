@@ -1,0 +1,3 @@
+// Tests action with verb and result
+action "look" // must use quotes since verb is same as result keyword look
+    then print "It works"

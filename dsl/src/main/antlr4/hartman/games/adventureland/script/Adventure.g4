@@ -14,6 +14,8 @@ NOWHERE         : 'nowhere';
 CALLED          : 'called';
 ACTION          : 'action';
 WHEN            : 'when';
+AND             : 'and';
+THEN            : 'then';
 OCCURS          : 'occurs';
 NORTH           : 'north';
 SOUTH           : 'south';
@@ -24,6 +26,69 @@ DOWN            : 'down';
 START           : 'start';
 VERBGROUP       : 'verbgroup';
 NOUNGROUP       : 'noungroup';
+ANY             : 'any';
+NONE            : 'none';
+UNKNOWN         : 'unknown';
+CARRYING        : 'carrying';
+PRINT           : 'print';
+LOOK            : 'look';
+
+Number
+    :   [0-9]+
+    ;
+
+Identifier
+	:	Letter LetterOrDigit*
+	;
+
+fragment
+LetterOrDigit
+    : Letter
+    | [0-9]
+    ;
+
+fragment
+Letter
+    : [a-zA-Z$_] // these are the "java letters" below 0x7F
+    | ~[\u0000-\u007F\uD800-\uDBFF] // covers all characters above 0x7F which are not a surrogate
+    | [\uD800-\uDBFF] [\uDC00-\uDFFF] // covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
+    ;
+
+StringLiteral
+	:	'"' StringCharacters '"'
+	;
+
+fragment
+StringCharacters
+	:	StringCharacter+
+	;
+
+fragment
+StringCharacter
+	:	~["\\\r\n]
+	|	EscapeSequence
+	;
+
+fragment
+EscapeSequence
+	:	'\\' [btnfr"'\\]
+	;
+
+//
+// Whitespace and comments
+//
+
+WHITESPACE
+    :  [ \t\r\n]+ -> skip
+    ;
+
+COMMENT
+    :   '/*' .*? '*/' -> skip
+    ;
+
+LINE_COMMENT
+    :   '//' ~[\r\n]* -> skip
+    ;
 
 adventure
     :   gameElement+ globalParameter* EOF
@@ -33,6 +98,8 @@ gameElement
     :   roomDeclaration
     |   itemDeclaration
     |   vocabularyDeclaration
+    |   actionDeclaration
+    |   occursDeclaration
     ;
 
 globalParameter
@@ -104,72 +171,54 @@ vocabularyDeclaration
     ;
 
 verbGroup
-    :   VERBGROUP verb (',' synonym)*
+    :   VERBGROUP verb=word (',' synonym)*
     ;
 
 nounGroup
-    :   NOUNGROUP noun (',' synonym)*
+    :   NOUNGROUP noun=word (',' synonym)*
     ;
 
-verb
-    :   Identifier
-    ;
-
-noun
-    :   Identifier
+word
+    :   (Identifier | StringLiteral)
     ;
 
 synonym
     :   Identifier
     ;
 
-Identifier
-	:	Letter LetterOrDigit*
-	;
-
-StringLiteral
-	:	'"' StringCharacters? '"'
-	;
-
-fragment
-StringCharacters
-	:	StringCharacter+
-	;
-
-fragment
-StringCharacter
-	:	~["\\\r\n]
-	|	EscapeSequence
-	;
-
-fragment
-EscapeSequence
-	:	'\\' [btnfr"'\\]
-	;
-
-fragment LetterOrDigit
-    : Letter
-    | [0-9]
+actionDeclaration
+    :   ACTION actionCommand actionConditionDeclaration* actionResultDeclaration+
     ;
 
-fragment Letter
-    : [a-zA-Z$_] // these are the "java letters" below 0x7F
-    | ~[\u0000-\u007F\uD800-\uDBFF] // covers all characters above 0x7F which are not a surrogate
-    | [\uD800-\uDBFF] [\uDC00-\uDFFF] // covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
+actionCommand
+    :   actionWord+
     ;
 
-//
-// Whitespace and comments
-//
-
-WHITESPACE
-    :  [ \t\r\n]+ -> skip
+actionWord
+    : (Identifier | StringLiteral)  # actionWordWord
+    | ANY                           # actionWordAny
+    | NONE                          # actionWordNone
+    | UNKNOWN                       # actionWordUnknown
     ;
 
-COMMENT
-    :   '/*' .*? '*/' -> skip
+actionConditionDeclaration
+    :   (WHEN | AND) actionCondition
     ;
 
-LINE_COMMENT
-    :   '//' ~[\r\n]* -> skip
+actionCondition
+    :   IN roomName             #conditionInRoom
+    |   CARRYING itemName       #conditionCarryingItem
+    ;
+
+actionResultDeclaration
+    :   THEN actionResult
+    ;
+
+actionResult
+    :   PRINT StringLiteral     #resultPrint
+    |   LOOK                    #resultLook
+    ;
+
+occursDeclaration
+    :   OCCURS (Number)? actionConditionDeclaration* actionResultDeclaration+
     ;

@@ -1,10 +1,14 @@
 package hartman.games.adventureland.script;
 
+import hartman.games.adventureland.engine.Action;
 import hartman.games.adventureland.engine.Adventure;
 import hartman.games.adventureland.engine.Item;
 import hartman.games.adventureland.engine.Room;
 import hartman.games.adventureland.engine.Vocabulary;
 import hartman.games.adventureland.engine.Word;
+import hartman.games.adventureland.engine.core.Actions;
+import hartman.games.adventureland.engine.core.Items;
+import hartman.games.adventureland.engine.core.Results;
 import hartman.games.adventureland.engine.core.Words;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStream;
@@ -22,7 +26,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.IntStream;
 
+import static hartman.games.adventureland.script.AdventureParser.ActionDeclarationContext;
+import static hartman.games.adventureland.script.AdventureParser.ActionWordAnyContext;
+import static hartman.games.adventureland.script.AdventureParser.ActionWordNoneContext;
+import static hartman.games.adventureland.script.AdventureParser.ActionWordUnknownContext;
+import static hartman.games.adventureland.script.AdventureParser.ActionWordWordContext;
 import static hartman.games.adventureland.script.AdventureParser.AdventureContext;
 import static hartman.games.adventureland.script.AdventureParser.ExitDownContext;
 import static hartman.games.adventureland.script.AdventureParser.ExitEastContext;
@@ -40,8 +52,10 @@ import static hartman.games.adventureland.script.AdventureParser.RoomDeclaration
 import static hartman.games.adventureland.script.AdventureParser.RoomExitContext;
 import static hartman.games.adventureland.script.AdventureParser.RoomExitsContext;
 import static hartman.games.adventureland.script.AdventureParser.VerbGroupContext;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -51,6 +65,12 @@ import static java.util.stream.Collectors.toSet;
  * ANTLR-based parser implementation which recognizes scripts written in Adventure grammar.
  */
 public class AdventureScriptParserImpl implements AdventureScriptParser {
+
+    private static final Function<String, String> stripQuotes = s -> {
+        if (s.startsWith("\"")) s = s.substring(1);
+        if (s.endsWith("\"")) s = s.substring(0, s.length() - 1);
+        return s;
+    };
 
     @Override
     public Adventure parse(Reader r) throws IOException {
@@ -74,9 +94,12 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         public Adventure visitAdventure(AdventureContext adventureContext) {
             List<Room> rooms = getRooms(adventureContext);
             Room startingRoom = getStartingRoom(adventureContext, rooms);
-            Set<Item> items = getItems(adventureContext, rooms);
+            Items items = getItems(adventureContext, rooms);
+            Set<Item> itemSet = items.copyOfItems();
             Vocabulary vocabulary = getVocabulary(adventureContext);
-            return new Adventure(vocabulary, emptySet(), emptySet(), items, startingRoom);
+            Actions actions = getActions(adventureContext, vocabulary, itemSet, rooms);
+            vocabulary = vocabulary.merge(actions.buildVocabulary());
+            return new Adventure(vocabulary, emptySet(), actions.copyOfActions(), itemSet, startingRoom);
         }
 
         private List<Room> getRooms(AdventureContext adventureContext) {
@@ -129,12 +152,13 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
                     })).findFirst();
         }
 
-        private Set<Item> getItems(AdventureContext adventureContext, List<Room> rooms) {
-            ItemDeclarationVisitor visitor = new ItemDeclarationVisitor(rooms);
-            return adventureContext.gameElement().stream()
+        private Items getItems(AdventureContext adventureContext, List<Room> rooms) {
+            Items items = Items.newItemSet();
+            ItemDeclarationVisitor visitor = new ItemDeclarationVisitor(items, rooms);
+            adventureContext.gameElement().stream()
                     .filter(gameElementContext -> null != gameElementContext.itemDeclaration())
-                    .map(gameElementContext -> gameElementContext.itemDeclaration().accept(visitor))
-                    .collect(toSet());
+                    .forEach(gameElementContext -> gameElementContext.itemDeclaration().accept(visitor));
+            return items;
         }
 
         private Vocabulary getVocabulary(AdventureContext adventureContext) {
@@ -144,6 +168,15 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
                     .map(gameElementContext -> gameElementContext.vocabularyDeclaration().accept(visitor))
                     .collect(toSet());
             return new Vocabulary(words);
+        }
+
+        private Actions getActions(AdventureContext adventureContext, Vocabulary vocabulary, Set<Item> items, List<Room> rooms) {
+            Actions actions = Actions.newActionSet();
+            ActionDeclarationVisitor visitor = new ActionDeclarationVisitor(actions, vocabulary, items, rooms);
+            adventureContext.gameElement().stream()
+                    .filter(gameElementContext -> null != gameElementContext.actionDeclaration())
+                    .forEach(gameElementContext -> gameElementContext.actionDeclaration().accept(visitor));
+            return actions;
         }
     }
 
@@ -159,13 +192,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         private Room newRoom(RoomDeclarationContext ctx) {
             String name = ctx.roomName().getText();
-            String description = ctx.roomDescription().getText();
-            if (description.startsWith("\"")) {
-                description = description.substring(1);
-            }
-            if (description.endsWith("\"")) {
-                description = description.substring(0, description.length() - 1);
-            }
+            String description = stripQuotes.apply(ctx.roomDescription().getText());
             // change and \" to just "
             description = description.replaceAll("\\\\\\\"", "\"");
             return new Room(name, description);
@@ -228,15 +255,17 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
     }
 
     private static class ItemDeclarationVisitor extends AdventureBaseVisitor<Item> {
-        private List<Room> rooms;
+        private final Items items;
+        private final List<Room> rooms;
 
-        private ItemDeclarationVisitor(List<Room> rooms) {
+        private ItemDeclarationVisitor(Items items, List<Room> rooms) {
+            this.items = items;
             this.rooms = rooms;
         }
 
         @Override
         public Item visitItemDeclaration(ItemDeclarationContext ctx) {
-            Item.Builder builder = new Item.Builder()
+            Item.Builder builder = items.newItem()
                     .named(ctx.itemName().getText())
                     .describedAs(ctx.itemDescription().getText());
 
@@ -317,7 +346,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         @Override
         public Word visitVerbGroup(VerbGroupContext ctx) {
-            String verb = ctx.verb().getText();
+            String verb = ctx.verb.getText();
             String[] synonyms = new String[0];
             if (null != ctx.synonym()) {
                 synonyms = ctx.synonym().stream().map(RuleContext::getText).toArray(String[]::new);
@@ -327,12 +356,98 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         @Override
         public Word visitNounGroup(NounGroupContext ctx) {
-            String noun = ctx.noun().getText();
+            String noun = ctx.noun.getText();
             String[] synonyms = new String[0];
             if (null != ctx.synonym()) {
                 synonyms = ctx.synonym().stream().map(RuleContext::getText).toArray(String[]::new);
             }
             return new Word(noun, synonyms);
+        }
+    }
+
+    private static class ActionDeclarationVisitor extends AdventureBaseVisitor<Action> {
+        private final Actions actions;
+        private final Vocabulary vocabulary;
+        private final Set<Item> items;
+        private final List<Room> rooms;
+
+        private ActionDeclarationVisitor(Actions actions, Vocabulary vocabulary, Set<Item> items, List<Room> rooms) {
+            this.actions = actions;
+            this.vocabulary = vocabulary;
+            this.items = items;
+            this.rooms = rooms;
+        }
+
+        @Override
+        public Action visitActionDeclaration(ActionDeclarationContext ctx) {
+            Actions.ActionBuilder builder = actions.newAction();
+            actionCommand(ctx, builder);
+            actionResults(ctx, builder);
+            return builder.build();
+        }
+
+        private void actionCommand(ActionDeclarationContext ctx, Actions.ActionBuilder builder) {
+            ActionWordContextVisitor visitor = new ActionWordContextVisitor(text -> vocabulary.findMatch(text).orElse(new Word(text)));
+            List<Consumer<? super Word>> consumers = asList(builder::on, builder::with);
+            IntStream.range(0, 2).forEach(i ->
+                    ofNullable(ctx.actionCommand().actionWord(i))
+                            .map(actionWordContext -> actionWordContext.accept(visitor))
+                            .filter(w -> !w.equals(Word.NONE))
+                            .ifPresent(consumers.get(i)));
+        }
+
+        private void actionResults(ActionDeclarationContext ctx, Actions.ActionBuilder builder) {
+            ActionResultDeclarationVisitor visitor = new ActionResultDeclarationVisitor();
+            ofNullable(ctx.actionResultDeclaration())
+                    .ifPresent(actionResultDeclarationContexts -> actionResultDeclarationContexts.stream()
+                            .map(actionResultDeclarationContext -> actionResultDeclarationContext.accept(visitor))
+                            .forEach(builder::then));
+        }
+    }
+
+    private static class ActionWordContextVisitor extends AdventureBaseVisitor<Word> {
+
+        private Function<String, Word> toWord;
+
+        private ActionWordContextVisitor(Function<String, Word> toWord) {
+            this.toWord = toWord;
+        }
+
+        @Override
+        public Word visitActionWordWord(ActionWordWordContext ctx) {
+            return of(ctx.getText())
+                    .map(stripQuotes)
+                    .map(toWord)
+                    .get();
+        }
+
+        @Override
+        public Word visitActionWordAny(ActionWordAnyContext ctx) {
+            return Word.ANY;
+        }
+
+        @Override
+        public Word visitActionWordNone(ActionWordNoneContext ctx) {
+            return Word.NONE;
+        }
+
+        @Override
+        public Word visitActionWordUnknown(ActionWordUnknownContext ctx) {
+            return Word.UNRECOGNIZED;
+        }
+
+    }
+
+    private static class ActionResultDeclarationVisitor extends AdventureBaseVisitor<Action.Result> {
+
+        @Override
+        public Action.Result visitResultPrint(AdventureParser.ResultPrintContext ctx) {
+            return Results.println(stripQuotes.apply(ctx.StringLiteral().getText()));
+        }
+
+        @Override
+        public Action.Result visitResultLook(AdventureParser.ResultLookContext ctx) {
+            return super.visitResultLook(ctx);
         }
     }
 

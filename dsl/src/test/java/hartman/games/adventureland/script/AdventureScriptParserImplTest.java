@@ -1,6 +1,10 @@
 package hartman.games.adventureland.script;
 
+import hartman.games.adventureland.engine.Action;
 import hartman.games.adventureland.engine.Adventure;
+import hartman.games.adventureland.engine.Command;
+import hartman.games.adventureland.engine.Display;
+import hartman.games.adventureland.engine.GameState;
 import hartman.games.adventureland.engine.Item;
 import hartman.games.adventureland.engine.Room;
 import hartman.games.adventureland.engine.Vocabulary;
@@ -238,6 +242,34 @@ public class AdventureScriptParserImplTest {
 
         Word basket = vocabulary.findMatch("basket").get();
         assertNotEquals(backpack, basket);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    @AdventureScriptResource("/scripts/300adventure.txt")
+    public void actionRequiresVerbAndResult() {
+        adventureScriptParsingRule.parse();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    @AdventureScriptResource("/scripts/301adventure.txt")
+    public void actionRequiresResult() {
+        adventureScriptParsingRule.parse();
+    }
+
+    private static final Display noOpDisplay = message -> {};
+
+    @Test
+    @AdventureScriptResource("/scripts/302adventure.txt")
+    public void actionVerbAndResult() {
+        Adventure adventure = adventureScriptParsingRule.parse();
+
+        assertFalse(adventure.getActions().isEmpty());
+
+        GameState gameState = new GameState(Room.NOWHERE);
+        Action action = adventure.getActions().iterator().next();
+        StringBuilder display = new StringBuilder();
+        action.run(gameState, display::append, new Command(new Word("look"), Word.NONE));
+        assertEquals("It works\n", display.toString());
     }
 
 }
