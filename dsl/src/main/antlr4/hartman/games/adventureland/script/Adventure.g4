@@ -22,6 +22,8 @@ WEST            : 'west';
 UP              : 'up';
 DOWN            : 'down';
 START           : 'start';
+VERBGROUP       : 'verbgroup';
+NOUNGROUP       : 'noungroup';
 
 adventure
     :   gameElement+ globalParameter* EOF
@@ -30,6 +32,7 @@ adventure
 gameElement
     :   roomDeclaration
     |   itemDeclaration
+    |   vocabularyDeclaration
     ;
 
 globalParameter
@@ -93,6 +96,31 @@ itemAlias
 
 itemDescription
     :   StringLiteral
+    ;
+
+vocabularyDeclaration
+    :   verbGroup
+    |   nounGroup
+    ;
+
+verbGroup
+    :   VERBGROUP verb (',' synonym)*
+    ;
+
+nounGroup
+    :   NOUNGROUP noun (',' synonym)*
+    ;
+
+verb
+    :   Identifier
+    ;
+
+noun
+    :   Identifier
+    ;
+
+synonym
+    :   Identifier
     ;
 
 Identifier
