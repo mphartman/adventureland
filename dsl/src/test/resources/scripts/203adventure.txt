@@ -1,0 +1,3 @@
+// Tests noungroup creates a noun and its aliases
+noungroup basket // just a noun
+noungroup backpack, bag, purse, manpurse // noun with aliases

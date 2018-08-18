@@ -3,6 +3,7 @@ package hartman.games.adventureland.script;
 import hartman.games.adventureland.engine.Adventure;
 import hartman.games.adventureland.engine.Item;
 import hartman.games.adventureland.engine.Room;
+import hartman.games.adventureland.engine.Vocabulary;
 import hartman.games.adventureland.engine.Word;
 import hartman.games.adventureland.engine.core.Words;
 import org.junit.Rule;
@@ -11,6 +12,8 @@ import org.junit.Test;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 public class AdventureScriptParserImplTest {
@@ -177,6 +180,64 @@ public class AdventureScriptParserImplTest {
 
     private Item getItemOrFail(Set<Item> items, String itemName) {
         return items.stream().filter(i -> i.getName().equals(itemName)).findFirst().orElseThrow(AssertionError::new);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    @AdventureScriptResource("/scripts/200adventure.txt")
+    public void verbGroupMustHaveVerb() {
+        adventureScriptParsingRule.parse();
+    }
+
+    @Test
+    @AdventureScriptResource("/scripts/201adventure.txt")
+    public void verbGroupCreatesVerbWithAliases() {
+        Adventure adventure = adventureScriptParsingRule.parse();
+        Vocabulary vocabulary = adventure.getVocabulary();
+
+        assertTrue(vocabulary.findMatch("search").isPresent());
+
+        assertTrue(vocabulary.findMatch("go").isPresent());
+        assertTrue(vocabulary.findMatch("enter").isPresent());
+        assertTrue(vocabulary.findMatch("run").isPresent());
+        assertTrue(vocabulary.findMatch("walk").isPresent());
+
+        Word go = vocabulary.findMatch("go").get();
+        assertTrue(go.matches(new Word("enter")));
+        assertTrue(go.matches(new Word("run")));
+        assertTrue(go.matches(new Word("walk")));
+        assertFalse(go.matches(new Word("search")));
+
+        Word search = vocabulary.findMatch("search").get();
+        assertNotEquals(go, search);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    @AdventureScriptResource("/scripts/202adventure.txt")
+    public void nounGroupMustHaveNoun() {
+        adventureScriptParsingRule.parse();
+    }
+
+    @Test
+    @AdventureScriptResource("/scripts/203adventure.txt")
+    public void nounGroupCreatesNounWithAliases() {
+        Adventure adventure = adventureScriptParsingRule.parse();
+        Vocabulary vocabulary = adventure.getVocabulary();
+
+        assertTrue(vocabulary.findMatch("basket").isPresent());
+
+        assertTrue(vocabulary.findMatch("backpack").isPresent());
+        assertTrue(vocabulary.findMatch("bag").isPresent());
+        assertTrue(vocabulary.findMatch("purse").isPresent());
+        assertTrue(vocabulary.findMatch("manpurse").isPresent());
+
+        Word backpack = vocabulary.findMatch("backpack").get();
+        assertTrue(backpack.matches(new Word("bag")));
+        assertTrue(backpack.matches(new Word("purse")));
+        assertTrue(backpack.matches(new Word("manpurse")));
+        assertFalse(backpack.matches(new Word("basket")));
+
+        Word basket = vocabulary.findMatch("basket").get();
+        assertNotEquals(backpack, basket);
     }
 
 }

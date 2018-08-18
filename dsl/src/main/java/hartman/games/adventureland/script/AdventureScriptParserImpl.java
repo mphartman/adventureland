@@ -35,9 +35,11 @@ import static hartman.games.adventureland.script.AdventureParser.ItemDeclaration
 import static hartman.games.adventureland.script.AdventureParser.ItemInRoomContext;
 import static hartman.games.adventureland.script.AdventureParser.ItemIsInInventoryContext;
 import static hartman.games.adventureland.script.AdventureParser.ItemIsNowhereContext;
+import static hartman.games.adventureland.script.AdventureParser.NounGroupContext;
 import static hartman.games.adventureland.script.AdventureParser.RoomDeclarationContext;
 import static hartman.games.adventureland.script.AdventureParser.RoomExitContext;
 import static hartman.games.adventureland.script.AdventureParser.RoomExitsContext;
+import static hartman.games.adventureland.script.AdventureParser.VerbGroupContext;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.ofNullable;
@@ -73,7 +75,8 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
             List<Room> rooms = getRooms(adventureContext);
             Room startingRoom = getStartingRoom(adventureContext, rooms);
             Set<Item> items = getItems(adventureContext, rooms);
-            return new Adventure(new Vocabulary(emptySet()), emptySet(), emptySet(), items, startingRoom);
+            Vocabulary vocabulary = getVocabulary(adventureContext);
+            return new Adventure(vocabulary, emptySet(), emptySet(), items, startingRoom);
         }
 
         private List<Room> getRooms(AdventureContext adventureContext) {
@@ -132,6 +135,15 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
                     .filter(gameElementContext -> null != gameElementContext.itemDeclaration())
                     .map(gameElementContext -> gameElementContext.itemDeclaration().accept(visitor))
                     .collect(toSet());
+        }
+
+        private Vocabulary getVocabulary(AdventureContext adventureContext) {
+            VocabularyDeclarationVisitor visitor = new VocabularyDeclarationVisitor();
+            Set<Word> words = adventureContext.gameElement().stream()
+                    .filter(gameElementContext -> null != gameElementContext.vocabularyDeclaration())
+                    .map(gameElementContext -> gameElementContext.vocabularyDeclaration().accept(visitor))
+                    .collect(toSet());
+            return new Vocabulary(words);
         }
     }
 
@@ -298,6 +310,29 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
                         .ifPresent(builder::in);
             }
 
+        }
+    }
+
+    private static class VocabularyDeclarationVisitor extends AdventureBaseVisitor<Word> {
+
+        @Override
+        public Word visitVerbGroup(VerbGroupContext ctx) {
+            String verb = ctx.verb().getText();
+            String[] synonyms = new String[0];
+            if (null != ctx.synonym()) {
+                synonyms = ctx.synonym().stream().map(RuleContext::getText).toArray(String[]::new);
+            }
+            return new Word(verb, synonyms);
+        }
+
+        @Override
+        public Word visitNounGroup(NounGroupContext ctx) {
+            String noun = ctx.noun().getText();
+            String[] synonyms = new String[0];
+            if (null != ctx.synonym()) {
+                synonyms = ctx.synonym().stream().map(RuleContext::getText).toArray(String[]::new);
+            }
+            return new Word(noun, synonyms);
         }
     }
 

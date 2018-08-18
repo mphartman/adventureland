@@ -1,0 +1,3 @@
+// Tests verbgroup creates a verb and its aliases
+verbgroup search // just a verb
+verbgroup go, enter, run, walk // verb with aliases
