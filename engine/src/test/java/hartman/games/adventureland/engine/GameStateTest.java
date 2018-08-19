@@ -13,7 +13,6 @@ import static java.util.Collections.singleton;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class GameStateTest {
 
@@ -58,25 +57,6 @@ public class GameStateTest {
         gameState = new GameState(Room.NOWHERE, singleton(dog));
         gameState.putInInventory(new Word("archie"));
         assertTrue("words matching items can be put into inventory", dog.isCarried());
-
-        AtomicReference<Item> dogInInventory = new AtomicReference<>();
-        gameState.inventory(new GameElementVisitor() {
-            @Override
-            public void visit(Item item) {
-                dogInInventory.set(item);
-            }
-
-            @Override
-            public void visit(Room room) {
-
-            }
-
-            @Override
-            public void visit(Room.Exit exit) {
-
-            }
-        });
-        assertTrue(dog.matches(dogInInventory.get()));
     }
 
     @Test
@@ -85,30 +65,20 @@ public class GameStateTest {
 
         Item tree = new Item.Builder().named("tree").alias("Tim").describedAs("An American Sycamore tree.").in(forest).build();
         Item key = new Item.Builder().named("key").describedAs("A skeleton key.").build();
-
         Set<Item> items = new LinkedHashSet<>(asList(tree, key));
-
-        GameState gameState = new GameState(forest, items);
 
         AtomicReference<Room> roomRef = new AtomicReference<>();
         AtomicReference<Item> itemRef = new AtomicReference<>();
-        gameState.describe(new GameElementVisitor() {
-            @Override
-            public void visit(Item item) {
-                assertEquals(tree, item); // checks that we don't see key Item
-                itemRef.set(item);
-            }
 
+        GameState gameState = new GameState(forest, items);
+        gameState.describe(new TestDisplay() {
             @Override
-            public void visit(Room room) {
+            public void look(Room room, Set<Item> itemsInRoom) {
                 roomRef.set(room);
-            }
-
-            @Override
-            public void visit(Room.Exit exit) {
-                fail("There are no exits. Should not have visited any.");
+                itemRef.set(itemsInRoom.stream().filter(i -> i.matches(tree)).findFirst().orElseThrow(AssertionError::new));
             }
         });
+
         assertEquals(forest, roomRef.get());
         assertEquals(tree, itemRef.get());
     }
@@ -123,21 +93,10 @@ public class GameStateTest {
         GameState gameState = new GameState(Room.NOWHERE, items);
 
         List<Item> itemList = new ArrayList<>();
-        gameState.inventory(new GameElementVisitor() {
+        gameState.inventory(new TestDisplay() {
             @Override
-            public void visit(Item item) {
-                assertEquals(sandwich, item); // checks that we only see carried items
-                itemList.add(item);
-            }
-
-            @Override
-            public void visit(Room room) {
-                fail("Inventory should not visit rooms");
-            }
-
-            @Override
-            public void visit(Room.Exit exit) {
-                fail("There are no exits. Should not have visited any.");
+            public void inventory(Set<Item> itemsCarried) {
+                itemList.addAll(itemsCarried);
             }
         });
         assertEquals(1, itemList.size());
@@ -177,26 +136,6 @@ public class GameStateTest {
         gameState = new GameState(conferenceRoom, singleton(candy));
         gameState.drop(new Word("candy"));
         assertTrue(candy.isHere(conferenceRoom));
-
-        AtomicReference<Item> candyInRoom = new AtomicReference<>();
-        gameState.describe(new GameElementVisitor() {
-            @Override
-            public void visit(Item item) {
-                candyInRoom.set(item);
-            }
-
-            @Override
-            public void visit(Room room) {
-
-            }
-
-            @Override
-            public void visit(Room.Exit exit) {
-
-            }
-        });
-        assertTrue(candy.matches(candyInRoom.get()));
-
     }
 
     @Test

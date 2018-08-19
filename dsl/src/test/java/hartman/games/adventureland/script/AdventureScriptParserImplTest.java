@@ -9,10 +9,12 @@ import hartman.games.adventureland.engine.Item;
 import hartman.games.adventureland.engine.Room;
 import hartman.games.adventureland.engine.Vocabulary;
 import hartman.games.adventureland.engine.Word;
+import hartman.games.adventureland.engine.core.DefaultDisplay;
 import hartman.games.adventureland.engine.core.Words;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.io.StringWriter;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -256,8 +258,6 @@ public class AdventureScriptParserImplTest {
         adventureScriptParsingRule.parse();
     }
 
-    private static final Display noOpDisplay = message -> {};
-
     @Test
     @AdventureScriptResource("/scripts/302adventure.txt")
     public void actionVerbAndResult() {
@@ -267,9 +267,10 @@ public class AdventureScriptParserImplTest {
 
         GameState gameState = new GameState(Room.NOWHERE);
         Action action = adventure.getActions().iterator().next();
-        StringBuilder display = new StringBuilder();
-        action.run(gameState, display::append, new Command(new Word("look"), Word.NONE));
-        assertEquals("It works\n", display.toString());
+        StringWriter out = new StringWriter();
+        Display display = new DefaultDisplay(out);
+        action.run(gameState, display, new Command(new Word("look"), Word.NONE));
+        assertEquals("It works\n", out.toString());
     }
 
 }

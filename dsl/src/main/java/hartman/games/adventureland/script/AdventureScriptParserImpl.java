@@ -485,7 +485,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         @Override
         public Action.Result visitResultLook(ResultLookContext ctx) {
-            throw new UnsupportedOperationException();
+            return Results.look;
         }
 
         @Override
@@ -500,7 +500,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         @Override
         public Action.Result visitResultInventory(ResultInventoryContext ctx) {
-            throw new UnsupportedOperationException();
+            return Results.inventory;
         }
 
         @Override

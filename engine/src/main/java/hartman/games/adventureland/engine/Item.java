@@ -9,7 +9,7 @@ import java.util.Set;
  * Items are either "objects" like keys, swords, lamps, and mud while other items
  * are "scenery" like trees, signs, crypts, tables, altars, donkeys, etc.
  */
-public class Item extends Word implements GameElement {
+public class Item extends Word {
 
     public static class Builder {
         private String name;
@@ -113,11 +113,6 @@ public class Item extends Word implements GameElement {
 
     public boolean isDestroyed() {
         return isHere(Room.NOWHERE);
-    }
-
-    @Override
-    public void accept(GameElementVisitor visitor) {
-        visitor.visit(this);
     }
 
 }

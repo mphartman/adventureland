@@ -1,16 +1,16 @@
 package hartman.games.adventureland.engine.core;
 
-import hartman.games.adventureland.engine.Action;
 import hartman.games.adventureland.engine.Command;
 import hartman.games.adventureland.engine.Display;
 import hartman.games.adventureland.engine.GameState;
 import hartman.games.adventureland.engine.Item;
 import hartman.games.adventureland.engine.Room;
+import hartman.games.adventureland.engine.TestDisplay;
 import hartman.games.adventureland.engine.Word;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -45,11 +45,18 @@ import static org.junit.Assert.assertTrue;
 
 public class ResultsTest {
 
+    private TestDisplay display;
+    
+    @Before
+    public void setupDisplay() {
+        display = new TestDisplay();
+    }
+    
     @Test
     public void quitShouldChangeGameStateRunning() {
         GameState gameState = new GameState(Room.NOWHERE);
         assertTrue(gameState.isRunning());
-        quit.execute(Command.NONE, gameState, msg -> {});
+        quit.execute(Command.NONE, gameState, display);
         assertFalse(gameState.isRunning());
     }
 
@@ -61,7 +68,7 @@ public class ResultsTest {
 
         GameState gameState = new GameState(tower_first_floor);
 
-        go.execute(new Command(GO, UP), gameState, msg -> {});
+        go.execute(new Command(GO, UP), gameState, display);
 
         assertEquals(tower_second_floor, gameState.getCurrentRoom());
     }
@@ -75,10 +82,10 @@ public class ResultsTest {
 
         GameState gameState = new GameState(firstFloor);
 
-        go.execute(new Command(UP, NONE), gameState, msg -> {});
+        go.execute(new Command(UP, NONE), gameState, display);
         assertEquals(secondFloor, gameState.getCurrentRoom());
 
-        go.execute(new Command(DOWN, NONE), gameState, msg -> {});
+        go.execute(new Command(DOWN, NONE), gameState, display);
         assertEquals(firstFloor, gameState.getCurrentRoom());
     }
 
@@ -88,7 +95,7 @@ public class ResultsTest {
         GameState gameState = new GameState(sealed_tomb);
         Command command = new Command(GO, UP);
 
-        go.execute(command, gameState, msg -> {});
+        go.execute(command, gameState, display);
     }
 
     @Test
@@ -100,47 +107,45 @@ public class ResultsTest {
         Items itemSet = Items.newItemSet();
         Item car = itemSet.newItem().named("car").describedAs("A BMW 325XI sedan.").in(garage).build();
         Item mailbox = itemSet.newItem().named("mailbox").describedAs("A wooden mailbox.").build();
-        GameState gameState = new GameState(garage, itemSet.copyOfItems());
 
         AtomicReference<Room> roomRef = new AtomicReference<>();
-        AtomicReference<List<Room.Exit>> exitsRef = new AtomicReference<>();
-        AtomicReference<List<Item>> itemsRef = new AtomicReference<>();
-        Action.Result look = look(((room, exits, roomItems) -> {
-            roomRef.set(room);
-            exitsRef.set(exits);
-            itemsRef.set(roomItems);
-            return "okay";
-        }));
+        AtomicReference<Set<Item>> itemsRef = new AtomicReference<>();
 
-        StringBuilder displayOutput = new StringBuilder();
-        look.execute(Command.NONE, gameState, displayOutput::append);
+        Display display = new TestDisplay() {
+            @Override
+            public void look(Room room, Set<Item> itemsInRoom) {
+                roomRef.set(room);
+                itemsRef.set(itemsInRoom);
+            }
+        };
 
-        assertEquals("okay", displayOutput.toString());
+        GameState gameState = new GameState(garage, itemSet.copyOfItems());
+
+        look.execute(Command.NONE, gameState, display);
+
         assertEquals(garage, roomRef.get());
         assertEquals(1, itemsRef.get().size());
-        assertEquals(car, itemsRef.get().get(0));
-        assertEquals(1, exitsRef.get().size());
-        assertEquals(new Room.Exit(UP, house), exitsRef.get().get(0));
+        assertEquals(car, itemsRef.get().iterator().next());
+        assertEquals(1, roomRef.get().getExits().size());
+        assertEquals(new Room.Exit(UP, house), roomRef.get().getExits().iterator().next());
     }
 
     @Test
     public void printShouldPrintToDisplayGivenAString() {
-        StringBuilder display = new StringBuilder();
-        print("Fly, you fools!").execute(Command.NONE, null, display::append);
+        print("Fly, you fools!").execute(Command.NONE, null, display);
         assertEquals("Fly, you fools!", display.toString());
     }
 
     @Test
-    public void printShouldValuesWhenGivenTemplateMessage() {
-        StringBuilder buf = new StringBuilder();
+    public void printShouldReplaceNounPlaceholderGivenTemplateMessage() {
+        print("This is the noun \"{noun}\"").execute(new Command(NONE, new Word("pop")), new GameState(Room.NOWHERE), display);
+        assertEquals("This is the noun \"pop\"", display.toString());
+    }
 
-        print("This is the noun \"{noun}\"").execute(new Command(NONE, new Word("pop")), new GameState(Room.NOWHERE), buf::append);
-        assertEquals("This is the noun \"pop\"", buf.toString());
-
-        buf.setLength(0); // clears it
-
-        print("I don't know how to \"{verb}\"").execute(new Command(new Word("Dance"), NONE), new GameState(Room.NOWHERE), buf::append);
-        assertEquals("I don't know how to \"Dance\"", buf.toString());
+    @Test
+    public void printShouldReplaceVerbPlaceholderGivenTemplateMessage() {
+        print("I don't know how to \"{verb}\"").execute(new Command(new Word("Dance"), NONE), new GameState(Room.NOWHERE), display);
+        assertEquals("I don't know how to \"Dance\"", display.toString());
     }
 
     @Test
@@ -151,18 +156,18 @@ public class ResultsTest {
         Item vacuum = itemSet.newItem().named("vacuum").describedAs("A Hoover upright vacuum.").in(house).build();
         GameState gameState = new GameState(house, itemSet.copyOfItems());
 
-        AtomicReference<List<Item>> itemsRef = new AtomicReference<>();
-        Action.Result inventory = inventory(((roomItems) -> {
-            itemsRef.set(roomItems);
-            return "okie dokie";
-        }));
+        AtomicReference<Item> itemRef = new AtomicReference<>();
 
-        StringBuilder displayOutput = new StringBuilder();
-        inventory.execute(Command.NONE, gameState, displayOutput::append);
+        Display display = new TestDisplay() {
+            @Override
+            public void inventory(Set<Item> itemsCarried) {
+                assertEquals(1, itemsCarried.size());
+                itemRef.set(itemsCarried.iterator().next());
+            }
+        };
 
-        assertEquals("okie dokie", displayOutput.toString());
-        assertEquals(1, itemsRef.get().size());
-        assertEquals(phone, itemsRef.get().get(0));
+        inventory.execute(Command.NONE, gameState, display);
+        assertEquals(phone, itemRef.get());
     }
 
     @Test
@@ -175,7 +180,7 @@ public class ResultsTest {
         assertTrue(openedChest.isHere(Room.NOWHERE));
 
         GameState gameState = new GameState(bedroom);
-        Display noDisplay = msg -> {};
+        Display noDisplay = display;
         swap(lockedChest, openedChest).execute(Command.NONE, gameState, noDisplay);
 
         assertTrue(lockedChest.isHere(Room.NOWHERE));
@@ -192,7 +197,7 @@ public class ResultsTest {
         Room atrium = new Room("atrium", "A spacious atrium.");
         GameState gameState = new GameState(Room.NOWHERE);
         assertEquals(Room.NOWHERE, gameState.getCurrentRoom());
-        gotoRoom(atrium).execute(Command.NONE, gameState, msg -> {});
+        gotoRoom(atrium).execute(Command.NONE, gameState, display);
         assertEquals(atrium, gameState.getCurrentRoom());
     }
 
@@ -203,7 +208,7 @@ public class ResultsTest {
 
         assertFalse(fly.isHere(kitchen));
 
-        put(fly, kitchen).execute(Command.NONE, new GameState(kitchen), msg -> {});
+        put(fly, kitchen).execute(Command.NONE, new GameState(kitchen), display);
 
         assertTrue(fly.isHere(kitchen));
     }
@@ -217,7 +222,7 @@ public class ResultsTest {
         assertTrue(bowl.isPortable());
         assertFalse(bowl.isCarried());
 
-        get.execute(new Command(GET, bowl), gameState, msg -> {});
+        get.execute(new Command(GET, bowl), gameState, display);
 
         assertFalse(bowl.isHere(Room.NOWHERE));
         assertTrue(bowl.isCarried());
@@ -234,11 +239,10 @@ public class ResultsTest {
         assertTrue(potato.isCarried());
         assertFalse(potato.isHere(cellar));
 
-        drop.execute(new Command(DROP, potato), gameState, msg -> {});
+        drop.execute(new Command(DROP, potato), gameState, display);
 
         assertFalse(potato.isCarried());
         assertTrue(potato.isHere(cellar));
-
     }
 
     @Test
@@ -250,7 +254,7 @@ public class ResultsTest {
         assertFalse(grenade.isHere(pants));
         assertTrue(phone.isHere(pants));
 
-        putWith(grenade, phone).execute(Command.NONE, new GameState(Room.NOWHERE), msg -> {});
+        putWith(grenade, phone).execute(Command.NONE, new GameState(Room.NOWHERE), display);
 
         assertTrue(grenade.isHere(pants));
         assertTrue(phone.isHere(pants));
@@ -266,7 +270,7 @@ public class ResultsTest {
         assertTrue(gameState.exists(orb));
         assertFalse(orb.isDestroyed());
 
-        destroy(orb).execute(Command.NONE, gameState, msg -> {});
+        destroy(orb).execute(Command.NONE, gameState, display);
         assertFalse(gameState.exists(orb));
         assertTrue(orb.isDestroyed());
     }
@@ -276,10 +280,10 @@ public class ResultsTest {
         GameState gameState = new GameState(Room.NOWHERE);
 
         assertFalse(gameState.getFlag("hostile"));
-        setFlag("hostile", true).execute(Command.NONE, gameState, message -> {});
+        setFlag("hostile", true).execute(Command.NONE, gameState, display);
         assertTrue(gameState.getFlag("hostile"));
 
-        setFlag("hostile", false).execute(Command.NONE, gameState, message -> {});
+        setFlag("hostile", false).execute(Command.NONE, gameState, display);
         assertFalse(gameState.getFlag("hostile"));
     }
 
@@ -290,7 +294,7 @@ public class ResultsTest {
         gameState.setFlag("hostile");
         assertTrue(gameState.getFlag("hostile"));
 
-        resetFlag("hostile").execute(Command.NONE, gameState, message -> {});
+        resetFlag("hostile").execute(Command.NONE, gameState, display);
         assertFalse(gameState.getFlag("hostile"));
     }
 
@@ -300,7 +304,7 @@ public class ResultsTest {
 
         assertEquals(0, gameState.getCounter("kills"));
 
-        setCounter("kills", 100).execute(Command.NONE, gameState, message -> {});
+        setCounter("kills", 100).execute(Command.NONE, gameState, display);
         assertEquals(100, gameState.getCounter("kills"));
     }
 
@@ -310,10 +314,10 @@ public class ResultsTest {
 
         assertEquals(0, gameState.getCounter("kills"));
 
-        incrementCounter("kills").execute(Command.NONE, gameState, message -> {});
+        incrementCounter("kills").execute(Command.NONE, gameState, display);
         assertEquals(1, gameState.getCounter("kills"));
 
-        incrementCounter("kills").execute(Command.NONE, gameState, message -> {});
+        incrementCounter("kills").execute(Command.NONE, gameState, display);
         assertEquals(2, gameState.getCounter("kills"));
     }
 
@@ -324,10 +328,10 @@ public class ResultsTest {
         gameState.setCounter("kills", 1);
         assertEquals(1, gameState.getCounter("kills"));
 
-        decrementCounter("kills").execute(Command.NONE, gameState, message -> {});
+        decrementCounter("kills").execute(Command.NONE, gameState, display);
         assertEquals(0, gameState.getCounter("kills"));
 
-        decrementCounter("kills").execute(Command.NONE, gameState, message -> {});
+        decrementCounter("kills").execute(Command.NONE, gameState, display);
         assertEquals(-1, gameState.getCounter("kills"));
     }
 
@@ -338,7 +342,7 @@ public class ResultsTest {
         gameState.setCounter("kills", 1);
         assertEquals(1, gameState.getCounter("kills"));
 
-        resetCounter("kills").execute(Command.NONE, gameState, message -> {});
+        resetCounter("kills").execute(Command.NONE, gameState, display);
         assertEquals(0, gameState.getCounter("kills"));
     }
 
@@ -348,7 +352,7 @@ public class ResultsTest {
 
         assertEquals("", gameState.getString("sign"));
 
-        setString("sign", "BEWARE OF DOG").execute(Command.NONE, gameState, message -> {});
+        setString("sign", "BEWARE OF DOG").execute(Command.NONE, gameState, display);
         assertEquals("BEWARE OF DOG", gameState.getString("sign"));
     }
 }

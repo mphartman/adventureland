@@ -7,14 +7,10 @@ import hartman.games.adventureland.engine.Vocabulary;
 import hartman.games.adventureland.engine.Word;
 import hartman.games.adventureland.engine.core.Actions;
 import hartman.games.adventureland.engine.core.Items;
-import hartman.games.adventureland.engine.core.Results;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import static hartman.games.adventureland.engine.Action.Result;
 import static hartman.games.adventureland.engine.core.Actions.newActionSet;
 import static hartman.games.adventureland.engine.core.Conditions.carrying;
 import static hartman.games.adventureland.engine.core.Conditions.here;
@@ -28,6 +24,8 @@ import static hartman.games.adventureland.engine.core.Results.drop;
 import static hartman.games.adventureland.engine.core.Results.get;
 import static hartman.games.adventureland.engine.core.Results.go;
 import static hartman.games.adventureland.engine.core.Results.gotoRoom;
+import static hartman.games.adventureland.engine.core.Results.inventory;
+import static hartman.games.adventureland.engine.core.Results.look;
 import static hartman.games.adventureland.engine.core.Results.printf;
 import static hartman.games.adventureland.engine.core.Results.println;
 import static hartman.games.adventureland.engine.core.Results.put;
@@ -50,7 +48,6 @@ import static hartman.games.adventureland.engine.core.Words.UP;
 import static hartman.games.adventureland.engine.core.Words.USE;
 import static hartman.games.adventureland.engine.core.Words.WEST;
 import static java.lang.String.format;
-import static java.lang.String.join;
 import static java.util.Arrays.asList;
 
 public class HouseEscapeAdventure {
@@ -339,53 +336,4 @@ public class HouseEscapeAdventure {
         return new Adventure(vocabulary, occurs.copyOfActions(), fullActionSet.copyOfActions(), itemSet.copyOfItems(), masterBedroom);
     }
 
-    private static Result look = Results.look((room, exits, items) -> {
-        StringBuilder buf = new StringBuilder();
-        buf.append(format("%n%s%n", room.getDescription()));
-        if (!items.isEmpty()) {
-            if (items.size() == 1) {
-                buf.append(format("I can also see %s%n", items.get(0).getDescription()));
-            } else {
-                buf.append(format("I can also see %d other things here: ", items.size()));
-                IntStream.range(0, items.size()).forEachOrdered(i -> {
-                    if (i > 0) {
-                        buf.append(", ");
-                    }
-                    if (i == (items.size() - 1)) {
-                        buf.append("and ");
-                    }
-                    buf.append(items.get(i).getDescription());
-                });
-                buf.append('\n');
-            }
-        }
-        if (exits.size() == 0) {
-            buf.append(format("There are no obvious exits from here.%n"));
-        } else {
-            if (exits.size() == 1) {
-                buf.append(format("There is a single exit to the %s%n", exits.get(0).getDescription()));
-            } else {
-                String exitsString = join(", ", exits.stream().map(Room.Exit::getDescription).collect(Collectors.toList()));
-                buf.append(format("There are %d obvious exits: %s%n", exits.size(), exitsString));
-            }
-        }
-        return buf.toString();
-    });
-
-    private static Result inventory = Results.inventory((items) -> {
-        StringBuilder buf = new StringBuilder();
-        if (items.isEmpty()) {
-            buf.append(format("%nI'm not carrying anything right now.%n"));
-        } else {
-            buf.append(format("%nI'm carrying "));
-            if (items.size() == 1) {
-                buf.append(format("%s%n", items.get(0).getDescription()));
-            } else {
-                buf.append(format("%d items: ", items.size()));
-                IntStream.range(0, items.size()).forEachOrdered(i -> buf.append(format("%n - %s", items.get(i).getDescription())));
-            }
-            buf.append('\n');
-        }
-        return buf.toString();
-    });
 }

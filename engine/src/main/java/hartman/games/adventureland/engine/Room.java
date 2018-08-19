@@ -1,6 +1,7 @@
 package hartman.games.adventureland.engine;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -12,11 +13,11 @@ import java.util.Set;
  *
  * E.g. A room can only have one North exit but the North and Up exits can point reference the same destination.
  */
-public class Room implements GameElement {
+public class Room {
 
     public static final Room NOWHERE = new Room("nowhere", "I am no where.  It's dark and I am alone.");
 
-    public static class Exit implements GameElement {
+    public static class Exit {
         private final Word direction;
         private final Room room;
 
@@ -37,11 +38,6 @@ public class Room implements GameElement {
 
         public String getDescription() {
             return direction.getName();
-        }
-
-        @Override
-        public void accept(GameElementVisitor visitor) {
-            visitor.visit(this);
         }
 
         @Override
@@ -110,10 +106,8 @@ public class Room implements GameElement {
                 .orElseThrow(() -> new IllegalStateException(String.format("Invalid exit. There is no exit %s from this room.", direction)));
     }
 
-    @Override
-    public void accept(GameElementVisitor visitor) {
-        visitor.visit(this);
-        exits.forEach(visitor::visit);
+    public Set<Exit> getExits() {
+        return Collections.unmodifiableSet(exits);
     }
 
     @Override

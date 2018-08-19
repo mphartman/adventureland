@@ -2,13 +2,8 @@ package hartman.games.adventureland.engine.core;
 
 import hartman.games.adventureland.engine.Action.Result;
 import hartman.games.adventureland.engine.Display;
-import hartman.games.adventureland.engine.GameElementVisitor;
 import hartman.games.adventureland.engine.Item;
 import hartman.games.adventureland.engine.Room;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public final class Results {
 
@@ -26,46 +21,10 @@ public final class Results {
      */
     public static final Result go = (command, gameState, display) -> gameState.exitTowards(command.getSecondThenFirst());
 
-    @FunctionalInterface
-    public interface LookCallback {
-        String describe(Room room, List<Room.Exit> exits, List<Item> items);
-    }
-
     /**
-     * Provides the room, exits, and items to a callback.
+     * Asks gamestate to describe itself
      */
-    public static Result look(LookCallback callback) {
-        return (command, gameState, display) -> {
-
-            List<Room> rooms = new ArrayList<>();
-            List<Room.Exit> exits = new ArrayList<>();
-            List<Item> items = new ArrayList<>();
-
-            gameState.describe(new GameElementVisitor() {
-                @Override
-                public void visit(Item item) {
-                    items.add(item);
-                }
-
-                @Override
-                public void visit(Room room) {
-                    rooms.add(room);
-                }
-
-                @Override
-                public void visit(Room.Exit exit) {
-                    exits.add(exit);
-                }
-            });
-
-            String description = callback.describe(
-                    rooms.stream().findFirst().orElse(Room.NOWHERE),
-                    Collections.unmodifiableList(exits),
-                    Collections.unmodifiableList(items));
-
-            display.print(description);
-        };
-    }
+    public static final Result look = (command, gameState, display) -> gameState.describe(display);
 
     /**
      * Prints the specified message to the {@link Display}
@@ -96,39 +55,10 @@ public final class Results {
         return printf(message.concat("%n"));
     }
 
-    @FunctionalInterface
-    public interface InventoryCallback {
-        String execute(List<Item> items);
-    }
-
     /**
      * Provides a callback with a list of items that the player carrying.
      */
-    public static Result inventory(InventoryCallback callback) {
-        return (command, gameState, display) -> {
-
-            List<Item> items = new ArrayList<>();
-
-            gameState.inventory(new GameElementVisitor() {
-                @Override
-                public void visit(Item item) {
-                    items.add(item);
-                }
-
-                @Override
-                public void visit(Room room) {
-                    // do nothing
-                }
-
-                @Override
-                public void visit(Room.Exit exit) {
-                    // do nothing
-                }
-            });
-
-            display.print(callback.execute(items));
-        };
-    }
+    public static final Result inventory = (command, gameState, display) -> gameState.inventory(display);
 
     /**
      * Exchanges the two specified items, so that each occupies the location previously occupied by the other.

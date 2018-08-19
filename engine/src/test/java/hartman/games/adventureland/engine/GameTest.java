@@ -51,7 +51,7 @@ public class GameTest {
         Adventure adventure = new Adventure(vocabulary, new LinkedHashSet<>(asList(occurs1, occurs2, occurs3)), singleton(quit), emptySet(), Room.NOWHERE);
         GameState gameState = new GameState(adventure.getStartRoom(), adventure.getItems());
 
-        Game game = new Game(adventure, () -> Command.NONE, message -> {});
+        Game game = new Game(adventure, () -> Command.NONE, new TestDisplay());
         gameState = game.run(gameState);
 
         assertFalse(gameState.isRunning());
@@ -76,7 +76,7 @@ public class GameTest {
         Adventure adventure = new Adventure(vocabulary, singleton(occurs), singleton(action), emptySet(), Room.NOWHERE);
         GameState gameState = new GameState(adventure.getStartRoom(), adventure.getItems());
 
-        Game game = new Game(adventure, () -> Command.NONE, message -> {});
+        Game game = new Game(adventure, () -> Command.NONE, new TestDisplay());
         gameState = game.run(gameState);
 
         assertFalse(gameState.isRunning());

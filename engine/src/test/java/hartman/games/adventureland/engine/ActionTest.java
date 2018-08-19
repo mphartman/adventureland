@@ -15,10 +15,10 @@ public class ActionTest {
 
         GameState gameState = new GameState(Room.NOWHERE);
 
-        action.run(gameState, msg -> {}, new Command(new Word("SHOUT"), Word.NONE));
+        action.run(gameState, new TestDisplay(), new Command(new Word("SHOUT"), Word.NONE));
         assertEquals("", gameState.getString("MESSAGE"));
 
-        action.run(gameState, msg -> {}, new Command(new Word("SLAP"), Word.NONE));
+        action.run(gameState, new TestDisplay(), new Command(new Word("SLAP"), Word.NONE));
         assertEquals("Ouch! That hurts!", gameState.getString("MESSAGE"));
     }
 
