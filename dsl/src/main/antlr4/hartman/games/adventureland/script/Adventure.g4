@@ -92,7 +92,7 @@ LINE_COMMENT
     ;
 
 adventure
-    :   gameElement+ globalParameter* EOF
+    :   globalParameter* gameElement+ EOF
     ;
 
 gameElement
