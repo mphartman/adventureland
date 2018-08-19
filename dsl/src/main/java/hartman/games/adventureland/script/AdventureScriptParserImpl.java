@@ -521,7 +521,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
     }
 
-    private static abstract class ActionVisitor<T> extends AdventureBaseVisitor<T> {
+    private abstract static class ActionVisitor<T> extends AdventureBaseVisitor<T> {
         private final Set<Item> items;
         private final List<Room> rooms;
 
