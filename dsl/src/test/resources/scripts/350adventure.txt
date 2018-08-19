@@ -1,0 +1,5 @@
+// Tests action with verb and IN room condition, room 'ledge' must exist
+action climb rope
+    when at ledge
+    then print "I'm too heavy. I fall!"
+        and game_over

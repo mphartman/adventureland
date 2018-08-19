@@ -7,6 +7,7 @@ import hartman.games.adventureland.engine.Room;
 import hartman.games.adventureland.engine.Vocabulary;
 import hartman.games.adventureland.engine.Word;
 import hartman.games.adventureland.engine.core.Actions;
+import hartman.games.adventureland.engine.core.Conditions;
 import hartman.games.adventureland.engine.core.Items;
 import hartman.games.adventureland.engine.core.Results;
 import hartman.games.adventureland.engine.core.Words;
@@ -23,7 +24,6 @@ import org.antlr.v4.runtime.tree.RuleNode;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -38,6 +38,7 @@ import static hartman.games.adventureland.script.AdventureParser.ActionWordNoneC
 import static hartman.games.adventureland.script.AdventureParser.ActionWordUnknownContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionWordWordContext;
 import static hartman.games.adventureland.script.AdventureParser.AdventureContext;
+import static hartman.games.adventureland.script.AdventureParser.ConditionInRoomContext;
 import static hartman.games.adventureland.script.AdventureParser.ExitDownContext;
 import static hartman.games.adventureland.script.AdventureParser.ExitEastContext;
 import static hartman.games.adventureland.script.AdventureParser.ExitNorthContext;
@@ -72,14 +73,12 @@ import static hartman.games.adventureland.script.AdventureParser.ResultSetString
 import static hartman.games.adventureland.script.AdventureParser.ResultSwapContext;
 import static hartman.games.adventureland.script.AdventureParser.RoomDeclarationContext;
 import static hartman.games.adventureland.script.AdventureParser.RoomExitContext;
-import static hartman.games.adventureland.script.AdventureParser.RoomExitsContext;
 import static hartman.games.adventureland.script.AdventureParser.VerbGroupContext;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 
 /**
@@ -124,28 +123,32 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         }
 
         private List<Room> getRooms(AdventureContext adventureContext) {
+
             RoomDeclarationVisitor visitor = new RoomDeclarationVisitor();
-            List<RoomDef> roomDefs = adventureContext.gameElement().stream()
+            List<RoomHolder> roomHolders = adventureContext.gameElement().stream()
                     .filter(gameElementContext -> null != gameElementContext.roomDeclaration())
                     .map(gameElementContext -> gameElementContext.roomDeclaration().accept(visitor))
                     .collect(toList());
 
-            Map<String, Room> roomsByName = roomDefs.stream()
-                    .collect(toMap(RoomDef::getRoomName, RoomDef::getRoom));
+            roomHolders.forEach(roomHolder ->
+                    roomHolder.getExits().forEach(roomExitHolder -> {
 
-            roomDefs.forEach(roomDef -> roomDef.getExits().forEach(exitDef -> {
-                String exitRoomName = exitDef.getRoomName();
-                if (null == exitRoomName || exitRoomName.equals(roomDef.getRoomName())) {
-                    roomDef.getRoom().setExitTowardsSelf(exitDef.getDirection());
-                } else {
-                    if (!roomsByName.containsKey(exitRoomName)) {
-                        throw new ParseCancellationException(String.format("Invalid exit. '%s' from room '%s' refers to non-existent room '%s'.", exitDef.getDirection().getName(), roomDef.getRoomName(), exitRoomName));
-                    }
-                    roomDef.getRoom().setExit(exitDef.getDirection(), roomsByName.get(exitRoomName));
-                }
-            }));
+                        String exitTowardsRoom = roomExitHolder.getRoomName();
 
-            return roomDefs.stream().map(RoomDef::getRoom).collect(toList());
+                        if (null == exitTowardsRoom || exitTowardsRoom.equals(roomHolder.getRoomName())) {
+                            roomHolder.setExitTowardsSelf(roomExitHolder.getDirection());
+
+                        } else {
+                            roomHolders.stream()
+                                    .filter(holder -> holder.getRoomName().equals(exitTowardsRoom))
+                                    .map(RoomHolder::getRoom)
+                                    .findFirst()
+                                    .map(room -> roomHolder.setExit(roomExitHolder.getDirection(), room))
+                                    .orElseThrow(ParseCancellationException::new);
+                        }
+                    }));
+
+            return roomHolders.stream().map(RoomHolder::getRoom).collect(toList());
         }
 
         private Room getStartingRoom(AdventureContext adventureContext, List<Room> rooms) {
@@ -197,45 +200,93 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         }
     }
 
-    private static class RoomDeclarationVisitor extends AdventureBaseVisitor<RoomDef> {
+    static class RoomHolder {
+        private final Room room;
+        private final List<RoomExitHolder> exits;
+
+        RoomHolder(Room room, List<RoomExitHolder> exits) {
+            this.room = room;
+            this.exits = exits;
+        }
+
+        Room getRoom() {
+            return room;
+        }
+
+        String getRoomName() {
+            return room.getName();
+        }
+
+        List<RoomExitHolder> getExits() {
+            return exits;
+        }
+
+        void setExitTowardsSelf(Word direction) {
+            room.setExitTowardsSelf(direction);
+        }
+
+        Room setExit(Word direction, Room towards) {
+            room.setExit(direction, towards);
+            return towards;
+        }
+
+    }
+
+    static class RoomExitHolder {
+        private final Word direction;
+        private final String roomName;
+
+        RoomExitHolder(Word direction, String roomName) {
+            this.direction = direction;
+            this.roomName = roomName;
+        }
+
+        Word getDirection() {
+            return direction;
+        }
+
+        String getRoomName() {
+            return roomName;
+        }
+    }
+
+    private static class RoomDeclarationVisitor extends AdventureBaseVisitor<RoomHolder> {
+
+        private RoomExitVisitor visitor = new RoomExitVisitor();
+
         @Override
-        public RoomDef visitRoomDeclaration(RoomDeclarationContext ctx) {
-            Room room = newRoom(ctx);
-            List<ExitDef> exitDefs = ofNullable(ctx.roomExits())
-                    .map(roomExits -> roomExits.accept(new RoomExitsVisitor()))
-                    .orElse(emptyList());
-            return new RoomDef(room, exitDefs);
+        public RoomHolder visitRoomDeclaration(RoomDeclarationContext ctx) {
+
+            List<RoomExitHolder> roomExitHolders =
+                    ofNullable(ctx.roomExits())
+                            .map(roomExitsContext -> roomExitsContext.roomExit().stream()
+                                    .map(roomExitContext -> roomExitContext.accept(visitor))
+                                    .collect(toList()))
+                            .orElse(emptyList());
+
+            return new RoomHolder(newRoom(ctx), roomExitHolders);
         }
 
         private Room newRoom(RoomDeclarationContext ctx) {
             String name = ctx.roomName().getText();
-            String description = stripQuotes.apply(ctx.roomDescription().getText());
-            // change and \" to just "
-            description = description.replaceAll("\\\\\\\"", "\"");
+            String description = stripQuotes.apply(ctx.roomDescription().getText())
+                    .replaceAll("\\\\\\\"", "\"");
             return new Room(name, description);
         }
     }
 
-    private static class RoomExitsVisitor extends AdventureBaseVisitor<List<ExitDef>> {
-        @Override
-        public List<ExitDef> visitRoomExits(RoomExitsContext ctx) {
-            RoomExitVisitor visitor = new RoomExitVisitor();
-            return ctx.roomExit().stream()
-                    .map(roomExit -> roomExit.accept(visitor))
-                    .collect(toList());
-        }
-    }
+    private static class RoomExitVisitor extends AdventureBaseVisitor<RoomExitHolder> {
 
-    private static class RoomExitVisitor extends AdventureBaseVisitor<ExitDef> {
+        private ExitDirectionVisitor exitDirectionVisitor = new ExitDirectionVisitor();
+
         @Override
-        public ExitDef visitRoomExit(RoomExitContext ctx) {
-            ExitDirectionVisitor exitDirectionVisitor = new ExitDirectionVisitor();
+        public RoomExitHolder visitRoomExit(RoomExitContext ctx) {
             Word direction = ctx.exitDirection().accept(exitDirectionVisitor);
             String roomName = null;
             if (null != ctx.roomName()) {
                 roomName = ctx.roomName().isEmpty() ? null : ctx.roomName().getText();
             }
-            return new ExitDef(direction, roomName);
+            return new RoomExitHolder(direction, roomName);
         }
     }
 
@@ -468,27 +519,35 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
     }
 
-    private static class ActionResultDeclarationVisitor extends AdventureBaseVisitor<Action.Result> {
+    private static abstract class ActionVisitor<T> extends AdventureBaseVisitor<T> {
         private final Set<Item> items;
         private final List<Room> rooms;
 
-        private ActionResultDeclarationVisitor(Set<Item> items, List<Room> rooms) {
+        private ActionVisitor(Set<Item> items, List<Room> rooms) {
             this.items = items;
             this.rooms = rooms;
         }
 
-        private Item getItemOrFail(String itemName) {
+        Item getItemOrFail(String itemName) {
             return items.stream()
                     .filter(item -> item.getName().equals(itemName))
                     .findFirst()
                     .orElseThrow(ParseCancellationException::new);
         }
 
-        private Room getRoomOrFail(String roomName) {
+        Room getRoomOrFail(String roomName) {
             return rooms.stream()
                     .filter(room -> room.getName().equals(roomName))
                     .findFirst()
                     .orElseThrow(ParseCancellationException::new);
+        }
+
+    }
+
+    private static class ActionResultDeclarationVisitor extends ActionVisitor<Action.Result> {
+
+        private ActionResultDeclarationVisitor(Set<Item> items, List<Room> rooms) {
+            super(items, rooms);
         }
 
         @Override
@@ -608,54 +667,17 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         }
     }
 
-    private static class ActionConditionDeclarationVisitor extends AdventureBaseVisitor<Action.Condition> {
-        private final Set<Item> items;
-        private final List<Room> rooms;
+    private static class ActionConditionDeclarationVisitor extends ActionVisitor<Action.Condition> {
 
-        public ActionConditionDeclarationVisitor(Set<Item> items, List<Room> rooms) {
-            this.items = items;
-            this.rooms = rooms;
+        private ActionConditionDeclarationVisitor(Set<Item> items, List<Room> rooms) {
+            super(items, rooms);
+        }
+
+        @Override
+        public Action.Condition visitConditionInRoom(ConditionInRoomContext ctx) {
+            Room room = getRoomOrFail(ctx.roomName().getText());
+            return Conditions.in(room);
         }
     }
 
-    private static class RoomDef {
-        private final Room room;
-        private final List<ExitDef> exits;
-
-        public RoomDef(Room room, List<ExitDef> exits) {
-            this.room = room;
-            this.exits = exits;
-        }
-
-        public Room getRoom() {
-            return room;
-        }
-
-        public String getRoomName() {
-            return room.getName();
-        }
-
-        public List<ExitDef> getExits() {
-            return exits;
-        }
-
-    }
-
-    private static class ExitDef {
-        private final Word direction;
-        private final String roomName;
-
-        public ExitDef(Word direction, String roomName) {
-            this.direction = direction;
-            this.roomName = roomName;
-        }
-
-        public Word getDirection() {
-            return direction;
-        }
-
-        public String getRoomName() {
-            return roomName;
-        }
-    }
 }

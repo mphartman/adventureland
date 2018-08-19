@@ -208,7 +208,7 @@ actionConditionDeclaration
     ;
 
 actionCondition
-    :   IN roomName                 # conditionInRoom
+    :   (IN | AT) roomName          # conditionInRoom
     |   CARRYING itemName           # conditionItemCarried
     |   'here'  itemName            # conditionItemIsHere
     |   'present' itemName          # conditionItemIsPresent
@@ -228,7 +228,7 @@ actionResult
     :   PRINT message=StringLiteral                 # resultPrint
     |   LOOK                                        # resultLook
     |   'go'                                        # resultGo
-    |   'quit'                                      # resultQuit
+    |   ('quit' | 'game_over' | 'gameOver')         # resultQuit
     |   'inventory'                                 # resultInventory
     |   'swap' i1=itemName i2=itemName              # resultSwap
     |   'goto' roomName                             # resultGotoRoom

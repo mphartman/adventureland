@@ -264,9 +264,11 @@ public class AdventureScriptParserImplTest {
 
         assertFalse(adventure.getActions().isEmpty());
 
-        GameState gameState = new GameState(Room.NOWHERE);
         Action action = adventure.getActions().iterator().next();
+
+        GameState gameState = new GameState(Room.NOWHERE);
         Display display = new TestDisplay();
+
         action.run(gameState, display, new Command(new Word("print"), Word.NONE));
         assertEquals("It works\n", display.toString());
     }
@@ -278,14 +280,16 @@ public class AdventureScriptParserImplTest {
 
         assertFalse(adventure.getActions().isEmpty());
 
-        GameState gameState = new GameState(Room.NOWHERE);
         Action action = adventure.getActions().iterator().next();
+
+        GameState gameState = new GameState(Room.NOWHERE);
         Display display = new TestDisplay() {
             @Override
             public void look(Room room, List<Item> itemsInRoom) {
                 print("It works");
             }
         };
+
         action.run(gameState, display, new Command(new Word("look"), Word.NONE));
         assertEquals("It works", display.toString());
     }
@@ -301,12 +305,15 @@ public class AdventureScriptParserImplTest {
         Room hall = new Room("hall", "A hall");
         lair.setExit(Words.NORTH, hall);
 
-        GameState gameState = new GameState(lair);
         Action action = adventure.getActions().iterator().next();
+
+        GameState gameState = new GameState(lair);
         Display display = new TestDisplay();
+
         action.run(gameState, display, new Command(new Word("flee"), new Word("south")));
         assertEquals(lair, gameState.getCurrentRoom());
         assertNotEquals(hall, gameState.getCurrentRoom());
+
         action.run(gameState, display, new Command(new Word("flee"), new Word("north")));
         assertEquals(hall, gameState.getCurrentRoom());
     }
@@ -318,13 +325,22 @@ public class AdventureScriptParserImplTest {
 
         assertFalse(adventure.getActions().isEmpty());
 
-        GameState gameState = new GameState(Room.NOWHERE);
         Action action = adventure.getActions().iterator().next();
+
+        GameState gameState = new GameState(Room.NOWHERE);
         Display display = new TestDisplay();
+
         action.run(gameState, display, new Command(new Word("take"), new Word("poison")));
         assertTrue(gameState.isRunning());
+
         action.run(gameState, display, new Command(new Word("quit"), Word.NONE));
         assertFalse(gameState.isRunning());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    @AdventureScriptResource("/scripts/350adventure.txt")
+    public void actionInRoomConditionRequiresRoomToExist() {
+        adventureScriptParsingRule.parse();
     }
 
 }
