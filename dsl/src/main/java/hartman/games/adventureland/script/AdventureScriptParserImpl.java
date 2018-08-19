@@ -400,6 +400,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
             Actions.ActionBuilder builder = actions.newAction();
             actionCommand(ctx, builder);
             actionResults(ctx, builder);
+            actionConditions(ctx, builder);
             return builder.build();
         }
 
@@ -421,6 +422,14 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
                     .ifPresent(actionResultDeclarationContexts -> actionResultDeclarationContexts.stream()
                             .map(actionResultDeclarationContext -> actionResultDeclarationContext.accept(visitor))
                             .forEach(builder::then));
+        }
+
+        private void actionConditions(ActionDeclarationContext ctx, Actions.ActionBuilder builder) {
+            ActionConditionDeclarationVisitor visitor = new ActionConditionDeclarationVisitor(items, rooms);
+            ofNullable(ctx.actionConditionDeclaration())
+                    .ifPresent(actionConditionDeclarationContexts -> actionConditionDeclarationContexts.stream()
+                            .map(actionConditionDeclarationContext -> actionConditionDeclarationContext.accept(visitor))
+                            .forEach(builder::when));
         }
     }
 
@@ -540,7 +549,8 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         @Override
         public Action.Result visitResultDrop(ResultDropContext ctx) {
-            return Results.drop;
+            Item item = getItemOrFail(ctx.itemName().getText());
+            return Results.drop(item);
         }
 
         @Override
@@ -595,6 +605,16 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
             String key = ctx.k.getText();
             String value = ctx.v.getText();
             return Results.setString(key, value);
+        }
+    }
+
+    private static class ActionConditionDeclarationVisitor extends AdventureBaseVisitor<Action.Condition> {
+        private final Set<Item> items;
+        private final List<Room> rooms;
+
+        public ActionConditionDeclarationVisitor(Set<Item> items, List<Room> rooms) {
+            this.items = items;
+            this.rooms = rooms;
         }
     }
 

@@ -99,6 +99,13 @@ public final class Results {
     public static final Result drop = ((command, gameState, display) -> gameState.drop(command.getSecondWord()));
 
     /**
+     * Drop item in current room.
+     */
+    public static Result drop(Item item) {
+        return (command, gameState, display) -> gameState.drop(item);
+    }
+
+    /**
      * Puts the first-specified item into the same location as the second.
      */
     public static Result putWith(Item item1, Item item2) {

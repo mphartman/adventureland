@@ -15,6 +15,7 @@ CALLED          : 'called';
 ACTION          : 'action';
 WHEN            : 'when';
 AND             : 'and';
+NOT             : 'not' | '!';
 THEN            : 'then';
 OCCURS          : 'occurs';
 NORTH           : 'north';
@@ -203,16 +204,24 @@ actionWord
     ;
 
 actionConditionDeclaration
-    :   (WHEN | AND) actionCondition
+    :   (WHEN | AND) (NOT)? actionCondition
     ;
 
 actionCondition
-    :   IN roomName             #conditionInRoom
-    |   CARRYING itemName       #conditionCarryingItem
+    :   IN roomName                 # conditionInRoom
+    |   CARRYING itemName           # conditionItemCarried
+    |   'here'  itemName            # conditionItemIsHere
+    |   'present' itemName          # conditionItemIsPresent
+    |   'exists' itemName           # conditionItemExists
+    |   'moved' itemName            # conditionItemHasMoved
+    |   'flag' word                 # conditionFlagIsTrue
+    |   'counterEq' word            # conditionCounterEquals
+    |   'counterLe' word            # conditionCounterLessThan
+    |   'counterGt' word            # conditionCounterGreaterThan
     ;
 
 actionResultDeclaration
-    :   THEN actionResult
+    :   (THEN | AND) actionResult
     ;
 
 actionResult
@@ -226,7 +235,7 @@ actionResult
     |   'put' itemName roomName                     # resultPut
     |   'putHere' itemName                          # resultPutHere
     |   'get'                                       # resultGet
-    |   'drop'                                      # resultDrop
+    |   'drop' itemName                             # resultDrop
     |   'putWith' i1=itemName i2=itemName           # resultPutWith
     |   'destroy' itemName                          # resultDestroy
     |   'setFlag' word booleanValue                 # resultSetFlag

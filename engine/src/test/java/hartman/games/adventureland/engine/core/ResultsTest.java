@@ -247,6 +247,25 @@ public class ResultsTest {
     }
 
     @Test
+    public void dropShouldPlaceItemInCurrentRoom() {
+        Item potato = new Item.Builder().named("potato").inInventory().build();
+        Item peeler = new Item.Builder().named("peeler").inInventory().build();
+        Set<Item> items = new LinkedHashSet<>();
+        items.add(potato);
+        items.add(peeler);
+        Room cellar = new Room("cellar", "a potato cellar");
+        GameState gameState = new GameState(cellar, items);
+
+        assertTrue(peeler.isCarried());
+        assertFalse(peeler.isHere(cellar));
+
+        drop(peeler).execute(new Command(DROP, peeler), gameState, display);
+
+        assertFalse(peeler.isCarried());
+        assertTrue(peeler.isHere(cellar));
+    }
+
+    @Test
     public void putWithShouldPlaceFirstItemInSameRoomAsSecondItem() {
         Room pants = new Room("pants", "A pair of jorts");
         Item grenade = new Item.Builder().named("grenade").build();
