@@ -20,10 +20,12 @@ import static hartman.games.adventureland.engine.core.Conditions.present;
 import static hartman.games.adventureland.engine.core.Conditions.random;
 import static hartman.games.adventureland.engine.core.Conditions.roomHasExit;
 import static hartman.games.adventureland.engine.core.Conditions.times;
+import static hartman.games.adventureland.engine.core.Results.destroy;
 import static hartman.games.adventureland.engine.core.Results.drop;
 import static hartman.games.adventureland.engine.core.Results.get;
 import static hartman.games.adventureland.engine.core.Results.go;
 import static hartman.games.adventureland.engine.core.Results.gotoRoom;
+import static hartman.games.adventureland.engine.core.Results.incrementCounter;
 import static hartman.games.adventureland.engine.core.Results.inventory;
 import static hartman.games.adventureland.engine.core.Results.look;
 import static hartman.games.adventureland.engine.core.Results.printf;
@@ -58,10 +60,11 @@ public class HouseEscapeAdventure {
          * Vocabulary
          */
 
-        Word kill = new Word("KILL", "SWAT", "HURT");
+        Word kill = new Word("KILL", "SWAT", "HURT", "HIT");
         Word yell = new Word("YELL", "SHOUT", "SCREAM");
         Word pet = new Word("PET", "PAT");
         Word door = new Word("Door");
+        Word close = new Word("CLOSE", "SHUT");
 
         Set<Word> directionWords = new LinkedHashSet<>(asList(NORTH, SOUTH, UP, DOWN, EAST, WEST));
         Vocabulary movement = new Vocabulary(directionWords);
@@ -103,7 +106,8 @@ public class HouseEscapeAdventure {
         Item dog = itemSet.newItem().named("dog").describedAs("a cute little dachshund").build();
         Item kennelWithDog = itemSet.newItem().named("kennelWithDog").alias("kennel").describedAs("a small dog kennel filled with blankets with a closed door").in(livingRoom).build();
         Item emptyKennel = itemSet.newItem().named("emptyKennel").describedAs("an open dog kennel").build();
-
+        Item openWindow = itemSet.newItem().named("window").describedAs("an open window").in(kitchen).build();
+        Item closedWindow = itemSet.newItem().named("closed_window").describedAs("a closed window.").build();
 
         // *** Occurs - actions which all run automatically at the start of every turn *** /
 
@@ -117,8 +121,8 @@ public class HouseEscapeAdventure {
 
         // the fly
         occurs.newAction()
-                .when(in(kitchen)).and(not(here(fly))).and(random(50))
-                .then(put(fly, kitchen)).andThen(printf("%nA fly buzzes past my ear!%n"))
+                .when(in(kitchen)).and(not(here(fly))).and(here(openWindow)).and(random(50))
+                .then(put(fly, kitchen)).andThen(printf("%nA fly comes in through the open window and buzzes past my ear!%n"))
                 .build();
 
         // Archie the dog
@@ -216,7 +220,22 @@ public class HouseEscapeAdventure {
         adventureActions.newAction()
                 .on(kill).the(fly)
                 .when(here(fly))
-                .then(swap(fly, deadFly)).andThen(printf("%nWHACK! I got 'em! It's dead.%n"))
+                .then(putHere(deadFly))
+                    .andThen(printf("%nWHACK! I got 'em! It's dead.%n"))
+                    .andThen(destroy(fly))
+                    .andThen(incrementCounter("deadFlies"))
+                .build();
+
+        adventureActions.newAction()
+                .on(close).the(openWindow)
+                .when(here(openWindow))
+                .then(swap(openWindow, closedWindow)).andThen(println("It's closed. That should keep those pesky flies out of here."))
+                .build();
+
+        adventureActions.newAction()
+                .on(OPEN).the(closedWindow)
+                .when(here(closedWindow))
+                .then(swap(closedWindow, openWindow)).andThen(println("It's open. A cool breeze greets me. I hear a buzzing sound coming from outside too."))
                 .build();
 
         adventureActions.newAction()
