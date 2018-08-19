@@ -143,8 +143,10 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
                                     .filter(holder -> holder.getRoomName().equals(exitTowardsRoom))
                                     .map(RoomHolder::getRoom)
                                     .findFirst()
-                                    .map(room -> roomHolder.setExit(roomExitHolder.getDirection(), room))
-                                    .orElseThrow(ParseCancellationException::new);
+                                    .<Runnable>map(room -> () -> roomHolder.setExit(roomExitHolder.getDirection(), room))
+                                    .orElse(() -> {
+                                        throw new ParseCancellationException();
+                                    }).run();
                         }
                     }));
 
