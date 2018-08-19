@@ -435,7 +435,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
             return of(ctx.getText())
                     .map(stripQuotes)
                     .map(toWord)
-                    .get();
+                    .orElse(Word.NONE);
         }
 
         @Override
