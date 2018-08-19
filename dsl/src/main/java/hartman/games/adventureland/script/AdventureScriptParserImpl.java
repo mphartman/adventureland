@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 
 import static hartman.games.adventureland.script.AdventureParser.ActionDeclarationContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionWordAnyContext;
+import static hartman.games.adventureland.script.AdventureParser.ActionWordDirectionContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionWordNoneContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionWordUnknownContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionWordWordContext;
@@ -76,7 +77,6 @@ import static hartman.games.adventureland.script.AdventureParser.VerbGroupContex
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
-import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -404,7 +404,9 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         }
 
         private void actionCommand(ActionDeclarationContext ctx, Actions.ActionBuilder builder) {
-            ActionWordContextVisitor visitor = new ActionWordContextVisitor(text -> vocabulary.findMatch(text).orElse(new Word(text)));
+            Function<String, Word> vocabLookupFunction = text -> vocabulary.findMatch(text).orElse(new Word(text));
+            Function<String, Word> toWordFunction = text -> vocabLookupFunction.apply(stripQuotes.apply(text));
+            ActionWordContextVisitor visitor = new ActionWordContextVisitor(toWordFunction);
             List<Consumer<? super Word>> consumers = asList(builder::on, builder::with);
             IntStream.range(0, 2).forEach(i ->
                     ofNullable(ctx.actionCommand().actionWord(i))
@@ -432,10 +434,12 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         @Override
         public Word visitActionWordWord(ActionWordWordContext ctx) {
-            return of(ctx.getText())
-                    .map(stripQuotes)
-                    .map(toWord)
-                    .orElse(Word.NONE);
+            return toWord.apply(ctx.getText());
+        }
+
+        @Override
+        public Word visitActionWordDirection(ActionWordDirectionContext ctx) {
+            return toWord.apply(ctx.getText());
         }
 
         @Override

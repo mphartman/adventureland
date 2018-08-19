@@ -196,6 +196,7 @@ actionCommand
 
 actionWord
     : (Identifier | StringLiteral)  # actionWordWord
+    | exitDirection                 # actionWordDirection
     | ANY                           # actionWordAny
     | NONE                          # actionWordNone
     | UNKNOWN                       # actionWordUnknown

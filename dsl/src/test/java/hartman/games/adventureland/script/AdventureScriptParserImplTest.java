@@ -13,6 +13,7 @@ import hartman.games.adventureland.engine.core.Words;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -258,7 +259,7 @@ public class AdventureScriptParserImplTest {
 
     @Test
     @AdventureScriptResource("/scripts/302adventure.txt")
-    public void actionVerbAndResult() {
+    public void actionVerbAndPrintResult() {
         Adventure adventure = adventureScriptParsingRule.parse();
 
         assertFalse(adventure.getActions().isEmpty());
@@ -266,8 +267,64 @@ public class AdventureScriptParserImplTest {
         GameState gameState = new GameState(Room.NOWHERE);
         Action action = adventure.getActions().iterator().next();
         Display display = new TestDisplay();
-        action.run(gameState, display, new Command(new Word("look"), Word.NONE));
+        action.run(gameState, display, new Command(new Word("print"), Word.NONE));
         assertEquals("It works\n", display.toString());
+    }
+
+    @Test
+    @AdventureScriptResource("/scripts/303adventure.txt")
+    public void actionVerbAndLookResult() {
+        Adventure adventure = adventureScriptParsingRule.parse();
+
+        assertFalse(adventure.getActions().isEmpty());
+
+        GameState gameState = new GameState(Room.NOWHERE);
+        Action action = adventure.getActions().iterator().next();
+        Display display = new TestDisplay() {
+            @Override
+            public void look(Room room, List<Item> itemsInRoom) {
+                print("It works");
+            }
+        };
+        action.run(gameState, display, new Command(new Word("look"), Word.NONE));
+        assertEquals("It works", display.toString());
+    }
+
+    @Test
+    @AdventureScriptResource("/scripts/304adventure.txt")
+    public void actionVerbAndGoResult() {
+        Adventure adventure = adventureScriptParsingRule.parse();
+
+        assertFalse(adventure.getActions().isEmpty());
+
+        Room lair = new Room("lair", "A scary lair");
+        Room hall = new Room("hall", "A hall");
+        lair.setExit(Words.NORTH, hall);
+
+        GameState gameState = new GameState(lair);
+        Action action = adventure.getActions().iterator().next();
+        Display display = new TestDisplay();
+        action.run(gameState, display, new Command(new Word("flee"), new Word("south")));
+        assertEquals(lair, gameState.getCurrentRoom());
+        assertNotEquals(hall, gameState.getCurrentRoom());
+        action.run(gameState, display, new Command(new Word("flee"), new Word("north")));
+        assertEquals(hall, gameState.getCurrentRoom());
+    }
+
+    @Test
+    @AdventureScriptResource("/scripts/305adventure.txt")
+    public void actionVerbAndQuitResult() {
+        Adventure adventure = adventureScriptParsingRule.parse();
+
+        assertFalse(adventure.getActions().isEmpty());
+
+        GameState gameState = new GameState(Room.NOWHERE);
+        Action action = adventure.getActions().iterator().next();
+        Display display = new TestDisplay();
+        action.run(gameState, display, new Command(new Word("take"), new Word("poison")));
+        assertTrue(gameState.isRunning());
+        action.run(gameState, display, new Command(new Word("quit"), Word.NONE));
+        assertFalse(gameState.isRunning());
     }
 
 }
