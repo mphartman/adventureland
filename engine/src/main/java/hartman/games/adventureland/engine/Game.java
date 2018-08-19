@@ -25,7 +25,7 @@ public class Game {
     }
 
     private void runOccurs(GameState gameState) {
-        adventure.getOccurs().forEach(occur -> occur.run(gameState, display));
+        adventure.getOccurs().forEach(occur -> occur.run(gameState, display, Command.NONE));
     }
 
     private void runActions(GameState gameState, Command command) {

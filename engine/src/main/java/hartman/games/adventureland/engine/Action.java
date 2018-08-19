@@ -67,13 +67,4 @@ public class Action {
         return false;
     }
 
-    /**
-     * Runs this Action if all conditions are met.
-     *
-     * @return true if this action's all conditions are met, otherwise returns false.
-     */
-    public boolean run(GameState gameState, Display display) {
-        return run(gameState, display, Command.NONE);
-    }
-
 }
