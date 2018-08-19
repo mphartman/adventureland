@@ -1,0 +1,7 @@
+// Tests action with verb and IN room condition
+room ledge "I'm on the ledge of a tall cliff."
+
+action climb down
+    when at ledge
+    then print "I'm too heavy. I fall!"
+        and game_over

@@ -343,4 +343,42 @@ public class AdventureScriptParserImplTest {
         adventureScriptParsingRule.parse();
     }
 
+    @Test
+    @AdventureScriptResource("/scripts/351adventure.txt")
+    public void actionInRoomCondition() {
+        Adventure adventure = adventureScriptParsingRule.parse();
+
+        assertFalse(adventure.getActions().isEmpty());
+        assertEquals(new Room("ledge", "A ledge"), adventure.getStartRoom());
+
+        Room ledge = adventure.getStartRoom();
+
+        Action action = adventure.getActions().iterator().next();
+
+        GameState gameState = new GameState(ledge);
+        TestDisplay display = new TestDisplay();
+
+        action.run(gameState, display, new Command(new Word("climb"), new Word("down")));
+
+        assertEquals("I'm too heavy. I fall!\n", display.toString());
+        assertFalse(gameState.isRunning());
+    }
+
+    @Test
+    @AdventureScriptResource("/scripts/351adventure.txt")
+    public void actionInRoomCondition2() {
+        Adventure adventure = adventureScriptParsingRule.parse();
+
+        Action action = adventure.getActions().iterator().next();
+
+        GameState gameState = new GameState(Room.NOWHERE);
+        TestDisplay display = new TestDisplay();
+
+        // not in 'ledge' room, so action condition should not trigger result
+        action.run(gameState, display, new Command(new Word("climb"), new Word("down")));
+
+        assertEquals("", display.toString());
+        assertTrue(gameState.isRunning());
+    }
+
 }
