@@ -6,7 +6,6 @@ import hartman.games.adventureland.engine.CommandInterpreter;
 import hartman.games.adventureland.engine.Display;
 import hartman.games.adventureland.engine.Game;
 import hartman.games.adventureland.engine.GameState;
-import hartman.games.adventureland.engine.core.DefaultDisplay;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -34,7 +33,7 @@ public class AdventurelandApplication implements CommandLineRunner {
     public void run(String... args) {
         Adventure adventure = HouseEscapeAdventure.adventure();
         CommandInterpreter interpreter = new ConsoleInterpreter(adventure.getVocabulary());
-        Display display = DefaultDisplay.CONSOLE_DISPLAY;
+        Display display = new ConsoleDisplay();
         GameState gameState = new GameState(adventure.getStartRoom(), adventure.getItems());
         Game game = new Game(adventure, interpreter, display);
         display.print(introduction);

@@ -1,13 +1,14 @@
 package hartman.games.adventureland.engine;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
 import static java.util.Collections.emptySet;
-import static java.util.Collections.unmodifiableSet;
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toList;
 
 /**
  * The state of the game world which consists of the player's current position
@@ -106,18 +107,19 @@ public class GameState {
      * Visits the current room and the items in that room.
      */
     public void describe(Display display) {
-        display.look(currentRoom, unmodifiableSet(items.stream()
+        display.look(currentRoom, items.stream()
                 .filter(item -> item.isHere(currentRoom))
-                .collect(toSet())));
+                .collect(collectingAndThen(toList(), Collections::unmodifiableList)));
+
     }
 
     /**
      * Visits only those items currently held in player's inventory.
      */
     public void inventory(Display display) {
-        display.inventory(unmodifiableSet(items.stream()
+        display.inventory(items.stream()
                 .filter(Item::isCarried)
-                .collect(toSet())));
+                .collect(collectingAndThen(toList(), Collections::unmodifiableList)));
     }
 
     /**

@@ -1,6 +1,6 @@
 package hartman.games.adventureland.engine;
 
-import java.util.Set;
+import java.util.List;
 
 public class TestDisplay implements Display {
 
@@ -12,12 +12,12 @@ public class TestDisplay implements Display {
     }
 
     @Override
-    public void look(Room room, Set<Item> itemsInRoom) {
+    public void look(Room room, List<Item> itemsInRoom) {
         // do nothing
     }
 
     @Override
-    public void inventory(Set<Item> itemsCarried) {
+    public void inventory(List<Item> itemsCarried) {
         // do nothing
     }
 

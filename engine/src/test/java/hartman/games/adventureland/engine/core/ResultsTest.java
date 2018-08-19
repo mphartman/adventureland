@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -109,11 +110,11 @@ public class ResultsTest {
         Item mailbox = itemSet.newItem().named("mailbox").describedAs("A wooden mailbox.").build();
 
         AtomicReference<Room> roomRef = new AtomicReference<>();
-        AtomicReference<Set<Item>> itemsRef = new AtomicReference<>();
+        AtomicReference<List<Item>> itemsRef = new AtomicReference<>();
 
         Display display = new TestDisplay() {
             @Override
-            public void look(Room room, Set<Item> itemsInRoom) {
+            public void look(Room room, List<Item> itemsInRoom) {
                 roomRef.set(room);
                 itemsRef.set(itemsInRoom);
             }
@@ -160,7 +161,7 @@ public class ResultsTest {
 
         Display display = new TestDisplay() {
             @Override
-            public void inventory(Set<Item> itemsCarried) {
+            public void inventory(List<Item> itemsCarried) {
                 assertEquals(1, itemsCarried.size());
                 itemRef.set(itemsCarried.iterator().next());
             }

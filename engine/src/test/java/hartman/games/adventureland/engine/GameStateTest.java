@@ -73,7 +73,7 @@ public class GameStateTest {
         GameState gameState = new GameState(forest, items);
         gameState.describe(new TestDisplay() {
             @Override
-            public void look(Room room, Set<Item> itemsInRoom) {
+            public void look(Room room, List<Item> itemsInRoom) {
                 roomRef.set(room);
                 itemRef.set(itemsInRoom.stream().filter(i -> i.matches(tree)).findFirst().orElseThrow(AssertionError::new));
             }
@@ -95,7 +95,7 @@ public class GameStateTest {
         List<Item> itemList = new ArrayList<>();
         gameState.inventory(new TestDisplay() {
             @Override
-            public void inventory(Set<Item> itemsCarried) {
+            public void inventory(List<Item> itemsCarried) {
                 itemList.addAll(itemsCarried);
             }
         });

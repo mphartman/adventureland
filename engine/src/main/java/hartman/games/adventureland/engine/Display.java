@@ -1,6 +1,6 @@
 package hartman.games.adventureland.engine;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * Presents game output to the user.
@@ -9,8 +9,8 @@ public interface Display {
 
     void print(String message);
 
-    void look(Room room, Set<Item> itemsInRoom);
+    void look(Room room, List<Item> itemsInRoom);
 
-    void inventory(Set<Item> itemsCarried);
+    void inventory(List<Item> itemsCarried);
 
 }
