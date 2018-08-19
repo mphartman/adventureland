@@ -101,7 +101,7 @@ public final class Results {
     /**
      * Drop item in current room.
      */
-    public static Result drop(Item item) {
+    public static Result dropItem(Item item) {
         return (command, gameState, display) -> gameState.drop(item);
     }
 

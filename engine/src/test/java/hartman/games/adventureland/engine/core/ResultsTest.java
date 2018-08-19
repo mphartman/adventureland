@@ -259,7 +259,7 @@ public class ResultsTest {
         assertTrue(peeler.isCarried());
         assertFalse(peeler.isHere(cellar));
 
-        drop(peeler).execute(new Command(DROP, peeler), gameState, display);
+        Results.dropItem(peeler).execute(new Command(DROP, peeler), gameState, display);
 
         assertFalse(peeler.isCarried());
         assertTrue(peeler.isHere(cellar));
