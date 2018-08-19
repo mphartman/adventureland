@@ -4,8 +4,7 @@ import hartman.games.adventureland.engine.Display;
 import hartman.games.adventureland.engine.Item;
 import hartman.games.adventureland.engine.Room;
 
-import java.io.IOException;
-import java.io.Writer;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -15,20 +14,16 @@ import static java.lang.String.format;
 
 public class DefaultDisplay implements Display {
 
-    private final Writer out;
+    private final PrintWriter out;
 
-    public DefaultDisplay(Writer writer) {
+    public DefaultDisplay(PrintWriter writer) {
         this.out = writer;
     }
 
     @Override
     public void print(String message) {
-        try {
-            out.write(message);
-            out.flush();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        out.print(message);
+        out.flush();
     }
 
     @Override

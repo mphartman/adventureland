@@ -278,6 +278,12 @@ public class HouseEscapeAdventure {
                 .build();
 
         standardActions.newAction()
+                .onAnyFirstWords(directionWords.toArray(new Word[0])).withNoSecondWord()
+                .when(not(roomHasExit))
+                .then(println("I can't go {verb} from here. Try one of the obvious exits."))
+                .build();
+
+        standardActions.newAction()
                 .onAnyFirstWord().withNoSecondWord()
                 .when(roomHasExit)
                 .then(go).andThen(look)

@@ -9,12 +9,10 @@ import hartman.games.adventureland.engine.Item;
 import hartman.games.adventureland.engine.Room;
 import hartman.games.adventureland.engine.Vocabulary;
 import hartman.games.adventureland.engine.Word;
-import hartman.games.adventureland.engine.core.DefaultDisplay;
 import hartman.games.adventureland.engine.core.Words;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.io.StringWriter;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -267,10 +265,9 @@ public class AdventureScriptParserImplTest {
 
         GameState gameState = new GameState(Room.NOWHERE);
         Action action = adventure.getActions().iterator().next();
-        StringWriter out = new StringWriter();
-        Display display = new DefaultDisplay(out);
+        Display display = new TestDisplay();
         action.run(gameState, display, new Command(new Word("look"), Word.NONE));
-        assertEquals("It works\n", out.toString());
+        assertEquals("It works\n", display.toString());
     }
 
 }
