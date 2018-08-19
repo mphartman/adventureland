@@ -215,8 +215,36 @@ actionResultDeclaration
     ;
 
 actionResult
-    :   PRINT StringLiteral     #resultPrint
-    |   LOOK                    #resultLook
+    :   PRINT message=StringLiteral                 # resultPrint
+    |   LOOK                                        # resultLook
+    |   'go'                                        # resultGo
+    |   'quit'                                      # resultQuit
+    |   'inventory'                                 # resultInventory
+    |   'swap' i1=itemName i2=itemName              # resultSwap
+    |   'goto' roomName                             # resultGotoRoom
+    |   'put' itemName roomName                     # resultPut
+    |   'putHere' itemName                          # resultPutHere
+    |   'get'                                       # resultGet
+    |   'drop'                                      # resultDrop
+    |   'putWith' i1=itemName i2=itemName           # resultPutWith
+    |   'destroy' itemName                          # resultDestroy
+    |   'setFlag' word booleanValue                 # resultSetFlag
+    |   'resetFlag' word                            # resultResetFlag
+    |   'setCounter' word Number                    # resultSetCounter
+    |   'incrementCounter' word                     # resultIncrementCounter
+    |   'decrementCounter' word                     # resultDecrementCounter
+    |   'resetCounter' word                         # resultResetCounter
+    |   'setString' k=word v=word                   # resultSetString
+    ;
+
+booleanValue
+    :   'true'
+    |   'false'
+    |   'yes'
+    |   'no'
+    |   'on'
+    |   'off'
+    |           // defaults to TRUE
     ;
 
 occursDeclaration

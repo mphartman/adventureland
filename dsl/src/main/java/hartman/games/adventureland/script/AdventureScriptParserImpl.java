@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static hartman.games.adventureland.script.AdventureParser.ActionDeclarationContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionWordAnyContext;
@@ -48,6 +49,26 @@ import static hartman.games.adventureland.script.AdventureParser.ItemInRoomConte
 import static hartman.games.adventureland.script.AdventureParser.ItemIsInInventoryContext;
 import static hartman.games.adventureland.script.AdventureParser.ItemIsNowhereContext;
 import static hartman.games.adventureland.script.AdventureParser.NounGroupContext;
+import static hartman.games.adventureland.script.AdventureParser.ResultDecrementCounterContext;
+import static hartman.games.adventureland.script.AdventureParser.ResultDestroyContext;
+import static hartman.games.adventureland.script.AdventureParser.ResultDropContext;
+import static hartman.games.adventureland.script.AdventureParser.ResultGetContext;
+import static hartman.games.adventureland.script.AdventureParser.ResultGoContext;
+import static hartman.games.adventureland.script.AdventureParser.ResultGotoRoomContext;
+import static hartman.games.adventureland.script.AdventureParser.ResultIncrementCounterContext;
+import static hartman.games.adventureland.script.AdventureParser.ResultInventoryContext;
+import static hartman.games.adventureland.script.AdventureParser.ResultLookContext;
+import static hartman.games.adventureland.script.AdventureParser.ResultPrintContext;
+import static hartman.games.adventureland.script.AdventureParser.ResultPutContext;
+import static hartman.games.adventureland.script.AdventureParser.ResultPutHereContext;
+import static hartman.games.adventureland.script.AdventureParser.ResultPutWithContext;
+import static hartman.games.adventureland.script.AdventureParser.ResultQuitContext;
+import static hartman.games.adventureland.script.AdventureParser.ResultResetCounterContext;
+import static hartman.games.adventureland.script.AdventureParser.ResultResetFlagContext;
+import static hartman.games.adventureland.script.AdventureParser.ResultSetCounterContext;
+import static hartman.games.adventureland.script.AdventureParser.ResultSetFlagContext;
+import static hartman.games.adventureland.script.AdventureParser.ResultSetStringContext;
+import static hartman.games.adventureland.script.AdventureParser.ResultSwapContext;
 import static hartman.games.adventureland.script.AdventureParser.RoomDeclarationContext;
 import static hartman.games.adventureland.script.AdventureParser.RoomExitContext;
 import static hartman.games.adventureland.script.AdventureParser.RoomExitsContext;
@@ -342,7 +363,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         @Override
         public Word visitVerbGroup(VerbGroupContext ctx) {
-            String verb = ctx.verb.getText();
+            String verb = stripQuotes.apply(ctx.verb.getText());
             String[] synonyms = new String[0];
             if (null != ctx.synonym()) {
                 synonyms = ctx.synonym().stream().map(RuleContext::getText).toArray(String[]::new);
@@ -352,7 +373,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         @Override
         public Word visitNounGroup(NounGroupContext ctx) {
-            String noun = ctx.noun.getText();
+            String noun = stripQuotes.apply(ctx.noun.getText());
             String[] synonyms = new String[0];
             if (null != ctx.synonym()) {
                 synonyms = ctx.synonym().stream().map(RuleContext::getText).toArray(String[]::new);
@@ -393,7 +414,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         }
 
         private void actionResults(ActionDeclarationContext ctx, Actions.ActionBuilder builder) {
-            ActionResultDeclarationVisitor visitor = new ActionResultDeclarationVisitor();
+            ActionResultDeclarationVisitor visitor = new ActionResultDeclarationVisitor(items, rooms);
             ofNullable(ctx.actionResultDeclaration())
                     .ifPresent(actionResultDeclarationContexts -> actionResultDeclarationContexts.stream()
                             .map(actionResultDeclarationContext -> actionResultDeclarationContext.accept(visitor))
@@ -435,15 +456,141 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
     }
 
     private static class ActionResultDeclarationVisitor extends AdventureBaseVisitor<Action.Result> {
+        private final Set<Item> items;
+        private final List<Room> rooms;
 
-        @Override
-        public Action.Result visitResultPrint(AdventureParser.ResultPrintContext ctx) {
-            return Results.println(stripQuotes.apply(ctx.StringLiteral().getText()));
+        private ActionResultDeclarationVisitor(Set<Item> items, List<Room> rooms) {
+            this.items = items;
+            this.rooms = rooms;
+        }
+
+        private Item getItemOrFail(String itemName) {
+            return items.stream()
+                    .filter(item -> item.getName().equals(itemName))
+                    .findFirst()
+                    .orElseThrow(ParseCancellationException::new);
+        }
+
+        private Room getRoomOrFail(String roomName) {
+            return rooms.stream()
+                    .filter(room -> room.getName().equals(roomName))
+                    .findFirst()
+                    .orElseThrow(ParseCancellationException::new);
         }
 
         @Override
-        public Action.Result visitResultLook(AdventureParser.ResultLookContext ctx) {
-            return super.visitResultLook(ctx);
+        public Action.Result visitResultPrint(ResultPrintContext ctx) {
+            return Results.println(stripQuotes.apply(ctx.message.getText()));
+        }
+
+        @Override
+        public Action.Result visitResultLook(ResultLookContext ctx) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Action.Result visitResultGo(ResultGoContext ctx) {
+            return Results.go;
+        }
+
+        @Override
+        public Action.Result visitResultQuit(ResultQuitContext ctx) {
+            return Results.quit;
+        }
+
+        @Override
+        public Action.Result visitResultInventory(ResultInventoryContext ctx) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Action.Result visitResultSwap(ResultSwapContext ctx) {
+            Item item1 = getItemOrFail(ctx.i1.getText());
+            Item item2 = getItemOrFail(ctx.i2.getText());
+            return Results.swap(item1, item2);
+        }
+
+        @Override
+        public Action.Result visitResultGotoRoom(ResultGotoRoomContext ctx) {
+            Room room = getRoomOrFail(ctx.roomName().getText());
+            return Results.gotoRoom(room);
+        }
+
+        @Override
+        public Action.Result visitResultPut(ResultPutContext ctx) {
+            Item item = getItemOrFail(ctx.itemName().getText());
+            Room room = getRoomOrFail(ctx.roomName().getText());
+            return Results.put(item, room);
+        }
+
+        @Override
+        public Action.Result visitResultPutHere(ResultPutHereContext ctx) {
+            Item item = getItemOrFail(ctx.itemName().getText());
+            return Results.putHere(item);
+        }
+
+        @Override
+        public Action.Result visitResultGet(ResultGetContext ctx) {
+            return Results.get;
+        }
+
+        @Override
+        public Action.Result visitResultDrop(ResultDropContext ctx) {
+            return Results.drop;
+        }
+
+        @Override
+        public Action.Result visitResultPutWith(ResultPutWithContext ctx) {
+            Item item1 = getItemOrFail(ctx.i1.getText());
+            Item item2 = getItemOrFail(ctx.i2.getText());
+            return Results.putWith(item1, item2);
+        }
+
+        @Override
+        public Action.Result visitResultDestroy(ResultDestroyContext ctx) {
+            Item item = getItemOrFail(ctx.itemName().getText());
+            return Results.destroy(item);
+        }
+
+        @Override
+        public Action.Result visitResultSetFlag(ResultSetFlagContext ctx) {
+            String name = ctx.word().getText();
+            Boolean val = Stream.of("yes", "on", "true").anyMatch(s -> s.equalsIgnoreCase(ctx.booleanValue().getText()));
+            return Results.setFlag(name, val);
+        }
+
+        @Override
+        public Action.Result visitResultResetFlag(ResultResetFlagContext ctx) {
+            return Results.resetFlag(ctx.word().getText());
+        }
+
+        @Override
+        public Action.Result visitResultSetCounter(ResultSetCounterContext ctx) {
+            String name = ctx.word().getText();
+            Integer val = Integer.parseInt(ctx.Number().getText());
+            return Results.setCounter(name, val);
+        }
+
+        @Override
+        public Action.Result visitResultIncrementCounter(ResultIncrementCounterContext ctx) {
+            return Results.incrementCounter(ctx.word().getText());
+        }
+
+        @Override
+        public Action.Result visitResultDecrementCounter(ResultDecrementCounterContext ctx) {
+            return Results.decrementCounter(ctx.word().getText());
+        }
+
+        @Override
+        public Action.Result visitResultResetCounter(ResultResetCounterContext ctx) {
+            return Results.resetCounter(ctx.word().getText());
+        }
+
+        @Override
+        public Action.Result visitResultSetString(ResultSetStringContext ctx) {
+            String key = ctx.k.getText();
+            String value = ctx.v.getText();
+            return Results.setString(key, value);
         }
     }
 
