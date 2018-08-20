@@ -270,7 +270,7 @@ public class AdventureScriptParserImplTest {
         Display display = new TestDisplay();
 
         action.run(gameState, display, new Command(new Word("print"), Word.NONE));
-        assertEquals("It works\n", display.toString());
+        assertEquals("It works" + System.getProperty("line.separator"), display.toString());
     }
 
     @Test
@@ -360,7 +360,7 @@ public class AdventureScriptParserImplTest {
 
         action.run(gameState, display, new Command(new Word("climb"), new Word("down")));
 
-        assertEquals("I'm too heavy. I fall!\n", display.toString());
+        assertEquals("I'm too heavy. I fall!" + System.getProperty("line.separator"), display.toString());
         assertFalse(gameState.isRunning());
     }
 
