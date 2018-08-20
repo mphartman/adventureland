@@ -38,7 +38,16 @@ import static hartman.games.adventureland.script.AdventureParser.ActionWordNoneC
 import static hartman.games.adventureland.script.AdventureParser.ActionWordUnknownContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionWordWordContext;
 import static hartman.games.adventureland.script.AdventureParser.AdventureContext;
+import static hartman.games.adventureland.script.AdventureParser.ConditionCounterEqualsContext;
+import static hartman.games.adventureland.script.AdventureParser.ConditionCounterGreaterThanContext;
+import static hartman.games.adventureland.script.AdventureParser.ConditionCounterLessThanContext;
+import static hartman.games.adventureland.script.AdventureParser.ConditionFlagIsTrueContext;
 import static hartman.games.adventureland.script.AdventureParser.ConditionInRoomContext;
+import static hartman.games.adventureland.script.AdventureParser.ConditionItemCarriedContext;
+import static hartman.games.adventureland.script.AdventureParser.ConditionItemExistsContext;
+import static hartman.games.adventureland.script.AdventureParser.ConditionItemHasMovedContext;
+import static hartman.games.adventureland.script.AdventureParser.ConditionItemIsHereContext;
+import static hartman.games.adventureland.script.AdventureParser.ConditionItemIsPresentContext;
 import static hartman.games.adventureland.script.AdventureParser.ExitDownContext;
 import static hartman.games.adventureland.script.AdventureParser.ExitEastContext;
 import static hartman.games.adventureland.script.AdventureParser.ExitNorthContext;
@@ -676,9 +685,71 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         }
 
         @Override
+        public Action.Condition visitActionConditionDeclaration(AdventureParser.ActionConditionDeclarationContext ctx) {
+            Action.Condition condition = super.visitActionConditionDeclaration(ctx);
+            if (null != ctx.NOT()) {
+                return Conditions.not(condition);
+            }
+            return condition;
+        }
+
+        @Override
         public Action.Condition visitConditionInRoom(ConditionInRoomContext ctx) {
             Room room = getRoomOrFail(ctx.roomName().getText());
             return Conditions.in(room);
+        }
+
+        @Override
+        public Action.Condition visitConditionItemCarried(ConditionItemCarriedContext ctx) {
+            Item item = getItemOrFail(ctx.itemName().getText());
+            return Conditions.carrying(item);
+        }
+
+        @Override
+        public Action.Condition visitConditionItemIsHere(ConditionItemIsHereContext ctx) {
+            Item item = getItemOrFail(ctx.itemName().getText());
+            return Conditions.here(item);
+        }
+
+        @Override
+        public Action.Condition visitConditionItemIsPresent(ConditionItemIsPresentContext ctx) {
+            Item item = getItemOrFail(ctx.itemName().getText());
+            return Conditions.present(item);
+        }
+
+        @Override
+        public Action.Condition visitConditionItemExists(ConditionItemExistsContext ctx) {
+            Item item = getItemOrFail(ctx.itemName().getText());
+            return Conditions.exists(item);
+        }
+
+        @Override
+        public Action.Condition visitConditionItemHasMoved(ConditionItemHasMovedContext ctx) {
+            Item item = getItemOrFail(ctx.itemName().getText());
+            return Conditions.hasMoved(item);
+        }
+
+        @Override
+        public Action.Condition visitConditionFlagIsTrue(ConditionFlagIsTrueContext ctx) {
+            return Conditions.isFlagSet(ctx.word().getText());
+        }
+
+        @Override
+        public Action.Condition visitConditionCounterEquals(ConditionCounterEqualsContext ctx) {
+            Integer number = Integer.parseInt(ctx.Number().getText());
+            return Conditions.compareCounter(ctx.word().getText(), val -> val.equals(number));
+        }
+
+        @Override
+        public Action.Condition visitConditionCounterLessThan(ConditionCounterLessThanContext ctx) {
+            Integer number = Integer.parseInt(ctx.Number().getText());
+            return Conditions.compareCounter(ctx.word().getText(), val -> val < number);
+        }
+
+        @Override
+        public Action.Condition visitConditionCounterGreaterThan(ConditionCounterGreaterThanContext ctx) {
+            Integer number = Integer.parseInt(ctx.Number().getText());
+            return Conditions.compareCounter(ctx.word().getText(), val -> val > number);
         }
     }
 

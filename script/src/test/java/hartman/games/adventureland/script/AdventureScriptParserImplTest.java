@@ -366,7 +366,7 @@ public class AdventureScriptParserImplTest {
 
     @Test
     @AdventureScriptResource("/scripts/351adventure.txt")
-    public void actionInRoomCondition2() {
+    public void actionInRoomConditionNegativeTest() {
         Adventure adventure = adventureScriptParsingRule.parse();
 
         Action action = adventure.getActions().iterator().next();
@@ -379,6 +379,17 @@ public class AdventureScriptParserImplTest {
 
         assertEquals("", display.toString());
         assertTrue(gameState.isRunning());
+    }
+
+    @Test
+    @AdventureScriptResource("/scripts/352adventure.txt")
+    public void actionNotInRoomCondition() {
+        Adventure adventure = adventureScriptParsingRule.parse();
+        GameState gameState = new GameState(Room.NOWHERE);
+        TestDisplay display = new TestDisplay();
+        Action action = adventure.getActions().iterator().next();
+        action.run(gameState, display, new Command(new Word("climb"), new Word("down")));
+        assertEquals("There's nowhere to climb down from here." + System.getProperty("line.separator"), display.toString());
     }
 
 }

@@ -1,0 +1,6 @@
+// Tests action with verb and NOT IN room condition
+room ledge "I'm on the ledge of a tall cliff."
+
+action climb down
+    when not at ledge
+    then print "There's nowhere to climb down from here."

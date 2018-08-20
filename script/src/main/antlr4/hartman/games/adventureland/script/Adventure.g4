@@ -215,9 +215,9 @@ actionCondition
     |   'exists' itemName           # conditionItemExists
     |   'moved' itemName            # conditionItemHasMoved
     |   'flag' word                 # conditionFlagIsTrue
-    |   'counterEq' word            # conditionCounterEquals
-    |   'counterLe' word            # conditionCounterLessThan
-    |   'counterGt' word            # conditionCounterGreaterThan
+    |   'counterEq' word Number     # conditionCounterEquals
+    |   'counterLe' word Number     # conditionCounterLessThan
+    |   'counterGt' word Number     # conditionCounterGreaterThan
     ;
 
 actionResultDeclaration
