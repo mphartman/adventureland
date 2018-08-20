@@ -1,35 +1,41 @@
 package hartman.games.adventureland.engine;
 
+import java.util.Collection;
+
 /**
  * A running game session with a player and an adventure.
  */
 public class Game {
-    private final Adventure adventure;
+    private final Collection<Action> actions;
+    private final Collection<Action> occurs;
     private final CommandInterpreter interpreter;
     private final Display display;
 
     public Game(Adventure adventure, CommandInterpreter interpreter, Display display) {
-        this.adventure = adventure;
+        this.actions = adventure.getActions();
+        this.occurs = adventure.getOccurs();
         this.interpreter = interpreter;
         this.display = display;
     }
 
     public GameState run(GameState gameState) {
         while (gameState.isRunning()) {
-            runOccurs(gameState);
-            if (gameState.isRunning()) {
-                runActions(gameState, interpreter.nextCommand());
+            takeTurn(gameState, interpreter.nextCommand());
+        }
+        return gameState;
+    }
+
+    public GameState takeTurn(GameState gameState, Command command) {
+        occurs.forEach(occur -> occur.run(gameState, display, Command.NONE));
+        if (gameState.isRunning()) {
+            for (Action action : actions) {
+                if (action.run(gameState, display, command)) {
+                    return gameState;
+                }
             }
         }
         return gameState;
     }
 
-    private void runOccurs(GameState gameState) {
-        adventure.getOccurs().forEach(occur -> occur.run(gameState, display, Command.NONE));
-    }
-
-    private void runActions(GameState gameState, Command command) {
-        for (Action action : adventure.getActions())
-            if (action.run(gameState, display, command)) return;
-    }
 }
+
