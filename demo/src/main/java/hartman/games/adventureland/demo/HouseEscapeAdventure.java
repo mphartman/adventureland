@@ -90,7 +90,7 @@ public class HouseEscapeAdventure {
                         "Copyright © 2018, Michael Hartman%n" +
                         "Distributed under the Apache License, version 2.%n%n" +
                         "A voice BOOMS out:%n" +
-                        "\"In this adventure you're to escape from the haunted house.\"%n%n" +
+                        "\"In this adventure you're to escape from the house.\"%n%n" +
                         "Remember you can always say \"HELP\"%n"
         );
 

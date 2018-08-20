@@ -11,8 +11,8 @@
     <modules>
         <module>engine</module>
 		<module>demo</module>
-        <module>app-cli</module>
-        <module>dsl</module>
-    </modules>    
+		<module>dsl</module>
+		<module>app-cli</module>
+    </modules>
 
 </project>
