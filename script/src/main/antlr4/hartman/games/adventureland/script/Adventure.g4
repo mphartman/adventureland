@@ -31,8 +31,34 @@ ANY             : 'any';
 NONE            : 'none';
 UNKNOWN         : 'unknown';
 CARRYING        : 'carrying';
+HERE            : 'here';
+PRESENT         : 'present';
+EXISTS          : 'exists';
+MOVED           : 'moved';
+FLAG            : 'flag';
+COUNTER_EQ      : 'counterEq';
+COUNTER_LE      : 'counterLe';
+COUNTER_GT      : 'counterGt';
 PRINT           : 'print';
 LOOK            : 'look';
+GO              : 'go';
+QUIT            : 'quit';
+GAME_OVER       : 'game_over';
+SWAP            : 'swap';
+GOTO            : 'goto';
+PUT             : 'put';
+PUT_HERE        : 'putHere' | 'put_here' ;
+GET             : 'get';
+DROP            : 'drop';
+PUT_WITH        : 'putWith' | 'put_with';
+DESTROY         : 'destroy';
+SET_FLAG        : 'setFlag' | 'set_flag' ;
+RESET_FLAG      : 'resetFlag' | 'reset_flag' ;
+SET_COUNTER     : 'setCounter' | 'set_counter' ;
+INCR_COUNTER    : 'incrementCounter' | 'increment_counter' | 'incr' | '++' ;
+DECR_COUNTER    : 'decrementCounter' | 'decrement_counter' | 'decr' | '--' ;
+RESET_COUNTER   : 'resetCounter' | 'reset_counter' ;
+SET_STRING      : 'setString' | 'set_string' ;
 
 Number
     :   [0-9]+
@@ -210,14 +236,14 @@ actionConditionDeclaration
 actionCondition
     :   (IN | AT) roomName          # conditionInRoom
     |   CARRYING itemName           # conditionItemCarried
-    |   'here'  itemName            # conditionItemIsHere
-    |   'present' itemName          # conditionItemIsPresent
-    |   'exists' itemName           # conditionItemExists
-    |   'moved' itemName            # conditionItemHasMoved
-    |   'flag' word                 # conditionFlagIsTrue
-    |   'counterEq' word Number     # conditionCounterEquals
-    |   'counterLe' word Number     # conditionCounterLessThan
-    |   'counterGt' word Number     # conditionCounterGreaterThan
+    |   HERE  itemName              # conditionItemIsHere
+    |   PRESENT itemName            # conditionItemIsPresent
+    |   EXISTS itemName             # conditionItemExists
+    |   MOVED itemName              # conditionItemHasMoved
+    |   FLAG word                   # conditionFlagIsTrue
+    |   COUNTER_EQ word Number      # conditionCounterEquals
+    |   COUNTER_LE word Number      # conditionCounterLessThan
+    |   COUNTER_GT word Number      # conditionCounterGreaterThan
     ;
 
 actionResultDeclaration
@@ -227,24 +253,24 @@ actionResultDeclaration
 actionResult
     :   PRINT message=StringLiteral                 # resultPrint
     |   LOOK                                        # resultLook
-    |   'go'                                        # resultGo
-    |   ('quit' | 'game_over' | 'gameOver')         # resultQuit
-    |   'inventory'                                 # resultInventory
-    |   'swap' i1=itemName i2=itemName              # resultSwap
-    |   'goto' roomName                             # resultGotoRoom
-    |   'put' itemName roomName                     # resultPut
-    |   'putHere' itemName                          # resultPutHere
-    |   'get'                                       # resultGet
-    |   'drop' itemName                             # resultDrop
-    |   'putWith' i1=itemName i2=itemName           # resultPutWith
-    |   'destroy' itemName                          # resultDestroy
-    |   'setFlag' word booleanValue                 # resultSetFlag
-    |   'resetFlag' word                            # resultResetFlag
-    |   'setCounter' word Number                    # resultSetCounter
-    |   'incrementCounter' word                     # resultIncrementCounter
-    |   'decrementCounter' word                     # resultDecrementCounter
-    |   'resetCounter' word                         # resultResetCounter
-    |   'setString' k=word v=word                   # resultSetString
+    |   GO                                          # resultGo
+    |   (QUIT | GAME_OVER)                          # resultQuit
+    |   INVENTORY                                   # resultInventory
+    |   SWAP i1=itemName i2=itemName                # resultSwap
+    |   GOTO roomName                               # resultGotoRoom
+    |   PUT itemName roomName                       # resultPut
+    |   PUT_HERE itemName                           # resultPutHere
+    |   GET                                         # resultGet
+    |   DROP itemName                               # resultDrop
+    |   PUT_WITH i1=itemName i2=itemName            # resultPutWith
+    |   DESTROY itemName                            # resultDestroy
+    |   SET_FLAG word booleanValue                  # resultSetFlag
+    |   RESET_FLAG word                             # resultResetFlag
+    |   SET_COUNTER word Number                     # resultSetCounter
+    |   INCR_COUNTER word                           # resultIncrementCounter
+    |   DECR_COUNTER word                           # resultDecrementCounter
+    |   RESET_COUNTER word                          # resultResetCounter
+    |   SET_STRING k=word v=word                    # resultSetString
     ;
 
 booleanValue
