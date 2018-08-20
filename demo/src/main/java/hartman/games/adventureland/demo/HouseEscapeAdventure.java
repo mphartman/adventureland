@@ -1,14 +1,22 @@
-package hartman.games.adventureland.adventures;
+package hartman.games.adventureland.demo;
 
 import hartman.games.adventureland.engine.Adventure;
+import hartman.games.adventureland.engine.CommandInterpreter;
+import hartman.games.adventureland.engine.Display;
+import hartman.games.adventureland.engine.Game;
+import hartman.games.adventureland.engine.GameState;
 import hartman.games.adventureland.engine.Item;
 import hartman.games.adventureland.engine.Room;
 import hartman.games.adventureland.engine.Vocabulary;
 import hartman.games.adventureland.engine.Word;
 import hartman.games.adventureland.engine.core.Actions;
+import hartman.games.adventureland.engine.core.DefaultCommandInterpreter;
+import hartman.games.adventureland.engine.core.DefaultDisplay;
 import hartman.games.adventureland.engine.core.Items;
 
+import java.io.PrintWriter;
 import java.util.LinkedHashSet;
+import java.util.Scanner;
 import java.util.Set;
 
 import static hartman.games.adventureland.engine.core.Actions.newActionSet;
@@ -54,7 +62,37 @@ import static java.util.Arrays.asList;
 
 public class HouseEscapeAdventure {
 
-    public static Adventure adventure() {
+    public static void main(String[] args) {
+        Adventure adventure = adventure();
+        CommandInterpreter interpreter = new ConsoleInterpreter(adventure.getVocabulary());
+        Display display = new ConsoleDisplay();
+        GameState gameState = new GameState(adventure.getStartRoom(), adventure.getItems());
+        Game game = new Game(adventure, interpreter, display);
+        game.run(gameState);
+    }
+
+    private static class ConsoleInterpreter extends DefaultCommandInterpreter {
+        private ConsoleInterpreter(Vocabulary vocabulary) {
+            super(new Scanner(System.in), vocabulary);
+        }
+    }
+
+    private static class ConsoleDisplay extends DefaultDisplay {
+        private ConsoleDisplay() {
+            super(new PrintWriter(System.out));
+        }
+    }
+
+    private static Adventure adventure() {
+
+        final String introduction = format(
+                "House Escape, a text-based adventure.%n" +
+                        "Copyright © 2018, Michael Hartman%n" +
+                        "Distributed under the Apache License, version 2.%n%n" +
+                        "A voice BOOMS out:%n" +
+                        "\"In this adventure you're to escape from the haunted house.\"%n%n" +
+                        "Remember you can always say \"HELP\"%n"
+        );
 
         /*
          * Vocabulary
@@ -112,6 +150,11 @@ public class HouseEscapeAdventure {
         // *** Occurs - actions which all run automatically at the start of every turn *** /
 
         Actions occurs = newActionSet();
+
+        occurs.newAction()
+                .when(times(1))
+                .then(println(introduction))
+                .build();
 
         // `look` on game startup
         occurs.newAction()

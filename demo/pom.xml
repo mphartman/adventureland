@@ -4,12 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>hartman.games</groupId>
-	<artifactId>adventureland-adventures</artifactId>
+	<artifactId>adventureland-demo</artifactId>
 	<version>0.1.0</version>
 	<packaging>jar</packaging>
 
-	<name>adventureland-adventures</name>
-	<description>Games for the Adventureland engine.</description>
+	<name>adventureland-demo</name>
+	<description>Demo game for the Adventureland engine.</description>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
