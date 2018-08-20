@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>hartman.games</groupId>
-	<artifactId>adventureland-app-cli</artifactId>
+	<artifactId>adventureland-app</artifactId>
 	<version>0.1.0</version>
 	<packaging>jar</packaging>
 
-	<name>adventureland-app-cli</name>
+	<name>adventureland-app</name>
 	<description>An Adventureland-like game with text-based interface</description>
 
 	<parent>

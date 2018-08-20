@@ -12,7 +12,7 @@
         <module>engine</module>
 		<module>demo</module>
 		<module>script</module>
-		<module>app-cli</module>
+		<module>app</module>
     </modules>
 
 </project>
