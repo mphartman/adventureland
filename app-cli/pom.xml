@@ -37,7 +37,7 @@
         </dependency>
 		<dependency>
 			<groupId>hartman.games</groupId>
-			<artifactId>adventureland-dsl</artifactId>
+			<artifactId>adventureland-script</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

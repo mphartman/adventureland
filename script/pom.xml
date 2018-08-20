@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>hartman.games</groupId>
-	<artifactId>adventureland-dsl</artifactId>
+	<artifactId>adventureland-script</artifactId>
 	<version>0.1.0</version>
 	<packaging>jar</packaging>
 
-	<name>adventureland-dsl</name>
+	<name>adventureland-script</name>
 	<description>A domain-specific language (DSL) for scripting Adventureland games.</description>
 
 	<properties>
