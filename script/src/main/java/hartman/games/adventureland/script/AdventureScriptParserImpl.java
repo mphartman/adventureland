@@ -103,6 +103,10 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         return s;
     };
 
+    private static final Function<String, String> replaceEscapedQuotes = s ->  s.replaceAll("\\\\\"", "\"");
+
+    private static final Function<String, String> replaceEscapedNewlines = s -> s.replaceAll("\\\\n", System.getProperty("line.separator"));
+
     @Override
     public Adventure parse(Reader r) throws IOException {
         CharStream input = CharStreams.fromReader(r);
@@ -292,8 +296,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         private Room newRoom(RoomDeclarationContext ctx) {
             String name = ctx.roomName().getText();
-            String description = stripQuotes.apply(ctx.roomDescription().getText())
-                    .replaceAll("\\\\\\\"", "\"");
+            String description = replaceEscapedQuotes.apply(stripQuotes.apply(ctx.roomDescription().getText()));
             return new Room(name, description);
         }
     }
@@ -596,8 +599,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         @Override
         public Action.Result visitResultPrint(ResultPrintContext ctx) {
-            return Results.println(stripQuotes.apply(ctx.message.getText())
-                    .replaceAll("\\\\n", System.getProperty("line.separator")));
+            return Results.println(replaceEscapedNewlines.apply(replaceEscapedQuotes.apply(stripQuotes.apply(ctx.message.getText()))));
         }
 
         @Override

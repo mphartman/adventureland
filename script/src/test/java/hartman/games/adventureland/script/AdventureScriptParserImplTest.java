@@ -424,6 +424,25 @@ public class AdventureScriptParserImplTest {
         assertFalse(gameState.isRunning());
     }
 
+    @Test
+    @AdventureScriptResource("/scripts/309adventure.txt")
+    public void actionVerbAndSwapItemResult() {
+        Adventure adventure = adventureScriptParsingRule.parse();
+
+        Action action = adventure.getActions().iterator().next();
+        GameState gameState = new GameState(adventure.getStartRoom());
+        TestDisplay display = new TestDisplay();
+
+        Item locked_door = getItemOrFail(adventure.getItems(), "locked_door");
+        assertTrue(locked_door.isHere(adventure.getStartRoom()));
+        Item open_door = getItemOrFail(adventure.getItems(), "open_door");
+        assertTrue(open_door.isHere(Room.NOWHERE));
+
+        action.run(gameState, display, new Command(new Word("unlock"), new Word("door")));
+        assertTrue(locked_door.isHere(Room.NOWHERE));
+        assertTrue(open_door.isHere(adventure.getStartRoom()));
+    }
+
     @Test(expected = IllegalStateException.class)
     @AdventureScriptResource("/scripts/350adventure.txt")
     public void actionInRoomConditionRequiresRoomToExist() {
