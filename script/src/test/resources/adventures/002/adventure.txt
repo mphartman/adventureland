@@ -1,25 +1,41 @@
-wordgroup "north", "n"
-wordgroup "south", "s"
-wordgroup "up", "u"
-wordgroup "down", "d"
-wordgroup "east", "e"
-wordgroup "west", "w"
+##
+## Test Adventure 002
+##
 
-room chamber "I'm in a square chamber."
-	exit east
+##
+## Words
+##
 
-action "go" none
-    then print "1"
+    wordgroup "north", "n"
+    wordgroup "south", "s"
+    wordgroup "up", "u"
+    wordgroup "down", "d"
+    wordgroup "east", "e"
+    wordgroup "west", "w"
 
-action "go" unknown
-    then print "2"
+##
+## Rooms
+##
 
-action "go" any
-    when has_exit
-    then print "3"
+    room chamber "I'm in a square chamber."
+        exit east
 
-action "go" any
-    then print "4"
+##
+## Actions
+##
 
-action "quit"
-    then quit
+    action "go" none
+        then print "1"
+
+    action "go" unknown
+        then print "2"
+
+    action "go" any
+        when has_exit
+        then print "3"
+
+    action "go" any
+        then print "4"
+
+    action "quit"
+        then quit
