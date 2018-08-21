@@ -18,8 +18,12 @@ public class Command {
         this.second = second;
     }
 
+    public Command(Word first) {
+        this(first, Word.NONE);
+    }
+
     public Word getSecondThenFirst() {
-        return !second.equals(Word.NONE) ? second : first;
+        return second.equals(Word.NONE) ? first : second;
     }
 
     public Word getFirstWord() {
@@ -28,6 +32,11 @@ public class Command {
 
     public Word getSecondWord() {
         return second;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s %s", first.getName(), second.getName());
     }
 
     @Override
