@@ -5,7 +5,9 @@ import org.junit.Test;
 import static hartman.games.adventureland.engine.Word.ANY;
 import static hartman.games.adventureland.engine.Word.NONE;
 import static hartman.games.adventureland.engine.Word.UNRECOGNIZED;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 public class WordTest {
@@ -13,17 +15,17 @@ public class WordTest {
     @Test
     public void nounEqualityIsCaseSensitive() {
         Word north = new Word("north", "n");
-        assertTrue(north.equals(new Word("north")));
-        assertTrue(new Word("north").equals(north));
-        assertFalse(north.equals(new Word("NORTH")));
-        assertFalse(new Word("NORTH").equals(north));
+        assertEquals(north, new Word("north"));
+        assertEquals(new Word("north"), north);
+        assertNotEquals(north, new Word("NORTH"));
+        assertNotEquals(new Word("NORTH"), north);
     }
 
     @Test
     public void synonymousNounsShouldMatch() {
         Word north = new Word("north", "n");
 
-        assertFalse(north.equals(new Word("n")));
+        assertNotEquals(north, new Word("n"));
 
         assertTrue(north.matches(new Word("n")));
         assertTrue(north.matches(new Word("north")));
@@ -43,44 +45,63 @@ public class WordTest {
     }
 
     @Test
-    public void anyEqualsAnyNoun() {
-        assertTrue(ANY.equals(ANY));
+    public void anyMatchesAnyWord() {
 
         assertTrue(ANY.matches(ANY));
 
         assertTrue(ANY.matches(new Word("crown")));
         assertTrue(ANY.matches(new Word("hat", "cap", "crown")));
 
-        assertFalse(ANY.equals(new Word("ANY")));
-        assertFalse(new Word("ANY").equals(ANY));
+        assertNotEquals(ANY, new Word("ANY"));
+        assertNotEquals(new Word("ANY"), ANY);
 
         assertTrue(new Word("ANY").matches(ANY));
 
-        assertFalse(ANY.equals(UNRECOGNIZED));
-        assertFalse(UNRECOGNIZED.equals(ANY));
+        assertNotEquals(ANY, UNRECOGNIZED);
+        assertNotEquals(UNRECOGNIZED, ANY);
 
         assertTrue(ANY.matches(UNRECOGNIZED));
         assertTrue(UNRECOGNIZED.matches(ANY));
 
-        assertFalse(ANY.equals(NONE));
+        assertNotEquals(ANY, NONE);
         assertFalse(ANY.matches(NONE));
     }
 
     @Test
-    public void noneEqualsNoNoun() {
-        assertTrue(NONE.equals(NONE));
+    public void noneDoesNotMatchAnything() {
+
         assertTrue(NONE.matches(NONE));
 
-        assertFalse(NONE.equals(ANY));
+        assertNotEquals(NONE, ANY);
         assertFalse(NONE.matches(ANY));
 
-        assertFalse(NONE.equals(new Word("NONE")));
+        assertNotEquals(NONE, new Word("NONE"));
         assertFalse(NONE.matches(new Word("NONE")));
 
-        assertFalse(NONE.equals(new Word("ring")));
+        assertNotEquals(NONE, new Word("ring"));
         assertFalse(NONE.matches(new Word("ring")));
 
+        assertNotEquals(new Word("ring"), NONE);
         assertFalse(new Word("ring").matches(NONE));
-        assertFalse(new Word("ring").equals(NONE));
+    }
+
+    @Test
+    public void anyAndNone() {
+        Word something = new Word("something)");
+        assertTrue(NONE.matches(NONE));
+        assertFalse(NONE.matches(ANY));
+        assertFalse(ANY.matches(NONE));
+        assertTrue(ANY.matches(ANY));
+        assertTrue(ANY.matches(UNRECOGNIZED));
+        assertTrue(UNRECOGNIZED.matches(ANY));
+        assertFalse(NONE.matches(UNRECOGNIZED));
+        assertFalse(UNRECOGNIZED.matches(NONE));
+        assertTrue(UNRECOGNIZED.matches(UNRECOGNIZED));
+        assertFalse(something.matches(NONE));
+        assertFalse(NONE.matches(something));
+        assertTrue(ANY.matches(something));
+        assertTrue(something.matches(ANY));
+        assertFalse(UNRECOGNIZED.matches(something));
+        assertFalse(something.matches(UNRECOGNIZED));
     }
 }
