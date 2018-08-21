@@ -6,4 +6,5 @@ west
 i
 l up
 l
+south
 quit

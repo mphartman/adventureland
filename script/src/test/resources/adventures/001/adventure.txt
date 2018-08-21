@@ -29,31 +29,31 @@ occurs
     when times 1
     then look
 
-action "go"
+action "go" none
     then print "Go where?"
 
+action "go" unknown
+    then print "I can't go that way. It's not a valid direction."
+
 action "go" any
     when has_exit
     then go
         and look
 
 action "go" any
-    when not has_exit
-    then print "I can't go that way."
+    then print "I can't go that way from here."
+
 
 action (north, south, up, down, east, west) none
-    when not has_exit
-    then print "I can't go {verb} from here."
-
-action any
     when has_exit
     then go
         and look
 
-action "look"
-    then look
+action (north, south, up, down, east, west)
+    then print "I can't go {verb} from here."
 
-action "look" any
+
+action "look"
     then look
 
 action "inventory"

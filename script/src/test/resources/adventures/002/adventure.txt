@@ -1,0 +1,25 @@
+verbgroup "north", "n"
+verbgroup "south", "s"
+verbgroup "up", "u"
+verbgroup "down", "d"
+verbgroup "east", "e"
+verbgroup "west", "w"
+
+room chamber "I'm in a square chamber."
+	exit east
+
+action "go" none
+    then print "1"
+
+action "go" unknown
+    then print "2"
+
+action "go" any
+    when has_exit
+    then print "3"
+
+action "go" any
+    then print "4"
+
+action "quit"
+    then quit

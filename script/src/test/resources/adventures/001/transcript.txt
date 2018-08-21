@@ -1,35 +1,37 @@
 I'm in a square chamber.
 With exits: East
-> ?
+> ? (help <none>)
 
 A voice BOOOMS out:
 Try --> 'GO, LOOK, JUMP, SWIM, CLIMB, TAKE, DROP'
 and any other verbs you can think of...
-> go
+> go (go <none>)
 
 Go where?
-> go up
+> go up (go up)
 
-I can't go that way.
-> go east
+I can't go that way from here.
+> go east (go east)
 
 I'm in a gloomy dungeon.
 With exits: West
-> west
+> west (West <none>)
 
 I'm in a square chamber.
 With exits: East
-> i
+> i (inventory <none>)
 
 Inventory is empty.
-> l up
+> l up (look up)
 
 I'm in a square chamber.
 With exits: East
-> l
+> l (look <none>)
 
 I'm in a square chamber.
 With exits: East
-> quit
+> south (south <none>)
 
+I can't go south from here.
+> quit (quit <none>)
 

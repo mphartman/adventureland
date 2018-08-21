@@ -1,0 +1,5 @@
+go
+go far
+go north
+go east
+quit

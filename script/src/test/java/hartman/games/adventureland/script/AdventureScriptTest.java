@@ -10,8 +10,8 @@ import hartman.games.adventureland.engine.Item;
 import hartman.games.adventureland.engine.Room;
 import hartman.games.adventureland.engine.Vocabulary;
 import hartman.games.adventureland.engine.core.DefaultCommandInterpreter;
+import org.junit.Test;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -36,7 +36,7 @@ public class AdventureScriptTest {
         @Override
         public Command nextCommand() {
             Command command = super.nextCommand();
-            display.print(String.format("> %s%n%n", getLastLine()));
+            display.print(String.format("> %s (%s)%n%n", getLastLine(), command.toString()));
             return command;
         }
     }
@@ -69,7 +69,7 @@ public class AdventureScriptTest {
         @Override
         public void inventory(List<Item> itemsCarried) {
             if (itemsCarried.isEmpty()) {
-                print("Inventory is empty.\n");
+                print("Inventory is empty." + NEWLINE);
             } else {
                 print(itemsCarried.stream().map(Item::getDescription).collect(joining(NEWLINE)) + NEWLINE);
             }
@@ -80,15 +80,13 @@ public class AdventureScriptTest {
     private static final String NEWLINE = System.getProperty("line.separator");
 
     private static Adventure readAdventure(String path) throws IOException {
-        try (Reader r = new BufferedReader(new InputStreamReader(AdventureScriptTest.class.getResourceAsStream(path), StandardCharsets.UTF_8))) {
+        try (Reader r = new InputStreamReader(AdventureScriptTest.class.getResourceAsStream(path), StandardCharsets.UTF_8)) {
             return new AdventureScriptParserImpl().parse(r);
         }
     }
 
     private static String readToString(String path) throws IOException {
-        try (BufferedReader buffer = new BufferedReader(new InputStreamReader(AdventureScriptTest.class.getResourceAsStream(path)))) {
-            return buffer.lines().collect(joining(NEWLINE));
-        }
+        return new Scanner(AdventureScriptTest.class.getResourceAsStream(path), "UTF-8").useDelimiter("\\A").next();
     }
 
     private void testAdventure(int id) {
@@ -100,15 +98,22 @@ public class AdventureScriptTest {
             Game game = new Game(adventure, interpreter, display);
             GameState gameState = new GameState(adventure.getStartRoom());
             game.run(gameState);
-            assertEquals(readToString(String.format("/adventures/%s/transcript.txt", ident)), display.toString());
+            String expected = readToString(String.format("/adventures/%s/transcript.txt", ident));
+            String actual = display.toString();
+            assertEquals(expected, actual);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    //@Test
-    public void testAdventure001() {
+    @Test
+    public void testAdventure1() {
         testAdventure(1);
+    }
+
+    @Test
+    public void testAdventure2() {
+        testAdventure(2);
     }
 
 }

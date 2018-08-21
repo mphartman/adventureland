@@ -488,19 +488,16 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
             for (ActionWordOrListContext actionWordOrListContext : ctx.actionCommand().actionWordOrList()) {
                 if (null != actionWordOrListContext.actionWord()) {
                     Word w = actionWordOrListContext.actionWord().accept(visitor);
-                    if (!w.equals(Word.NONE)) {
-                        if (firstWord) {
-                            builder.on(w);
-                            firstWord = false;
-                        } else {
-                            builder.with(w);
-                            break;
-                        }
+                    if (firstWord) {
+                        builder.on(w);
+                        firstWord = false;
+                    } else {
+                        builder.with(w);
+                        break;
                     }
                 } else if (null != actionWordOrListContext.actionWordList()) {
                     List<Word> wordList = actionWordOrListContext.actionWordList().actionWord().stream()
                             .map(actionWordContext -> actionWordContext.accept(visitor))
-                            .filter(w -> !w.equals(Word.NONE))
                             .collect(toList());
                     if (!wordList.isEmpty()) {
                         Word[] wordArray = wordList.toArray(new Word[0]);
@@ -546,7 +543,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         @Override
         public Word visitActionWordDirection(ActionWordDirectionContext ctx) {
-            return toWord.apply(ctx.getText());
+            return ctx.exitDirection().accept(new ExitDirectionVisitor());
         }
 
         @Override
@@ -600,7 +597,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         @Override
         public Action.Result visitResultPrint(ResultPrintContext ctx) {
             return Results.println(stripQuotes.apply(ctx.message.getText())
-                    .replaceAll("\\\\n", "\n"));
+                    .replaceAll("\\\\n", System.getProperty("line.separator")));
         }
 
         @Override
