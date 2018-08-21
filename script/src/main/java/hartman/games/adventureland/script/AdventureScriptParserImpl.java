@@ -751,6 +751,11 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
             Integer number = Integer.parseInt(ctx.Number().getText());
             return Conditions.compareCounter(ctx.word().getText(), val -> val > number);
         }
+
+        @Override
+        public Action.Condition visitConditionRoomHasExit(AdventureParser.ConditionRoomHasExitContext ctx) {
+            return Conditions.roomHasExit;
+        }
     }
 
 }

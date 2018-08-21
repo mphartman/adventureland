@@ -39,6 +39,7 @@ FLAG            : 'flag';
 COUNTER_EQ      : 'counterEq';
 COUNTER_LE      : 'counterLe';
 COUNTER_GT      : 'counterGt';
+HAS_EXIT        : 'hasExit' | 'has_exit';
 PRINT           : 'print';
 LOOK            : 'look';
 GO              : 'go';
@@ -114,7 +115,7 @@ COMMENT
     ;
 
 LINE_COMMENT
-    :   '//' ~[\r\n]* -> skip
+    :   ('//' | '#') ~[\r\n]* -> skip
     ;
 
 adventure
@@ -244,6 +245,7 @@ actionCondition
     |   COUNTER_EQ word Number      # conditionCounterEquals
     |   COUNTER_LE word Number      # conditionCounterLessThan
     |   COUNTER_GT word Number      # conditionCounterGreaterThan
+    |   HAS_EXIT                    # conditionRoomHasExit
     ;
 
 actionResultDeclaration
