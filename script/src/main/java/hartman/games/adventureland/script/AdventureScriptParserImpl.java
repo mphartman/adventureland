@@ -449,14 +449,14 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         protected final Set<Item> items;
         protected final List<Room> rooms;
 
-        private final ActionWordVisitor visitor;
+        private final ActionWordVisitor actionWordVisitor;
 
         private ActionDeclarationVisitor(Actions actions, Vocabulary vocabulary, Set<Item> items, List<Room> rooms) {
             this.actions = actions;
             this.vocabulary = vocabulary;
             this.items = items;
             this.rooms = rooms;
-            this.visitor = new ActionWordVisitor(vocabulary);
+            this.actionWordVisitor = new ActionWordVisitor(vocabulary);
         }
 
         @Override
@@ -490,7 +490,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
             if (null == actionWordContext) {
                 return false;
             }
-            Word word = actionWordContext.accept(visitor);
+            Word word = actionWordContext.accept(actionWordVisitor);
             builderFn.accept(word);
             return true;
         }
@@ -501,7 +501,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
             }
 
             Word[] words = actionWordListContext.actionWord().stream()
-                    .map(actionWordContext -> actionWordContext.accept(visitor))
+                    .map(actionWordContext -> actionWordContext.accept(actionWordVisitor))
                     .toArray(Word[]::new);
 
             if (words.length > 0) {
