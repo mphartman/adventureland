@@ -85,7 +85,6 @@ import static hartman.games.adventureland.script.AdventureParser.RoomDeclaration
 import static hartman.games.adventureland.script.AdventureParser.RoomExitContext;
 import static hartman.games.adventureland.script.AdventureParser.VerbGroupContext;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptySet;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -128,7 +127,8 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
             Vocabulary vocabulary = getVocabulary(adventureContext);
             Actions actions = getActions(adventureContext, vocabulary, itemSet, rooms);
             vocabulary = vocabulary.merge(actions.buildVocabulary());
-            return new Adventure(vocabulary, emptySet(), actions.copyOfActions(), itemSet, startingRoom);
+            Actions occurs = getOccurs(adventureContext, vocabulary, itemSet, rooms);
+            return new Adventure(vocabulary, occurs.copyOfActions(), actions.copyOfActions(), itemSet, startingRoom);
         }
 
         private List<Room> getRooms(AdventureContext adventureContext) {
@@ -207,6 +207,15 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
             adventureContext.gameElement().stream()
                     .filter(gameElementContext -> null != gameElementContext.actionDeclaration())
                     .forEach(gameElementContext -> gameElementContext.actionDeclaration().accept(visitor));
+            return actions;
+        }
+
+        private Actions getOccurs(AdventureContext adventureContext, Vocabulary vocabulary, Set<Item> items, List<Room> rooms) {
+            Actions actions = Actions.newActionSet();
+            ActionDeclarationVisitor visitor = new ActionDeclarationVisitor(actions, vocabulary, items, rooms);
+            adventureContext.gameElement().stream()
+                    .filter(gameElementContext -> null != gameElementContext.occursDeclaration())
+                    .forEach(gameElementContext -> gameElementContext.occursDeclaration().accept(visitor));
             return actions;
         }
     }
