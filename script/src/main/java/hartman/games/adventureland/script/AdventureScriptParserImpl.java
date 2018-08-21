@@ -26,6 +26,7 @@ import java.io.Reader;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -33,7 +34,9 @@ import static hartman.games.adventureland.script.AdventureParser.ActionCondition
 import static hartman.games.adventureland.script.AdventureParser.ActionDeclarationContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionResultDeclarationContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionWordAnyContext;
+import static hartman.games.adventureland.script.AdventureParser.ActionWordContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionWordDirectionContext;
+import static hartman.games.adventureland.script.AdventureParser.ActionWordListContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionWordNoneContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionWordOrListContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionWordUnknownContext;
@@ -96,7 +99,7 @@ import static java.util.stream.Collectors.toSet;
  */
 public class AdventureScriptParserImpl implements AdventureScriptParser {
 
-    private static final Function<String, String> replaceEscapedQuotes = s ->  s.replaceAll("\\\\\"", "\"");
+    private static final Function<String, String> replaceEscapedQuotes = s -> s.replaceAll("\\\\\"", "\"");
 
     private static final Function<String, String> replaceEscapedNewlines = s -> s.replaceAll("\\\\n", System.getProperty("line.separator"));
 
@@ -446,11 +449,14 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         protected final Set<Item> items;
         protected final List<Room> rooms;
 
+        private final ActionWordVisitor visitor;
+
         private ActionDeclarationVisitor(Actions actions, Vocabulary vocabulary, Set<Item> items, List<Room> rooms) {
             this.actions = actions;
             this.vocabulary = vocabulary;
             this.items = items;
             this.rooms = rooms;
+            this.visitor = new ActionWordVisitor(vocabulary);
         }
 
         @Override
@@ -463,37 +469,46 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         }
 
         private void actionCommand(ActionDeclarationContext ctx, Actions.ActionBuilder builder) {
-
-            Function<String, Word> toWordFunction = text -> vocabulary.findMatch(text).orElse(new Word(text));
-            ActionWordContextVisitor visitor = new ActionWordContextVisitor(toWordFunction);
-
-            boolean firstWord = true;
+            int wordSetCount = 0;
             for (ActionWordOrListContext actionWordOrListContext : ctx.actionCommand().actionWordOrList()) {
-                if (null != actionWordOrListContext.actionWord()) {
-                    Word w = actionWordOrListContext.actionWord().accept(visitor);
-                    if (firstWord) {
-                        builder.on(w);
-                        firstWord = false;
-                    } else {
-                        builder.with(w);
-                        break;
-                    }
-                } else if (null != actionWordOrListContext.actionWordList()) {
-                    List<Word> wordList = actionWordOrListContext.actionWordList().actionWord().stream()
-                            .map(actionWordContext -> actionWordContext.accept(visitor))
-                            .collect(toList());
-                    if (!wordList.isEmpty()) {
-                        Word[] wordArray = wordList.toArray(new Word[0]);
-                        if (firstWord) {
-                            builder.onAnyFirstWords(wordArray);
-                            firstWord = false;
-                        } else {
-                            builder.withAnySecondWords(wordArray);
-                            break;
-                        }
-                    }
+
+                if (wordSetCount >= 2) {
+                    break;
+                }
+
+                if (actionWord((wordSetCount == 0) ? builder::on : builder::with, actionWordOrListContext.actionWord())) {
+                    wordSetCount++;
+                }
+
+                if (actionWordList((wordSetCount == 0) ? builder::onAnyFirstWords : builder::withAnySecondWords, actionWordOrListContext.actionWordList())) {
+                    wordSetCount++;
                 }
             }
+        }
+
+        private boolean actionWord(Consumer<Word> builderFn, ActionWordContext actionWordContext) {
+            if (null == actionWordContext) {
+                return false;
+            }
+            Word word = actionWordContext.accept(visitor);
+            builderFn.accept(word);
+            return true;
+        }
+
+        private boolean actionWordList(Consumer<Word[]> builderFn, ActionWordListContext actionWordListContext) {
+            if (null == actionWordListContext) {
+                return false;
+            }
+
+            Word[] words = actionWordListContext.actionWord().stream()
+                    .map(actionWordContext -> actionWordContext.accept(visitor))
+                    .toArray(Word[]::new);
+
+            if (words.length > 0) {
+                builderFn.accept(words);
+                return true;
+            }
+            return false;
         }
 
         protected void actionResults(List<ActionResultDeclarationContext> contextList, Actions.ActionBuilder builder) {
@@ -511,12 +526,12 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         }
     }
 
-    private static class ActionWordContextVisitor extends AdventureBaseVisitor<Word> {
+    private static class ActionWordVisitor extends AdventureBaseVisitor<Word> {
 
         private Function<String, Word> toWord;
 
-        private ActionWordContextVisitor(Function<String, Word> toWord) {
-            this.toWord = toWord;
+        private ActionWordVisitor(Vocabulary vocabulary) {
+            this.toWord = text -> vocabulary.findMatch(text).orElse(new Word(text));
         }
 
         @Override
