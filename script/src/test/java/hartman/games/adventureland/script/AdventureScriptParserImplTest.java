@@ -443,6 +443,21 @@ public class AdventureScriptParserImplTest {
         assertTrue(open_door.isHere(adventure.getStartRoom()));
     }
 
+    @Test
+    @AdventureScriptResource("/scripts/310adventure.txt")
+    public void actionVerbAndSetFlagResult() {
+        Adventure adventure = adventureScriptParsingRule.parse();
+
+        Action action = adventure.getActions().iterator().next();
+        GameState gameState = new GameState(adventure.getStartRoom());
+        TestDisplay display = new TestDisplay();
+
+        assertFalse(gameState.getFlag("wet"));
+
+        action.run(gameState, display, new Command(new Word("swim"), new Word("underwater")));
+        assertTrue(gameState.getFlag("wet"));
+    }
+
     @Test(expected = IllegalStateException.class)
     @AdventureScriptResource("/scripts/350adventure.txt")
     public void actionInRoomConditionRequiresRoomToExist() {

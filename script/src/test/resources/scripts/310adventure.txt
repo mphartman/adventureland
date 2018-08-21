@@ -1,0 +1,4 @@
+// Tests action with verb set flag result
+
+action swim underwater
+    then set_flag "wet" yes

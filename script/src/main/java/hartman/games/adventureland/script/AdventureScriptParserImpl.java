@@ -97,12 +97,6 @@ import static java.util.stream.Collectors.toSet;
  */
 public class AdventureScriptParserImpl implements AdventureScriptParser {
 
-    private static final Function<String, String> stripQuotes = s -> {
-        if (s.startsWith("\"")) s = s.substring(1);
-        if (s.endsWith("\"")) s = s.substring(0, s.length() - 1);
-        return s;
-    };
-
     private static final Function<String, String> replaceEscapedQuotes = s ->  s.replaceAll("\\\\\"", "\"");
 
     private static final Function<String, String> replaceEscapedNewlines = s -> s.replaceAll("\\\\n", System.getProperty("line.separator"));
@@ -296,7 +290,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         private Room newRoom(RoomDeclarationContext ctx) {
             String name = ctx.roomName().getText();
-            String description = replaceEscapedQuotes.apply(stripQuotes.apply(ctx.roomDescription().getText()));
+            String description = replaceEscapedQuotes.apply(ctx.roomDescription().getText());
             return new Room(name, description);
         }
     }
@@ -440,20 +434,20 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         @Override
         public Word visitVerbGroup(VerbGroupContext ctx) {
-            String verb = stripQuotes.apply(ctx.verb.getText());
+            String verb = ctx.verb.getText();
             String[] synonyms = new String[0];
             if (null != ctx.synonym()) {
-                synonyms = ctx.synonym().stream().map(RuleContext::getText).map(stripQuotes).toArray(String[]::new);
+                synonyms = ctx.synonym().stream().map(RuleContext::getText).toArray(String[]::new);
             }
             return new Word(verb, synonyms);
         }
 
         @Override
         public Word visitNounGroup(NounGroupContext ctx) {
-            String noun = stripQuotes.apply(ctx.noun.getText());
+            String noun = ctx.noun.getText();
             String[] synonyms = new String[0];
             if (null != ctx.synonym()) {
-                synonyms = ctx.synonym().stream().map(RuleContext::getText).map(stripQuotes).toArray(String[]::new);
+                synonyms = ctx.synonym().stream().map(RuleContext::getText).toArray(String[]::new);
             }
             return new Word(noun, synonyms);
         }
@@ -483,8 +477,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         private void actionCommand(ActionDeclarationContext ctx, Actions.ActionBuilder builder) {
 
-            Function<String, Word> vocabLookupFunction = text -> vocabulary.findMatch(text).orElse(new Word(text));
-            Function<String, Word> toWordFunction = text -> vocabLookupFunction.apply(stripQuotes.apply(text));
+            Function<String, Word> toWordFunction = text -> vocabulary.findMatch(text).orElse(new Word(text));
             ActionWordContextVisitor visitor = new ActionWordContextVisitor(toWordFunction);
 
             boolean firstWord = true;
@@ -599,7 +592,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         @Override
         public Action.Result visitResultPrint(ResultPrintContext ctx) {
-            return Results.println(replaceEscapedNewlines.apply(replaceEscapedQuotes.apply(stripQuotes.apply(ctx.message.getText()))));
+            return Results.println(replaceEscapedNewlines.apply(replaceEscapedQuotes.apply(ctx.message.getText())));
         }
 
         @Override
