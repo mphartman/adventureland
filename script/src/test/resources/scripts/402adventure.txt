@@ -1,0 +1,4 @@
+// Tests occurs invokes given Result 50% of the time
+
+occurs 50%
+    then print "It happened."

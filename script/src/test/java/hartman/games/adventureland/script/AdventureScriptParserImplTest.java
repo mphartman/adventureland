@@ -392,4 +392,25 @@ public class AdventureScriptParserImplTest {
         assertEquals("There's nowhere to climb down from here." + System.getProperty("line.separator"), display.toString());
     }
 
+    @Test(expected = IllegalStateException.class)
+    @AdventureScriptResource("/scripts/400adventure.txt")
+    public void occursRequiresResult() {
+        adventureScriptParsingRule.parse();
+    }
+
+    @Test
+    @AdventureScriptResource("/scripts/401adventure.txt")
+    public void occursRunsPrintResult() {
+        Adventure adventure = adventureScriptParsingRule.parse();
+
+        assertFalse(adventure.getOccurs().isEmpty());
+
+        GameState gameState = new GameState(Room.NOWHERE);
+        TestDisplay display = new TestDisplay();
+        Action occurs = adventure.getOccurs().iterator().next();
+        occurs.run(gameState, display, Command.NONE);
+
+        assertEquals(String.format("It happened.%n"), display.toString());
+    }
+
 }

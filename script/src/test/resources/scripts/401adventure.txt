@@ -1,0 +1,4 @@
+// Tests occurs invokes given Result
+
+occurs
+    then print "It happened."
