@@ -1,0 +1,9 @@
+?
+go
+go up
+go east
+west
+i
+l up
+l
+quit

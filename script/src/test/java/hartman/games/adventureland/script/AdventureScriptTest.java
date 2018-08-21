@@ -1,0 +1,114 @@
+package hartman.games.adventureland.script;
+
+import hartman.games.adventureland.engine.Adventure;
+import hartman.games.adventureland.engine.Command;
+import hartman.games.adventureland.engine.CommandInterpreter;
+import hartman.games.adventureland.engine.Display;
+import hartman.games.adventureland.engine.Game;
+import hartman.games.adventureland.engine.GameState;
+import hartman.games.adventureland.engine.Item;
+import hartman.games.adventureland.engine.Room;
+import hartman.games.adventureland.engine.Vocabulary;
+import hartman.games.adventureland.engine.core.DefaultCommandInterpreter;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Scanner;
+
+import static java.util.stream.Collectors.joining;
+import static org.junit.Assert.assertEquals;
+
+public class AdventureScriptTest {
+
+    private class EchoCommandInterpreter extends DefaultCommandInterpreter {
+
+        private final Display display;
+
+        private EchoCommandInterpreter(Scanner scanner, Vocabulary vocabulary, Display display) {
+            super(scanner, vocabulary);
+            this.display = display;
+        }
+
+        @Override
+        public Command nextCommand() {
+            Command command = super.nextCommand();
+            display.print(String.format("> %s%n%n", getLastLine()));
+            return command;
+        }
+    }
+
+    private class TranscriptCommandInterpreter extends EchoCommandInterpreter {
+        private TranscriptCommandInterpreter(String path, Vocabulary vocabulary, Display display) {
+            super(new Scanner(TranscriptCommandInterpreter.class.getResourceAsStream(path)), vocabulary, display);
+        }
+    }
+
+    private class SimpleTestDisplay extends TestDisplay {
+
+        @Override
+        public void look(Room room, List<Item> itemsInRoom) {
+            StringBuilder builder = new StringBuilder();
+            builder.append(room.getDescription()).append(NEWLINE);
+            if (!room.getExits().isEmpty()) {
+                builder.append("With exits: ")
+                        .append(room.getExits().stream().map(Room.Exit::getDescription).collect(joining(", ")))
+                        .append(NEWLINE);
+            }
+            if (!itemsInRoom.isEmpty()) {
+                builder.append("With items: ")
+                        .append(itemsInRoom.stream().map(Item::getDescription).collect(joining(", ")))
+                        .append(NEWLINE);
+            }
+            print(builder.toString());
+        }
+
+        @Override
+        public void inventory(List<Item> itemsCarried) {
+            if (itemsCarried.isEmpty()) {
+                print("Inventory is empty.\n");
+            } else {
+                print(itemsCarried.stream().map(Item::getDescription).collect(joining(NEWLINE)) + NEWLINE);
+            }
+        }
+
+    }
+
+    private static final String NEWLINE = System.getProperty("line.separator");
+
+    private static Adventure readAdventure(String path) throws IOException {
+        try (Reader r = new BufferedReader(new InputStreamReader(AdventureScriptTest.class.getResourceAsStream(path), StandardCharsets.UTF_8))) {
+            return new AdventureScriptParserImpl().parse(r);
+        }
+    }
+
+    private static String readToString(String path) throws IOException {
+        try (BufferedReader buffer = new BufferedReader(new InputStreamReader(AdventureScriptTest.class.getResourceAsStream(path)))) {
+            return buffer.lines().collect(joining(NEWLINE));
+        }
+    }
+
+    private void testAdventure(int id) {
+        try {
+            String ident = String.format("%03d", id);
+            Adventure adventure = readAdventure(String.format("/adventures/%s/adventure.txt", ident));
+            TestDisplay display = new SimpleTestDisplay();
+            CommandInterpreter interpreter = new TranscriptCommandInterpreter(String.format("/adventures/%s/input.txt", ident), adventure.getVocabulary(), display);
+            Game game = new Game(adventure, interpreter, display);
+            GameState gameState = new GameState(adventure.getStartRoom());
+            game.run(gameState);
+            assertEquals(readToString(String.format("/adventures/%s/transcript.txt", ident)), display.toString());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    //@Test
+    public void testAdventure001() {
+        testAdventure(1);
+    }
+
+}

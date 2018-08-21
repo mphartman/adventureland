@@ -1,0 +1,35 @@
+I'm in a square chamber.
+With exits: East
+> ?
+
+A voice BOOOMS out:
+Try --> 'GO, LOOK, JUMP, SWIM, CLIMB, TAKE, DROP'
+and any other verbs you can think of...
+> go
+
+Go where?
+> go up
+
+I can't go that way.
+> go east
+
+I'm in a gloomy dungeon.
+With exits: West
+> west
+
+I'm in a square chamber.
+With exits: East
+> i
+
+Inventory is empty.
+> l up
+
+I'm in a square chamber.
+With exits: East
+> l
+
+I'm in a square chamber.
+With exits: East
+> quit
+
+
