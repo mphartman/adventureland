@@ -4,13 +4,12 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 public class Word {
-    public static final Word UNRECOGNIZED = new Word("Unrecognized");
-    public static final Word ANY = new Word("");
-    public static final Word NONE = new Word("nil");
+    public static final Word UNRECOGNIZED = new Word("<unrecognized>");
+    public static final Word ANY = new Word("<any>");
+    public static final Word NONE = new Word("<none>");
 
     private final String name;
     private final Set<String> synonyms = new LinkedHashSet<>();
@@ -38,9 +37,7 @@ public class Word {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", getClass().getSimpleName() + "[", "]")
-                .add(name)
-                .toString();
+        return name;
     }
 
     @Override
