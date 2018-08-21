@@ -189,13 +189,13 @@ public class AdventureScriptParserImplTest {
 
     @Test(expected = IllegalStateException.class)
     @AdventureScriptResource("/scripts/200adventure.txt")
-    public void verbGroupMustHaveVerb() {
+    public void wordGroupMustHaveWord() {
         adventureScriptParsingRule.parse();
     }
 
     @Test
     @AdventureScriptResource("/scripts/201adventure.txt")
-    public void verbGroupCreatesVerbWithAliases() {
+    public void wordGroupCreatesWordWithAliases() {
         Adventure adventure = adventureScriptParsingRule.parse();
         Vocabulary vocabulary = adventure.getVocabulary();
 
@@ -214,35 +214,6 @@ public class AdventureScriptParserImplTest {
 
         Word search = vocabulary.findMatch("search").get();
         assertNotEquals(go, search);
-    }
-
-    @Test(expected = IllegalStateException.class)
-    @AdventureScriptResource("/scripts/202adventure.txt")
-    public void nounGroupMustHaveNoun() {
-        adventureScriptParsingRule.parse();
-    }
-
-    @Test
-    @AdventureScriptResource("/scripts/203adventure.txt")
-    public void nounGroupCreatesNounWithAliases() {
-        Adventure adventure = adventureScriptParsingRule.parse();
-        Vocabulary vocabulary = adventure.getVocabulary();
-
-        assertTrue(vocabulary.findMatch("basket").isPresent());
-
-        assertTrue(vocabulary.findMatch("backpack").isPresent());
-        assertTrue(vocabulary.findMatch("bag").isPresent());
-        assertTrue(vocabulary.findMatch("purse").isPresent());
-        assertTrue(vocabulary.findMatch("manpurse").isPresent());
-
-        Word backpack = vocabulary.findMatch("backpack").get();
-        assertTrue(backpack.matches(new Word("bag")));
-        assertTrue(backpack.matches(new Word("purse")));
-        assertTrue(backpack.matches(new Word("manpurse")));
-        assertFalse(backpack.matches(new Word("basket")));
-
-        Word basket = vocabulary.findMatch("basket").get();
-        assertNotEquals(backpack, basket);
     }
 
     @Test(expected = IllegalStateException.class)

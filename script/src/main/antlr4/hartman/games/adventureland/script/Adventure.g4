@@ -30,11 +30,10 @@ DOWN            : 'down';
 
 START           : 'start';
 
-VERBGROUP       : 'verbgroup';
-NOUNGROUP       : 'noungroup';
+WORDGROUP       : 'wordgroup';
 ANY             : 'any';
 NONE            : 'none';
-UNKNOWN         : 'unknown';
+UNKNOWN         : 'unknown' | 'unrecognized';
 
 CARRYING        : 'carrying';
 HERE            : 'here';
@@ -203,16 +202,11 @@ itemDescription
     ;
 
 vocabularyDeclaration
-    :   verbGroup
-    |   nounGroup
+    :   wordGroup
     ;
 
-verbGroup
-    :   VERBGROUP verb=word (',' synonym)*
-    ;
-
-nounGroup
-    :   NOUNGROUP noun=word (',' synonym)*
+wordGroup
+    :   WORDGROUP word (',' synonym)*
     ;
 
 word

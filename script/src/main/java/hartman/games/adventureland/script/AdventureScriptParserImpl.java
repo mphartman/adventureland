@@ -62,7 +62,6 @@ import static hartman.games.adventureland.script.AdventureParser.ItemDeclaration
 import static hartman.games.adventureland.script.AdventureParser.ItemInRoomContext;
 import static hartman.games.adventureland.script.AdventureParser.ItemIsInInventoryContext;
 import static hartman.games.adventureland.script.AdventureParser.ItemIsNowhereContext;
-import static hartman.games.adventureland.script.AdventureParser.NounGroupContext;
 import static hartman.games.adventureland.script.AdventureParser.OccursDeclarationContext;
 import static hartman.games.adventureland.script.AdventureParser.ResultDecrementCounterContext;
 import static hartman.games.adventureland.script.AdventureParser.ResultDestroyContext;
@@ -86,7 +85,7 @@ import static hartman.games.adventureland.script.AdventureParser.ResultSetString
 import static hartman.games.adventureland.script.AdventureParser.ResultSwapContext;
 import static hartman.games.adventureland.script.AdventureParser.RoomDeclarationContext;
 import static hartman.games.adventureland.script.AdventureParser.RoomExitContext;
-import static hartman.games.adventureland.script.AdventureParser.VerbGroupContext;
+import static hartman.games.adventureland.script.AdventureParser.WordGroupContext;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -431,25 +430,13 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
     }
 
     private static class VocabularyDeclarationVisitor extends AdventureBaseVisitor<Word> {
-
         @Override
-        public Word visitVerbGroup(VerbGroupContext ctx) {
-            String verb = ctx.verb.getText();
-            String[] synonyms = new String[0];
-            if (null != ctx.synonym()) {
-                synonyms = ctx.synonym().stream().map(RuleContext::getText).toArray(String[]::new);
-            }
-            return new Word(verb, synonyms);
-        }
-
-        @Override
-        public Word visitNounGroup(NounGroupContext ctx) {
-            String noun = ctx.noun.getText();
-            String[] synonyms = new String[0];
-            if (null != ctx.synonym()) {
-                synonyms = ctx.synonym().stream().map(RuleContext::getText).toArray(String[]::new);
-            }
-            return new Word(noun, synonyms);
+        public Word visitWordGroup(WordGroupContext ctx) {
+            String word = ctx.word().getText();
+            String[] synonyms = ofNullable(ctx.synonym())
+                    .map(x -> x.stream().map(RuleContext::getText).toArray(String[]::new))
+                    .orElse(new String[0]);
+            return new Word(word, synonyms);
         }
     }
 

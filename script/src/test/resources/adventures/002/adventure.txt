@@ -1,9 +1,9 @@
-verbgroup "north", "n"
-verbgroup "south", "s"
-verbgroup "up", "u"
-verbgroup "down", "d"
-verbgroup "east", "e"
-verbgroup "west", "w"
+wordgroup "north", "n"
+wordgroup "south", "s"
+wordgroup "up", "u"
+wordgroup "down", "d"
+wordgroup "east", "e"
+wordgroup "west", "w"
 
 room chamber "I'm in a square chamber."
 	exit east

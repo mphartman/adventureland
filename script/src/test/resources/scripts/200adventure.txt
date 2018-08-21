@@ -1,2 +1,2 @@
-// Tests verbgroup must have at least verb
-verbgroup
+// Tests wordgroup must have at least verb
+wordgroup
