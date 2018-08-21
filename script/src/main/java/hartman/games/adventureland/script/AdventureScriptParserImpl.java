@@ -31,6 +31,7 @@ import java.util.stream.Stream;
 
 import static hartman.games.adventureland.script.AdventureParser.ActionConditionDeclarationContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionDeclarationContext;
+import static hartman.games.adventureland.script.AdventureParser.ActionResultDeclarationContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionWordAnyContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionWordDirectionContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionWordNoneContext;
@@ -49,6 +50,7 @@ import static hartman.games.adventureland.script.AdventureParser.ConditionItemHa
 import static hartman.games.adventureland.script.AdventureParser.ConditionItemIsHereContext;
 import static hartman.games.adventureland.script.AdventureParser.ConditionItemIsPresentContext;
 import static hartman.games.adventureland.script.AdventureParser.ConditionRoomHasExitContext;
+import static hartman.games.adventureland.script.AdventureParser.ConditionTimesContext;
 import static hartman.games.adventureland.script.AdventureParser.ExitDownContext;
 import static hartman.games.adventureland.script.AdventureParser.ExitEastContext;
 import static hartman.games.adventureland.script.AdventureParser.ExitNorthContext;
@@ -61,6 +63,7 @@ import static hartman.games.adventureland.script.AdventureParser.ItemInRoomConte
 import static hartman.games.adventureland.script.AdventureParser.ItemIsInInventoryContext;
 import static hartman.games.adventureland.script.AdventureParser.ItemIsNowhereContext;
 import static hartman.games.adventureland.script.AdventureParser.NounGroupContext;
+import static hartman.games.adventureland.script.AdventureParser.OccursDeclarationContext;
 import static hartman.games.adventureland.script.AdventureParser.ResultDecrementCounterContext;
 import static hartman.games.adventureland.script.AdventureParser.ResultDestroyContext;
 import static hartman.games.adventureland.script.AdventureParser.ResultDropContext;
@@ -212,7 +215,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         private Actions getOccurs(AdventureContext adventureContext, Vocabulary vocabulary, Set<Item> items, List<Room> rooms) {
             Actions actions = Actions.newActionSet();
-            ActionDeclarationVisitor visitor = new ActionDeclarationVisitor(actions, vocabulary, items, rooms);
+            OccursDeclarationVisitor visitor = new OccursDeclarationVisitor(actions, vocabulary, items, rooms);
             adventureContext.gameElement().stream()
                     .filter(gameElementContext -> null != gameElementContext.occursDeclaration())
                     .forEach(gameElementContext -> gameElementContext.occursDeclaration().accept(visitor));
@@ -437,7 +440,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
             String verb = stripQuotes.apply(ctx.verb.getText());
             String[] synonyms = new String[0];
             if (null != ctx.synonym()) {
-                synonyms = ctx.synonym().stream().map(RuleContext::getText).toArray(String[]::new);
+                synonyms = ctx.synonym().stream().map(RuleContext::getText).map(stripQuotes).toArray(String[]::new);
             }
             return new Word(verb, synonyms);
         }
@@ -447,17 +450,17 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
             String noun = stripQuotes.apply(ctx.noun.getText());
             String[] synonyms = new String[0];
             if (null != ctx.synonym()) {
-                synonyms = ctx.synonym().stream().map(RuleContext::getText).toArray(String[]::new);
+                synonyms = ctx.synonym().stream().map(RuleContext::getText).map(stripQuotes).toArray(String[]::new);
             }
             return new Word(noun, synonyms);
         }
     }
 
     private static class ActionDeclarationVisitor extends AdventureBaseVisitor<Action> {
-        private final Actions actions;
-        private final Vocabulary vocabulary;
-        private final Set<Item> items;
-        private final List<Room> rooms;
+        protected final Actions actions;
+        protected final Vocabulary vocabulary;
+        protected final Set<Item> items;
+        protected final List<Room> rooms;
 
         private ActionDeclarationVisitor(Actions actions, Vocabulary vocabulary, Set<Item> items, List<Room> rooms) {
             this.actions = actions;
@@ -470,8 +473,8 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         public Action visitActionDeclaration(ActionDeclarationContext ctx) {
             Actions.ActionBuilder builder = actions.newAction();
             actionCommand(ctx, builder);
-            actionResults(ctx, builder);
-            actionConditions(ctx, builder);
+            actionResults(ctx.actionResultDeclaration(), builder);
+            actionConditions(ctx.actionConditionDeclaration(), builder);
             return builder.build();
         }
 
@@ -489,14 +492,12 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
                         if (firstWord) {
                             builder.on(w);
                             firstWord = false;
-                        }
-                        else {
+                        } else {
                             builder.with(w);
                             break;
                         }
                     }
-                }
-                else if (null != actionWordOrListContext.actionWordList()) {
+                } else if (null != actionWordOrListContext.actionWordList()) {
                     List<Word> wordList = actionWordOrListContext.actionWordList().actionWord().stream()
                             .map(actionWordContext -> actionWordContext.accept(visitor))
                             .filter(w -> !w.equals(Word.NONE))
@@ -506,8 +507,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
                         if (firstWord) {
                             builder.onAnyFirstWords(wordArray);
                             firstWord = false;
-                        }
-                        else {
+                        } else {
                             builder.withAnySecondWords(wordArray);
                             break;
                         }
@@ -516,20 +516,18 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
             }
         }
 
-        private void actionResults(ActionDeclarationContext ctx, Actions.ActionBuilder builder) {
+        protected void actionResults(List<ActionResultDeclarationContext> contextList, Actions.ActionBuilder builder) {
             ActionResultDeclarationVisitor visitor = new ActionResultDeclarationVisitor(items, rooms);
-            ofNullable(ctx.actionResultDeclaration())
-                    .ifPresent(actionResultDeclarationContexts -> actionResultDeclarationContexts.stream()
-                            .map(actionResultDeclarationContext -> actionResultDeclarationContext.accept(visitor))
-                            .forEach(builder::then));
+            ofNullable(contextList).ifPresent(actionResultDeclarationContexts -> actionResultDeclarationContexts.stream()
+                    .map(actionResultDeclarationContext -> actionResultDeclarationContext.accept(visitor))
+                    .forEach(builder::then));
         }
 
-        private void actionConditions(ActionDeclarationContext ctx, Actions.ActionBuilder builder) {
+        protected void actionConditions(List<ActionConditionDeclarationContext> contextList, Actions.ActionBuilder builder) {
             ActionConditionDeclarationVisitor visitor = new ActionConditionDeclarationVisitor(items, rooms);
-            ofNullable(ctx.actionConditionDeclaration())
-                    .ifPresent(actionConditionDeclarationContexts -> actionConditionDeclarationContexts.stream()
-                            .map(actionConditionDeclarationContext -> actionConditionDeclarationContext.accept(visitor))
-                            .forEach(builder::when));
+            ofNullable(contextList).ifPresent(actionConditionDeclarationContexts -> actionConditionDeclarationContexts.stream()
+                    .map(actionConditionDeclarationContext -> actionConditionDeclarationContext.accept(visitor))
+                    .forEach(builder::when));
         }
     }
 
@@ -601,7 +599,8 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         @Override
         public Action.Result visitResultPrint(ResultPrintContext ctx) {
-            return Results.println(stripQuotes.apply(ctx.message.getText()));
+            return Results.println(stripQuotes.apply(ctx.message.getText())
+                    .replaceAll("\\\\n", "\n"));
         }
 
         @Override
@@ -796,10 +795,25 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         }
 
         @Override
-        public Action.Condition visitConditionTimes(AdventureParser.ConditionTimesContext ctx) {
+        public Action.Condition visitConditionTimes(ConditionTimesContext ctx) {
             int val = Integer.parseInt(ctx.Number().getText());
             return Conditions.times(val);
         }
     }
 
+    private static class OccursDeclarationVisitor extends ActionDeclarationVisitor {
+
+        private OccursDeclarationVisitor(Actions actions, Vocabulary vocabulary, Set<Item> items, List<Room> rooms) {
+            super(actions, vocabulary, items, rooms);
+        }
+
+        @Override
+        public Action visitOccursDeclaration(OccursDeclarationContext ctx) {
+            Actions.ActionBuilder builder = actions.newAction();
+            actionResults(ctx.actionResultDeclaration(), builder);
+            actionConditions(ctx.actionConditionDeclaration(), builder);
+            return builder.build();
+        }
+
+    }
 }

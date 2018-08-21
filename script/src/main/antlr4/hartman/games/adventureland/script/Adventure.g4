@@ -219,7 +219,7 @@ word
     ;
 
 synonym
-    :   Identifier
+    :   (Identifier | StringLiteral)
     ;
 
 actionDeclaration
