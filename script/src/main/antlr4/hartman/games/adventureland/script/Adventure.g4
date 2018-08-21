@@ -219,7 +219,16 @@ actionDeclaration
     ;
 
 actionCommand
-    :   actionWord+
+    :   actionWordOrList+
+    ;
+
+actionWordOrList
+    : actionWord
+    | actionWordList
+    ;
+
+actionWordList
+    :   '(' actionWord (',' actionWord)* ')'
     ;
 
 actionWord

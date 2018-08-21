@@ -26,15 +26,15 @@ import java.io.Reader;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static hartman.games.adventureland.script.AdventureParser.ActionConditionDeclarationContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionDeclarationContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionWordAnyContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionWordDirectionContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionWordNoneContext;
+import static hartman.games.adventureland.script.AdventureParser.ActionWordOrListContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionWordUnknownContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionWordWordContext;
 import static hartman.games.adventureland.script.AdventureParser.AdventureContext;
@@ -48,6 +48,7 @@ import static hartman.games.adventureland.script.AdventureParser.ConditionItemEx
 import static hartman.games.adventureland.script.AdventureParser.ConditionItemHasMovedContext;
 import static hartman.games.adventureland.script.AdventureParser.ConditionItemIsHereContext;
 import static hartman.games.adventureland.script.AdventureParser.ConditionItemIsPresentContext;
+import static hartman.games.adventureland.script.AdventureParser.ConditionRoomHasExitContext;
 import static hartman.games.adventureland.script.AdventureParser.ExitDownContext;
 import static hartman.games.adventureland.script.AdventureParser.ExitEastContext;
 import static hartman.games.adventureland.script.AdventureParser.ExitNorthContext;
@@ -83,7 +84,6 @@ import static hartman.games.adventureland.script.AdventureParser.ResultSwapConte
 import static hartman.games.adventureland.script.AdventureParser.RoomDeclarationContext;
 import static hartman.games.adventureland.script.AdventureParser.RoomExitContext;
 import static hartman.games.adventureland.script.AdventureParser.VerbGroupContext;
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.ofNullable;
@@ -467,15 +467,44 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         }
 
         private void actionCommand(ActionDeclarationContext ctx, Actions.ActionBuilder builder) {
+
             Function<String, Word> vocabLookupFunction = text -> vocabulary.findMatch(text).orElse(new Word(text));
             Function<String, Word> toWordFunction = text -> vocabLookupFunction.apply(stripQuotes.apply(text));
             ActionWordContextVisitor visitor = new ActionWordContextVisitor(toWordFunction);
-            List<Consumer<? super Word>> consumers = asList(builder::on, builder::with);
-            IntStream.range(0, 2).forEach(i ->
-                    ofNullable(ctx.actionCommand().actionWord(i))
+
+            boolean firstWord = true;
+            for (ActionWordOrListContext actionWordOrListContext : ctx.actionCommand().actionWordOrList()) {
+                if (null != actionWordOrListContext.actionWord()) {
+                    Word w = actionWordOrListContext.actionWord().accept(visitor);
+                    if (!w.equals(Word.NONE)) {
+                        if (firstWord) {
+                            builder.on(w);
+                            firstWord = false;
+                        }
+                        else {
+                            builder.with(w);
+                            break;
+                        }
+                    }
+                }
+                else if (null != actionWordOrListContext.actionWordList()) {
+                    List<Word> wordList = actionWordOrListContext.actionWordList().actionWord().stream()
                             .map(actionWordContext -> actionWordContext.accept(visitor))
                             .filter(w -> !w.equals(Word.NONE))
-                            .ifPresent(consumers.get(i)));
+                            .collect(toList());
+                    if (!wordList.isEmpty()) {
+                        Word[] wordArray = wordList.toArray(new Word[0]);
+                        if (firstWord) {
+                            builder.onAnyFirstWords(wordArray);
+                            firstWord = false;
+                        }
+                        else {
+                            builder.withAnySecondWords(wordArray);
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
         private void actionResults(ActionDeclarationContext ctx, Actions.ActionBuilder builder) {
@@ -685,7 +714,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         }
 
         @Override
-        public Action.Condition visitActionConditionDeclaration(AdventureParser.ActionConditionDeclarationContext ctx) {
+        public Action.Condition visitActionConditionDeclaration(ActionConditionDeclarationContext ctx) {
             Action.Condition condition = super.visitActionConditionDeclaration(ctx);
             if (null != ctx.NOT()) {
                 return Conditions.not(condition);
@@ -753,7 +782,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         }
 
         @Override
-        public Action.Condition visitConditionRoomHasExit(AdventureParser.ConditionRoomHasExitContext ctx) {
+        public Action.Condition visitConditionRoomHasExit(ConditionRoomHasExitContext ctx) {
             return Conditions.roomHasExit;
         }
     }
