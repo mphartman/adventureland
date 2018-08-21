@@ -25,6 +25,10 @@ public class TestDisplay implements Display {
         // do nothing
     }
 
+    public void clear() {
+        out.setLength(0);
+    }
+
     @Override
     public String toString() {
         return out.toString();

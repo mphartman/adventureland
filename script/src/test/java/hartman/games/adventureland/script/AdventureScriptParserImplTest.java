@@ -258,6 +258,93 @@ public class AdventureScriptParserImplTest {
     }
 
     @Test
+    @AdventureScriptResource("/scripts/306adventure.txt")
+    public void actionWordListCreatesAnyMatchingCondition() {
+        Adventure adventure = adventureScriptParsingRule.parse();
+
+        Action action = adventure.getActions().iterator().next();
+
+        GameState gameState = new GameState(Room.NOWHERE);
+        TestDisplay display = new TestDisplay();
+        action.run(gameState, display, new Command(new Word("first")));
+
+        assertEquals(String.format("matched%n"), display.toString());
+        display.clear();
+
+        action.run(gameState, display, new Command(new Word("nope")));
+        assertTrue(display.toString().isEmpty());
+        display.clear();
+
+        action.run(gameState, display, new Command(new Word("second")));
+        assertEquals(String.format("matched%n"), display.toString());
+        display.clear();
+
+        action.run(gameState, display, new Command(new Word("third")));
+        assertEquals(String.format("matched%n"), display.toString());
+    }
+
+    @Test
+    @AdventureScriptResource("/scripts/307adventure.txt")
+    public void actionSecondWordListCreatesAnyMatchingCondition() {
+        Adventure adventure = adventureScriptParsingRule.parse();
+
+        Action action = adventure.getActions().iterator().next();
+
+        GameState gameState = new GameState(Room.NOWHERE);
+        TestDisplay display = new TestDisplay();
+
+        action.run(gameState, display, new Command(new Word("first"), new Word("one")));
+        assertEquals(String.format("matched!%n"), display.toString());
+        display.clear();
+
+        action.run(gameState, display, new Command(new Word("first"), new Word("four")));
+        assertTrue(display.toString().isEmpty());
+        display.clear();
+
+        action.run(gameState, display, new Command(new Word("first"), new Word("two")));
+        assertEquals(String.format("matched!%n"), display.toString());
+        display.clear();
+
+        action.run(gameState, display, new Command(new Word("first"), new Word("three")));
+        assertEquals(String.format("matched!%n"), display.toString());
+    }
+
+    @Test
+    @AdventureScriptResource("/scripts/308adventure.txt")
+    public void actionFirstWordListAndSecondWordListCreatesAnyMatchingCondition() {
+        Adventure adventure = adventureScriptParsingRule.parse();
+
+        Action action = adventure.getActions().iterator().next();
+
+        GameState gameState = new GameState(Room.NOWHERE);
+        TestDisplay display = new TestDisplay();
+
+        action.run(gameState, display, new Command(new Word("first"), new Word("one")));
+        assertEquals(String.format("matched!%n"), display.toString());
+        display.clear();
+
+        action.run(gameState, display, new Command(new Word("first"), new Word("two")));
+        assertEquals(String.format("matched!%n"), display.toString());
+        display.clear();
+
+        action.run(gameState, display, new Command(new Word("second"), new Word("one")));
+        assertEquals(String.format("matched!%n"), display.toString());
+        display.clear();
+
+        action.run(gameState, display, new Command(new Word("second"), new Word("two")));
+        assertEquals(String.format("matched!%n"), display.toString());
+        display.clear();
+
+        action.run(gameState, display, new Command(new Word("3"), new Word("one")));
+        assertTrue(display.toString().isEmpty());
+        display.clear();
+
+        action.run(gameState, display, new Command(new Word("one"), new Word("3")));
+        assertTrue(display.toString().isEmpty());
+        display.clear();
+    }
+
+    @Test
     @AdventureScriptResource("/scripts/302adventure.txt")
     public void actionVerbAndPrintResult() {
         Adventure adventure = adventureScriptParsingRule.parse();
