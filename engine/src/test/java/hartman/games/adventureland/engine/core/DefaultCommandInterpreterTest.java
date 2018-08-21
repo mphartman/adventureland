@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Scanner;
 
 import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class DefaultCommandInterpreterTest {
@@ -103,6 +104,14 @@ public class DefaultCommandInterpreterTest {
         Command command = interpreter.nextCommand();
         assertTrue(command.getFirstWord().matches(new Word("THROW")));
         assertTrue(command.getSecondWord().matches(new Word("AXE")));
+    }
+
+    @Test
+    public void lastLineProvidesRawInput() {
+        Vocabulary vocabulary = new Vocabulary(new HashSet<>(asList(new Word("throw"), new Word("axe"))));
+        DefaultCommandInterpreter interpreter = new DefaultCommandInterpreter(new Scanner("throw axe at bear"), vocabulary);
+        interpreter.nextCommand();
+        assertEquals("throw axe at bear", interpreter.getLastLine());
     }
 
 
