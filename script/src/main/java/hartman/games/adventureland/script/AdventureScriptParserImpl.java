@@ -785,6 +785,12 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         public Action.Condition visitConditionRoomHasExit(ConditionRoomHasExitContext ctx) {
             return Conditions.roomHasExit;
         }
+
+        @Override
+        public Action.Condition visitConditionTimes(AdventureParser.ConditionTimesContext ctx) {
+            int val = Integer.parseInt(ctx.Number().getText());
+            return Conditions.times(val);
+        }
     }
 
 }

@@ -6,30 +6,36 @@ grammar Adventure;
 
 ROOM            : 'room';
 EXIT            : 'exit';
+
 ITEM            : 'item';
 AT              : 'at';
 IN              : 'in';
 INVENTORY       : 'inventory';
 NOWHERE         : 'nowhere';
 CALLED          : 'called';
+
 ACTION          : 'action';
 WHEN            : 'when';
 AND             : 'and';
 NOT             : 'not' | '!';
 THEN            : 'then';
 OCCURS          : 'occurs';
+
 NORTH           : 'north';
 SOUTH           : 'south';
 EAST            : 'east';
 WEST            : 'west';
 UP              : 'up';
 DOWN            : 'down';
+
 START           : 'start';
+
 VERBGROUP       : 'verbgroup';
 NOUNGROUP       : 'noungroup';
 ANY             : 'any';
 NONE            : 'none';
 UNKNOWN         : 'unknown';
+
 CARRYING        : 'carrying';
 HERE            : 'here';
 PRESENT         : 'present';
@@ -40,6 +46,8 @@ COUNTER_EQ      : 'counterEq';
 COUNTER_LE      : 'counterLe';
 COUNTER_GT      : 'counterGt';
 HAS_EXIT        : 'hasExit' | 'has_exit';
+TIMES           : 'times';
+
 PRINT           : 'print';
 LOOK            : 'look';
 GO              : 'go';
@@ -255,6 +263,7 @@ actionCondition
     |   COUNTER_LE word Number      # conditionCounterLessThan
     |   COUNTER_GT word Number      # conditionCounterGreaterThan
     |   HAS_EXIT                    # conditionRoomHasExit
+    |   TIMES Number                # conditionTimes
     ;
 
 actionResultDeclaration
