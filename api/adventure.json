@@ -1,0 +1,19 @@
+{
+  "adventure": {
+    "title": "Haunted House",
+    "author": "Michael Hartman",
+    "version": 1.0,
+    "published": "2018-08-22T12:00:00.000Z"
+  },
+  "_links": {
+    "games": {
+      "href": "/adventures/2/games"
+    },
+    "start": {
+      "href": "/adventures/2/games"
+    },
+    "self": {
+      "href": "/adventures/2"
+    }
+  }
+}

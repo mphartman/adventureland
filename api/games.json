@@ -1,0 +1,56 @@
+{
+  "games": [
+    {
+      "player": "Michael Hartman",
+      "started": "2018-08-22T12:00:00.000Z",
+      "status": "running",
+      "_links": {
+        "adventure": {
+          "href": "/adventures/2"
+        },
+        "self": {
+          "href": "/adventures/2/games/2"
+        }
+      }
+    },
+    {
+      "player": "Michael Hartman",
+      "started": "2018-08-21T11:00:00.000Z",
+      "status": "game_over",
+      "_links": {
+        "adventure": {
+          "href": "/adventures/2"
+        },
+        "self": {
+          "href": "/adventures/2/games/1"
+        }
+      }
+    }
+  ],
+  "_links": {
+    "adventure": {
+      "href": "/adventures/2"
+    },
+    "first": {
+      "href": "/adventures/2/games?page=0&size=2"
+    },
+    "prev": {
+      "href": "/adventures/2/games?page=0&size=2"
+    },
+    "self": {
+      "href": "/adventures/2/games"
+    },
+    "next": {
+      "href": "/adventures/2/games?page=0&size=2"
+    },
+    "last": {
+      "href": "/adventures/2/games?page=0&size=2"
+    }
+  },
+  "page": {
+    "size": 2,
+    "totalElements": 2,
+    "totalPages": 1,
+    "number": 1
+  }
+}

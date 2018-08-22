@@ -7,12 +7,12 @@
 
 Run adventure games in Scott Adams format using a Java-based game engine. 
 
-## How to Run
+## How to Play
 
-TBD
+[Adventureland API](api/api.md)
 
 
-## How to write your own Adventure
+## How to Write your own Adventure
 
 [Reference Manual](docs/reference.md)
 
