@@ -54,12 +54,12 @@ public class AdventureScriptTest {
             StringBuilder builder = new StringBuilder();
             builder.append(room.getDescription()).append(NEWLINE);
             if (!room.getExits().isEmpty()) {
-                builder.append("With exits: ")
+                builder.append("Room exits: ")
                         .append(room.getExits().stream().map(Room.Exit::getDescription).collect(joining(", ")))
                         .append(NEWLINE);
             }
             if (!itemsInRoom.isEmpty()) {
-                builder.append("With items: ")
+                builder.append("Room items: ")
                         .append(itemsInRoom.stream().map(Item::getDescription).collect(joining(", ")))
                         .append(NEWLINE);
             }
@@ -71,7 +71,8 @@ public class AdventureScriptTest {
             if (itemsCarried.isEmpty()) {
                 print("Inventory is empty." + NEWLINE);
             } else {
-                print(itemsCarried.stream().map(Item::getDescription).collect(joining(NEWLINE)) + NEWLINE);
+                print("Inventory items: ");
+                print(itemsCarried.stream().map(Item::getDescription).collect(joining(", ")) + NEWLINE);
             }
         }
 
@@ -85,23 +86,29 @@ public class AdventureScriptTest {
         }
     }
 
-    private static String readToString(String path) throws IOException {
-        return new Scanner(AdventureScriptTest.class.getResourceAsStream(path), "UTF-8").useDelimiter("\\A").next();
+    private static String readToString(String path) {
+        try (Scanner scanner = new Scanner(AdventureScriptTest.class.getResourceAsStream(path), "UTF-8").useDelimiter("\\A")) {
+            if (scanner.hasNext()) {
+                return scanner.next();
+            }
+            return "";
+        }
     }
 
     private void testAdventure(int id) {
+        TestDisplay display = new SimpleTestDisplay();
         try {
             String ident = String.format("%03d", id);
             Adventure adventure = readAdventure(String.format("/adventures/%s/adventure.txt", ident));
-            TestDisplay display = new SimpleTestDisplay();
             CommandInterpreter interpreter = new TranscriptCommandInterpreter(String.format("/adventures/%s/input.txt", ident), adventure.getVocabulary(), display);
             Game game = new Game(adventure, interpreter, display);
-            GameState gameState = new GameState(adventure.getStartRoom());
+            GameState gameState = new GameState(adventure.getStartRoom(), adventure.getItems());
             game.run(gameState);
             String expected = readToString(String.format("/adventures/%s/transcript.txt", ident));
             String actual = display.toString();
             assertEquals(expected, actual);
-        } catch (IOException e) {
+        } catch (Exception e) {
+            System.err.println(display.toString());
             throw new RuntimeException(e);
         }
     }
@@ -114,6 +121,11 @@ public class AdventureScriptTest {
     @Test
     public void testAdventure2() {
         testAdventure(2);
+    }
+
+    @Test
+    public void testAdventure3() {
+        testAdventure(3);
     }
 
 }

@@ -1,0 +1,51 @@
+Welcome!
+This is "test" adventure #3.
+
+I'm in a luxurious master bedroom with a huge king-size bed.
+Room exits: South
+Inventory items: a bloody knife
+> go south (go south)
+
+I'm at the top of long flight of stairs which lead down.
+Room exits: North, Down
+> go down (go Down)
+
+I'm looking north down a long hallway. There are stairs leading up.
+Room exits: Up
+Room items: a closed door
+> inventory (inventory <none>)
+
+Inventory items: a bloody knife
+> open door (open door)
+
+Okay, I opened it and am going through.
+I'm outside. I've made it.
+Room exits: South
+
+Weee-Wooo Weee-Wooo! It's the police.
+They've spotted me carrying a weapon.
+> go south (go south)
+
+I'm looking north down a long hallway. There are stairs leading up.
+Room exits: Up
+Room items: an open door
+I can still here the police outside. It doesn't look good that I'm carrying a bloody knife.
+> close door (close door)
+
+Whew! That was close. I may want to get rid of this knife.
+> drop knife (drop knife)
+
+Good idea. Okay, I dropped it.
+Inventory is empty.
+I'm looking north down a long hallway. There are stairs leading up.
+Room exits: Up
+Room items: a bloody knife, a closed door
+> inventory (inventory <none>)
+
+Inventory is empty.
+> open door (open door)
+
+Okay, I opened it and am going through.
+I'm outside. I've made it.
+Room exits: South
+Congratulations! You won the game.

@@ -1,5 +1,5 @@
 I'm in a square chamber.
-With exits: East
+Room exits: East
 > ? (help <none>)
 
 A voice BOOOMS out:
@@ -14,22 +14,22 @@ I can't go that way from here.
 > go east (go east)
 
 I'm in a gloomy dungeon.
-With exits: West
+Room exits: West
 > west (West <none>)
 
 I'm in a square chamber.
-With exits: East
+Room exits: East
 > i (inventory <none>)
 
 Inventory is empty.
 > l up (look up)
 
 I'm in a square chamber.
-With exits: East
+Room exits: East
 > l (look <none>)
 
 I'm in a square chamber.
-With exits: East
+Room exits: East
 > south (south <none>)
 
 I can't go south from here.

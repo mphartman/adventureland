@@ -1,0 +1,18 @@
+go south
+go down
+inventory
+open door
+go south
+close door
+drop knife
+inventory
+open door
+
+
+
+
+
+
+
+
+
