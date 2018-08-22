@@ -2,14 +2,49 @@
 ## Test Adventure 004
 ##
 
+start bridge
+
 ##
 ##  Rooms
 ##
 
+room bridge "I'm on the bridge of the starship.\nI can see the helm, navigator, science, tactical, communications and engineering stations."
+
+room engineering "I'm in main engineering."
+
+room medbay "I'm in the medical bay."
+
+room messhall "I'm in the crew's mess hall."
+
+room ready_room "I'm in the captain's ready room."
+
+room captains_cabin "I'm in the captain's personal cabin."
+
+room transporter_room "I'm in the transporter room."
+
+room turbolift "I'm in the main turbolift."
+
+room engine_room "I'm standing in the engine room."
+
+room brig "I'm in the ship's brig."
+
+room armory "I'm in the armory. There are rows of lockers."
 
 ##
 ## Items
 ##
+
+item phaser "a handheld phaser"
+    nowhere
+    called phaser
+
+item phaser_rifle "a phaser assault rifle"
+    nowhere
+    called rifle
+
+item tricorder "a standard tricorder"
+    nowhere
+    called tricorder
 
 
 ##

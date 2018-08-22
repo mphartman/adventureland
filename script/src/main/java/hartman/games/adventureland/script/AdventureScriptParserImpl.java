@@ -99,10 +99,6 @@ import static java.util.stream.Collectors.toSet;
  */
 public class AdventureScriptParserImpl implements AdventureScriptParser {
 
-    private static final Function<String, String> replaceEscapedQuotes = s -> s.replaceAll("\\\\\"", "\"");
-
-    private static final Function<String, String> replaceEscapedNewlines = s -> s.replaceAll("\\\\n", System.getProperty("line.separator"));
-
     @Override
     public Adventure parse(Reader r) throws IOException {
         CharStream input = CharStreams.fromReader(r);
@@ -292,7 +288,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         private Room newRoom(RoomDeclarationContext ctx) {
             String name = ctx.roomName().getText();
-            String description = replaceEscapedQuotes.apply(ctx.roomDescription().getText());
+            String description = ctx.roomDescription().getText();
             return new Room(name, description);
         }
     }
@@ -594,7 +590,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         @Override
         public Action.Result visitResultPrint(ResultPrintContext ctx) {
-            return Results.println(replaceEscapedNewlines.apply(replaceEscapedQuotes.apply(ctx.message.getText())));
+            return Results.println(ctx.message.getText());
         }
 
         @Override

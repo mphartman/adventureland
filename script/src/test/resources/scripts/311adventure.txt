@@ -1,0 +1,4 @@
+// Tests action with verb set flag result
+
+action swim underwater
+    then print "I\nam\ndrowning\n...\n...\n..."

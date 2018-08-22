@@ -91,7 +91,11 @@ Letter
 
 StringLiteral
 	:	'"' StringCharacters '"'
-	{setText(getText().substring(1, getText().length()-1));} // strip leading and trailing quote characters
+	    {
+	        setText(getText().substring(1, getText().length()-1));
+	        setText(getText().replaceAll("\\\\\"", "\""));
+	        setText(getText().replaceAll("\\\\n", System.getProperty("line.separator")));
+	    }
 	;
 
 fragment

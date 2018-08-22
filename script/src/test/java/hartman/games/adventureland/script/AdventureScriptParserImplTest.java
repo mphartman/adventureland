@@ -240,15 +240,15 @@ public class AdventureScriptParserImplTest {
         action.run(gameState, display, new Command(new Word("first")));
 
         assertEquals(String.format("matched%n"), display.toString());
-        display.clear();
+        display.reset();
 
         action.run(gameState, display, new Command(new Word("nope")));
         assertTrue(display.toString().isEmpty());
-        display.clear();
+        display.reset();
 
         action.run(gameState, display, new Command(new Word("second")));
         assertEquals(String.format("matched%n"), display.toString());
-        display.clear();
+        display.reset();
 
         action.run(gameState, display, new Command(new Word("third")));
         assertEquals(String.format("matched%n"), display.toString());
@@ -266,15 +266,15 @@ public class AdventureScriptParserImplTest {
 
         action.run(gameState, display, new Command(new Word("first"), new Word("one")));
         assertEquals(String.format("matched!%n"), display.toString());
-        display.clear();
+        display.reset();
 
         action.run(gameState, display, new Command(new Word("first"), new Word("four")));
         assertTrue(display.toString().isEmpty());
-        display.clear();
+        display.reset();
 
         action.run(gameState, display, new Command(new Word("first"), new Word("two")));
         assertEquals(String.format("matched!%n"), display.toString());
-        display.clear();
+        display.reset();
 
         action.run(gameState, display, new Command(new Word("first"), new Word("three")));
         assertEquals(String.format("matched!%n"), display.toString());
@@ -292,27 +292,27 @@ public class AdventureScriptParserImplTest {
 
         action.run(gameState, display, new Command(new Word("first"), new Word("one")));
         assertEquals(String.format("matched!%n"), display.toString());
-        display.clear();
+        display.reset();
 
         action.run(gameState, display, new Command(new Word("first"), new Word("two")));
         assertEquals(String.format("matched!%n"), display.toString());
-        display.clear();
+        display.reset();
 
         action.run(gameState, display, new Command(new Word("second"), new Word("one")));
         assertEquals(String.format("matched!%n"), display.toString());
-        display.clear();
+        display.reset();
 
         action.run(gameState, display, new Command(new Word("second"), new Word("two")));
         assertEquals(String.format("matched!%n"), display.toString());
-        display.clear();
+        display.reset();
 
         action.run(gameState, display, new Command(new Word("3"), new Word("one")));
         assertTrue(display.toString().isEmpty());
-        display.clear();
+        display.reset();
 
         action.run(gameState, display, new Command(new Word("one"), new Word("3")));
         assertTrue(display.toString().isEmpty());
-        display.clear();
+        display.reset();
     }
 
     @Test
@@ -505,4 +505,18 @@ public class AdventureScriptParserImplTest {
         assertEquals(String.format("It happened.%n"), display.toString());
     }
 
+    @Test
+    @AdventureScriptResource("/scripts/311adventure.txt")
+    public void actionPrintResultExpandsEscapedNewline() {
+        Adventure adventure = adventureScriptParsingRule.parse();
+
+        TestDisplay testDisplay = new TestDisplay();
+        GameState gameState = new GameState(adventure.getStartRoom(), adventure.getItems());
+        Action action = adventure.getActions().iterator().next();
+
+        action.run(gameState, testDisplay, new Command(new Word("swim"), new Word("underwater")));
+
+        assertEquals("I\nam\ndrowning\n...\n...\n...\n", testDisplay.toString());
+
+    }
 }
