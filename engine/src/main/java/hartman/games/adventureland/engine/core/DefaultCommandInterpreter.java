@@ -22,8 +22,18 @@ public class DefaultCommandInterpreter implements CommandInterpreter {
 
     @Override
     public Command nextCommand() {
-        if (scanner.hasNextLine()) {
-            lastLine = scanner.nextLine();
+
+        // skip blank lines
+        String line = null;
+        while (scanner.hasNextLine()) {
+            line = scanner.nextLine();
+            if (!line.isEmpty()) {
+                break;
+            }
+        }
+
+        if (!(null == line || line.isEmpty())) {
+            lastLine = line;
             try (Scanner lineScanner = new Scanner(lastLine)) {
                 LinkedList<Word> words = new LinkedList<>();
                 while (lineScanner.hasNext()) {
@@ -34,6 +44,7 @@ public class DefaultCommandInterpreter implements CommandInterpreter {
                 return new Command(firstWord, secondWord);
             }
         }
+
         throw new IllegalStateException("Need input.");
     }
 
