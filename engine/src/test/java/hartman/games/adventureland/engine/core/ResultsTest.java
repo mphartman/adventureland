@@ -133,7 +133,7 @@ public class ResultsTest {
 
     @Test
     public void printShouldPrintToDisplayGivenAString() {
-        print("Fly, you fools!").execute(Command.NONE, null, display);
+        print("Fly, you fools!").execute(Command.NONE, new GameState(Room.NOWHERE), display);
         assertEquals("Fly, you fools!", display.toString());
     }
 
@@ -374,5 +374,59 @@ public class ResultsTest {
 
         setString("sign", "BEWARE OF DOG").execute(Command.NONE, gameState, display);
         assertEquals("BEWARE OF DOG", gameState.getString("sign"));
+    }
+
+    @Test
+    public void printShouldResolveCounterPlaceholdersWithCounterValues() {
+        TestDisplay display = new TestDisplay();
+        GameState gameState = new GameState(Room.NOWHERE);
+        gameState.setCounter("kills", 3);
+
+        Results.print("{counter:kills} kills").execute(Command.NONE, gameState, display);
+        assertEquals("3 kills", display.toString());
+        display.reset();
+
+        Results.print("{counter:foo} foos").execute(Command.NONE, gameState, display);
+        assertEquals("0 foos", display.toString());
+    }
+
+    @Test
+    public void printShouldResolveFlagPlaceholdersWithFlagValues() {
+        TestDisplay display = new TestDisplay();
+        GameState gameState = new GameState(Room.NOWHERE);
+        gameState.setFlag("winning", true);
+
+        Results.print("Am I winning? {flag:winning}").execute(Command.NONE, gameState, display);
+        assertEquals("Am I winning? true", display.toString());
+        display.reset();
+
+        Results.print("{flag:foo} foos").execute(Command.NONE, gameState, display);
+        assertEquals("false foos", display.toString());
+    }
+
+    @Test
+    public void printShouldResolveStringPlaceholdersWithStringValues() {
+        TestDisplay display = new TestDisplay();
+        GameState gameState = new GameState(Room.NOWHERE);
+        gameState.setString("foo", "bar");
+
+        Results.print("Every programmer knows that foo equals {string:foo}").execute(Command.NONE, gameState, display);
+        assertEquals("Every programmer knows that foo equals bar", display.toString());
+        display.reset();
+
+        Results.print("{string:bar} does not exist.").execute(Command.NONE, gameState, display);
+        assertEquals(" does not exist.", display.toString());
+    }
+
+    @Test
+    public void printShouldResolvePlaceholdersWithValues() {
+        TestDisplay display = new TestDisplay();
+        GameState gameState = new GameState(Room.NOWHERE);
+        gameState.setString("term", "x");
+        gameState.setCounter("operand", 42);
+        gameState.setFlag("result", true);
+
+        Results.print("Every programmer knows that {verb}ing a {noun} is like {string:term} + {counter:operand} is {flag:result}").execute(new Command(new Word("fly"), new Word("kite")), gameState, display);
+        assertEquals("Every programmer knows that flying a kite is like x + 42 is true", display.toString());
     }
 }

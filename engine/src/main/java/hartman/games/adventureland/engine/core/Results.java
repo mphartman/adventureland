@@ -5,6 +5,10 @@ import hartman.games.adventureland.engine.Display;
 import hartman.games.adventureland.engine.Item;
 import hartman.games.adventureland.engine.Room;
 
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public final class Results {
 
     private Results() {
@@ -26,13 +30,38 @@ public final class Results {
      */
     public static final Result look = (command, gameState, display) -> gameState.describe(display);
 
+    private static Pattern verbPlaceholderPattern = Pattern.compile("\\{verb\\}");
+    private static Pattern nounPlaceholderPattern = Pattern.compile("\\{noun\\}");
+    private static Pattern counterPlaceholderPattern = Pattern.compile("\\{counter:(.+?)\\}");
+    private static Pattern flagPlaceholderPattern = Pattern.compile("\\{flag:(.+?)\\}");
+    private static Pattern stringPlaceholderPattern = Pattern.compile("\\{string:(.+?)\\}");
+
+    private static String resolvePlaceholder(String s, Pattern pattern, Function<String, String> resolver) {
+        Matcher matcher = pattern.matcher(s);
+        StringBuilder builder = new StringBuilder();
+        int i = 0;
+        while (matcher.find()) {
+            String group = (matcher.groupCount() == 0) ? matcher.group(0) : matcher.group(1);
+            String result = resolver.apply(group);
+            builder.append(s, i, matcher.start());
+            builder.append(result);
+            i = matcher.end();
+        }
+        builder.append(s.substring(i));
+        return builder.toString();
+    }
+
     /**
      * Prints the specified message to the {@link Display}
      */
     public static Result print(String message) {
         return (command, gameState, display) -> {
-            String output = message.replaceAll("\\Q{noun}\\E", command.getSecondWord().getName());
-            output = output.replaceAll("\\Q{verb}\\E", command.getFirstWord().getName());
+            String output = message;
+            output = resolvePlaceholder(output, verbPlaceholderPattern, counter -> command.getFirstWord().getName());
+            output = resolvePlaceholder(output, nounPlaceholderPattern, counter -> command.getSecondWord().getName());
+            output = resolvePlaceholder(output, counterPlaceholderPattern, counter -> String.valueOf(gameState.getCounter(counter)));
+            output = resolvePlaceholder(output, flagPlaceholderPattern, counter -> String.valueOf(gameState.getFlag(counter)));
+            output = resolvePlaceholder(output, stringPlaceholderPattern, gameState::getString);
             display.print(output);
         };
     }
@@ -137,7 +166,7 @@ public final class Results {
      * Sets named counter to integer VALUE
      */
     public static Result setCounter(String name, Integer value) {
-       return (command, gameState, display) -> gameState.setCounter(name, value);
+        return (command, gameState, display) -> gameState.setCounter(name, value);
     }
 
     /**
