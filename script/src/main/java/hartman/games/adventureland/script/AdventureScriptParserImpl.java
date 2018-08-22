@@ -244,9 +244,8 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
             room.setExitTowardsSelf(direction);
         }
 
-        Room setExit(Word direction, Room towards) {
+        void setExit(Word direction, Room towards) {
             room.setExit(direction, towards);
-            return towards;
         }
 
     }
@@ -271,7 +270,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
     private static class RoomDeclarationVisitor extends AdventureBaseVisitor<RoomHolder> {
 
-        private RoomExitVisitor visitor = new RoomExitVisitor();
+        private RoomExitVisitor roomExitVisitor = new RoomExitVisitor();
 
         @Override
         public RoomHolder visitRoomDeclaration(RoomDeclarationContext ctx) {
@@ -279,7 +278,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
             List<RoomExitHolder> roomExitHolders =
                     ofNullable(ctx.roomExits())
                             .map(roomExitsContext -> roomExitsContext.roomExit().stream()
-                                    .map(roomExitContext -> roomExitContext.accept(visitor))
+                                    .map(roomExitContext -> roomExitContext.accept(roomExitVisitor))
                                     .collect(toList()))
                             .orElse(emptyList());
 
