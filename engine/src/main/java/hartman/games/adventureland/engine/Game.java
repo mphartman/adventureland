@@ -16,10 +16,15 @@ public class Game {
 
     public GameState run(GameState gameState) {
         while (gameState.isRunning()) {
-            runOccurs(gameState);
-            if (gameState.isRunning()) {
-                runActions(gameState, interpreter.nextCommand());
-            }
+            gameState = takeTurn(gameState, interpreter);
+        }
+        return gameState;
+    }
+
+    public GameState takeTurn(GameState gameState, CommandInterpreter interpreter) {
+        runOccurs(gameState);
+        if (gameState.isRunning()) {
+            runActions(gameState, interpreter.nextCommand());
         }
         return gameState;
     }
