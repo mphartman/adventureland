@@ -433,7 +433,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         @Override
         public Word visitActionWordDirection(ActionWordDirectionContext ctx) {
-            return new Word(ctx.exitDirection().getText());
+            return toWord.apply(ctx.exitDirection().getText());
         }
 
         @Override
