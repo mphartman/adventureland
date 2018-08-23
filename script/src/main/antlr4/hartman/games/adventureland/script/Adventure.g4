@@ -78,7 +78,7 @@ Number
     ;
 
 Identifier
-	:	Letter LetterOrDigit*
+	:	LetterOrDigit+
 	;
 
 fragment

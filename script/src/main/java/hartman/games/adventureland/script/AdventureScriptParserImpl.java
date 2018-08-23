@@ -10,6 +10,7 @@ import hartman.games.adventureland.engine.core.Actions;
 import hartman.games.adventureland.engine.core.Conditions;
 import hartman.games.adventureland.engine.core.Items;
 import hartman.games.adventureland.engine.core.Results;
+import hartman.games.adventureland.engine.core.Rooms;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -82,10 +83,9 @@ import static hartman.games.adventureland.script.AdventureParser.ResultSetString
 import static hartman.games.adventureland.script.AdventureParser.ResultSwapContext;
 import static hartman.games.adventureland.script.AdventureParser.RoomDeclarationContext;
 import static hartman.games.adventureland.script.AdventureParser.RoomExitContext;
+import static hartman.games.adventureland.script.AdventureParser.RoomExitsContext;
 import static hartman.games.adventureland.script.AdventureParser.WordGroupContext;
-import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 /**
@@ -113,50 +113,35 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         @Override
         public Adventure visitAdventure(AdventureContext adventureContext) {
-            List<Room> rooms = getRooms(adventureContext);
-            Room startingRoom = getStartingRoom(adventureContext, rooms);
-            Items items = getItems(adventureContext, rooms);
+            Rooms rooms = getRooms(adventureContext);
+            Set<Room> roomSet = rooms.copyOfRooms();
+
+            Room startingRoom = getStartingRoom(adventureContext, roomSet);
+
+            Items items = getItems(adventureContext, roomSet);
             Set<Item> itemSet = items.copyOfItems();
-            Actions occurs = getOccurs(adventureContext, itemSet, rooms);
-            Vocabulary vocabulary = getVocabulary(adventureContext);
-            Actions actions = getActions(adventureContext, vocabulary, itemSet, rooms);
+
+            Actions occurs = getOccurs(adventureContext, itemSet, roomSet);
+
+            Vocabulary vocabulary = getVocabulary(adventureContext).merge(rooms.buildVocabulary());
+
+            Actions actions = getActions(adventureContext, vocabulary, itemSet, roomSet);
+
             vocabulary = vocabulary.merge(actions.buildVocabulary());
+
             return new Adventure(vocabulary, occurs.copyOfActions(), actions.copyOfActions(), itemSet, startingRoom);
         }
 
-        private List<Room> getRooms(AdventureContext adventureContext) {
-
-            RoomDeclarationVisitor visitor = new RoomDeclarationVisitor();
-            List<RoomHolder> roomHolders = adventureContext.gameElement().stream()
+        private Rooms getRooms(AdventureContext adventureContext) {
+            Rooms rooms = Rooms.newRoomSet();
+            RoomDeclarationVisitor visitor = new RoomDeclarationVisitor(rooms);
+            adventureContext.gameElement().stream()
                     .filter(gameElementContext -> null != gameElementContext.roomDeclaration())
-                    .map(gameElementContext -> gameElementContext.roomDeclaration().accept(visitor))
-                    .collect(toList());
-
-            // resolve the room names to each exit to point to the referenced room object
-            roomHolders.forEach(roomHolder ->
-                    roomHolder.getExits().forEach(roomExitHolder -> {
-
-                        String exitRoomName = roomExitHolder.getRoomName();
-
-                        if (null == exitRoomName || exitRoomName.equals(roomHolder.getRoomName())) {
-                            roomHolder.setExitTowardsSelf(roomExitHolder.getDirection());
-
-                        } else {
-                            roomHolders.stream()
-                                    .filter(holder -> holder.getRoomName().equals(exitRoomName))
-                                    .map(RoomHolder::getRoom)
-                                    .findFirst()
-                                    .<Runnable>map(room -> () -> roomHolder.setExit(roomExitHolder.getDirection(), room))
-                                    .orElse(() -> {
-                                        throw new ParseCancellationException(String.format("Invalid exit. Room %s is not defined.", exitRoomName));
-                                    }).run(); // could be replaced with Java 9 ifPresentOrElse
-                        }
-                    }));
-
-            return roomHolders.stream().map(RoomHolder::getRoom).collect(toList());
+                    .forEach(gameElementContext -> gameElementContext.roomDeclaration().accept(visitor));
+            return rooms;
         }
 
-        private Room getStartingRoom(AdventureContext adventureContext, List<Room> rooms) {
+        private Room getStartingRoom(AdventureContext adventureContext, Set<Room> rooms) {
             if (rooms.isEmpty()) {
                 return Room.NOWHERE;
             }
@@ -164,7 +149,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
                     .flatMap(roomName -> rooms.stream()
                             .filter(room -> room.getName().equals(roomName))
                             .findFirst())
-                    .orElse(rooms.get(0));
+                    .orElse(rooms.iterator().next());
         }
 
         private Optional<String> getGlobalParameterStart(AdventureContext adventureContext) {
@@ -177,7 +162,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
                     })).findFirst();
         }
 
-        private Items getItems(AdventureContext adventureContext, List<Room> rooms) {
+        private Items getItems(AdventureContext adventureContext, Set<Room> rooms) {
             Items items = Items.newItemSet();
             ItemDeclarationVisitor visitor = new ItemDeclarationVisitor(items, rooms);
             adventureContext.gameElement().stream()
@@ -195,7 +180,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
             return new Vocabulary(words);
         }
 
-        private Actions getActions(AdventureContext adventureContext, Vocabulary vocabulary, Set<Item> items, List<Room> rooms) {
+        private Actions getActions(AdventureContext adventureContext, Vocabulary vocabulary, Set<Item> items, Set<Room> rooms) {
             Actions actions = Actions.newActionSet();
             ActionDeclarationVisitor visitor = new ActionDeclarationVisitor(actions, items, rooms, vocabulary);
             adventureContext.gameElement().stream()
@@ -204,7 +189,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
             return actions;
         }
 
-        private Actions getOccurs(AdventureContext adventureContext, Set<Item> items, List<Room> rooms) {
+        private Actions getOccurs(AdventureContext adventureContext, Set<Item> items, Set<Room> rooms) {
             Actions actions = Actions.newActionSet();
             OccursDeclarationVisitor visitor = new OccursDeclarationVisitor(actions, items, rooms);
             adventureContext.gameElement().stream()
@@ -214,90 +199,57 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         }
     }
 
-    private static class RoomHolder {
-        private final Room room;
-        private final List<RoomExitHolder> exits;
+    private static class RoomDeclarationVisitor extends AdventureBaseVisitor<Void> {
 
-        RoomHolder(Room room, List<RoomExitHolder> exits) {
-            this.room = room;
-            this.exits = exits;
+        private Rooms rooms;
+
+        private RoomDeclarationVisitor(Rooms rooms) {
+            this.rooms = rooms;
         }
-
-        Room getRoom() {
-            return room;
-        }
-
-        String getRoomName() {
-            return room.getName();
-        }
-
-        List<RoomExitHolder> getExits() {
-            return exits;
-        }
-
-        void setExitTowardsSelf(Word direction) {
-            room.setExitTowardsSelf(direction);
-        }
-
-        void setExit(Word direction, Room towards) {
-            room.setExit(direction, towards);
-        }
-
-    }
-
-    private static class RoomExitHolder {
-        private final Word direction;
-        private final String roomName;
-
-        RoomExitHolder(Word direction, String roomName) {
-            this.direction = direction;
-            this.roomName = roomName;
-        }
-
-        Word getDirection() {
-            return direction;
-        }
-
-        String getRoomName() {
-            return roomName;
-        }
-    }
-
-    private static class RoomDeclarationVisitor extends AdventureBaseVisitor<RoomHolder> {
-
-        private RoomExitVisitor roomExitVisitor = new RoomExitVisitor();
 
         @Override
-        public RoomHolder visitRoomDeclaration(RoomDeclarationContext ctx) {
-            String name = ctx.roomName().getText();
-            String description = ctx.roomDescription().getText();
-            Room room = new Room(name, description);
+        public Void visitRoomDeclaration(RoomDeclarationContext ctx) {
+            Rooms.RoomBuilder roomBuilder = rooms
+                    .newRoom()
+                    .named(ctx.roomName().getText())
+                    .describedAs(ctx.roomDescription().getText());
+            setExits(ctx.roomExits(), roomBuilder);
+            roomBuilder.build();
+            return null;
+        }
 
-            List<RoomExitHolder> roomExitHolders =
-                    ofNullable(ctx.roomExits())
-                            .map(roomExitsContext -> roomExitsContext.roomExit().stream()
-                                    .map(roomExitContext -> roomExitContext.accept(roomExitVisitor))
-                                    .collect(toList()))
-                            .orElse(emptyList());
-
-            return new RoomHolder(room, roomExitHolders);
+        private void setExits(RoomExitsContext context, Rooms.RoomBuilder roomBuilder) {
+            RoomExitVisitor roomExitVisitor = new RoomExitVisitor(roomBuilder);
+            ofNullable(context)
+                    .ifPresent(roomExitsContext -> roomExitsContext.roomExit()
+                            .forEach(roomExitContext -> roomExitContext.accept(roomExitVisitor)));
         }
     }
 
-    private static class RoomExitVisitor extends AdventureBaseVisitor<RoomExitHolder> {
+    private static class RoomExitVisitor extends AdventureBaseVisitor<Void> {
+        private Rooms.RoomBuilder roomBuilder;
+
+        private RoomExitVisitor(Rooms.RoomBuilder roomBuilder) {
+            this.roomBuilder = roomBuilder;
+        }
+
         @Override
-        public RoomExitHolder visitRoomExit(RoomExitContext ctx) {
-            Word direction = new Word(ctx.exitDirection().getText());
-            String roomName = ofNullable(ctx.roomName()).map(RuleContext::getText).orElse(null);
-            return new RoomExitHolder(direction, roomName);
+        public Void visitRoomExit(RoomExitContext ctx) {
+            Rooms.RoomExitBuilder roomExitBuilder = roomBuilder.withExit();
+            roomExitBuilder.inDirectionOf(ctx.exitDirection().getText());
+            ofNullable(ctx.roomName())
+                    .map(RuleContext::getText)
+                    .ifPresent(roomExitBuilder::towards);
+            roomExitBuilder.buildExit();
+            return null;
         }
     }
 
     private static class ItemDeclarationVisitor extends AdventureBaseVisitor<Item> {
         private final Items items;
-        private final List<Room> rooms;
+        private final Set<Room> rooms;
 
-        private ItemDeclarationVisitor(Items items, List<Room> rooms) {
+        private ItemDeclarationVisitor(Items items, Set<Room> rooms) {
             this.items = items;
             this.rooms = rooms;
         }
@@ -330,9 +282,9 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
     private static class ItemLocationVisitor extends AdventureBaseVisitor<Item.Builder> {
         private final Item.Builder builder;
-        private final List<Room> rooms;
+        private final Set<Room> rooms;
 
-        private ItemLocationVisitor(Item.Builder builder, List<Room> rooms) {
+        private ItemLocationVisitor(Item.Builder builder, Set<Room> rooms) {
             this.builder = builder;
             this.rooms = rooms;
         }
@@ -370,9 +322,9 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
     private static class OccursDeclarationVisitor extends AdventureBaseVisitor<Action> {
         private final Actions actions;
         private final Set<Item> items;
-        private final List<Room> rooms;
+        private final Set<Room> rooms;
 
-        private OccursDeclarationVisitor(Actions actions, Set<Item> items, List<Room> rooms) {
+        private OccursDeclarationVisitor(Actions actions, Set<Item> items, Set<Room> rooms) {
             this.actions = actions;
             this.items = items;
             this.rooms = rooms;
@@ -406,7 +358,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         private final Actions actions;
         private final ActionWordVisitor actionWordVisitor;
 
-        private ActionDeclarationVisitor(Actions actions, Set<Item> items, List<Room> rooms, Vocabulary vocabulary) {
+        private ActionDeclarationVisitor(Actions actions, Set<Item> items, Set<Room> rooms, Vocabulary vocabulary) {
             super(actions, items, rooms);
             this.actions = actions;
             this.actionWordVisitor = new ActionWordVisitor(vocabulary);
@@ -503,9 +455,9 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
     private abstract static class ActionVisitor<T> extends AdventureBaseVisitor<T> {
         private final Set<Item> items;
-        private final List<Room> rooms;
+        private final Set<Room> rooms;
 
-        private ActionVisitor(Set<Item> items, List<Room> rooms) {
+        private ActionVisitor(Set<Item> items, Set<Room> rooms) {
             this.items = items;
             this.rooms = rooms;
         }
@@ -528,7 +480,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
     private static class ActionResultDeclarationVisitor extends ActionVisitor<Action.Result> {
 
-        private ActionResultDeclarationVisitor(Set<Item> items, List<Room> rooms) {
+        private ActionResultDeclarationVisitor(Set<Item> items, Set<Room> rooms) {
             super(items, rooms);
         }
 
@@ -651,7 +603,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
     private static class ActionConditionDeclarationVisitor extends ActionVisitor<Action.Condition> {
 
-        private ActionConditionDeclarationVisitor(Set<Item> items, List<Room> rooms) {
+        private ActionConditionDeclarationVisitor(Set<Item> items, Set<Room> rooms) {
             super(items, rooms);
         }
 

@@ -14,8 +14,10 @@ start bridge
 ##
 
 room bridge "I'm on the bridge of the starship.\nI can see the helm, navigator, science, tactical, communications and engineering stations."
+    exit turbolift turbolift
 
 room engineering "I'm in main engineering."
+    exit turbolift turbolift
 
 room medbay "I'm in the medical bay."
 
@@ -28,6 +30,8 @@ room captains_cabin "I'm in the captain's personal cabin."
 room transporter_room "I'm in the transporter room."
 
 room turbolift "I'm in the main turbolift."
+    exit bridge bridge
+    exit engineering engineering
 
 room engine_room "I'm standing in the engine room."
 

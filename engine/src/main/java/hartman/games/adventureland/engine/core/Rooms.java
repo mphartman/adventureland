@@ -9,7 +9,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.toCollection;
 
 public final class Rooms {
 
@@ -143,7 +143,7 @@ public final class Rooms {
 
     public Set<Room> copyOfRooms() {
         resolveExits();
-        return roomHolders.stream().map(RoomHolder::getRoom).collect(toSet());
+        return roomHolders.stream().map(RoomHolder::getRoom).collect(toCollection(LinkedHashSet::new));
     }
 
     private void resolveExits() {

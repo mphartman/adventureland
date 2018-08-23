@@ -3,6 +3,24 @@
 
 I'm on the bridge of the starship.
 I can see the helm, navigator, science, tactical, communications and engineering stations.
+Room exits: turbolift
 Inventory is empty.
+> go turbolift (go turbolift)
+
+I'm in the main turbolift.
+Room exits: bridge, engineering
+> go engineering (go engineering)
+
+I'm in main engineering.
+Room exits: turbolift
+> go turbolift (go turbolift)
+
+I'm in the main turbolift.
+Room exits: bridge, engineering
+> go bridge (go bridge)
+
+I'm on the bridge of the starship.
+I can see the helm, navigator, science, tactical, communications and engineering stations.
+Room exits: turbolift
 > quit (quit <none>)
 
