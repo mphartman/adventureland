@@ -40,4 +40,19 @@ public class CommandTest {
         assertNotEquals(c4, c5);
         assertNotEquals(c5, c4);
     }
+
+    @Test
+    public void commandAcceptsListOfWords() {
+        Command command = new Command(new Word("apple"), new Word("banana"), new Word("carrot"), new Word("dog"));
+        assertEquals(new Word("apple"), command.getFirstWord());
+        assertEquals(new Word("banana"), command.getSecondWord());
+    }
+
+    @Test
+    public void commandEqualityConsidersFullWordListAndIsOrderSensitive() {
+        Command command = new Command(new Word("apple"), new Word("banana"), new Word("carrot"), new Word("dog"));
+        Command command2 = new Command(new Word("apple"), new Word("banana"), new Word("dog"), new Word("carrot"));
+        assertNotEquals(command, command2);
+    }
+
 }

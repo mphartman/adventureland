@@ -1,6 +1,9 @@
 package hartman.games.adventureland.engine;
 
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * The player's desired action represented by a two-word phrase.
@@ -8,35 +11,41 @@ import java.util.Objects;
 public class Command {
     public static final Command NONE = new Command(Word.NONE, Word.NONE);
 
-    private final Word first;
-    private final Word second;
+    private final LinkedList<Word> words = new LinkedList<>();
+
+    public Command(Word... wordList) {
+        if (wordList.length == 0) {
+            throw new IllegalArgumentException("Must have at least one word.");
+        }
+        this.words.addAll(Arrays.stream(wordList).filter(Objects::nonNull).collect(Collectors.toList()));
+        if (this.words.isEmpty()) {
+            throw new IllegalArgumentException("Words must contain as least one non-null value.");
+        }
+    }
 
     public Command(Word first, Word second) {
-        Objects.requireNonNull(first, "First word cannot be null.");
-        Objects.requireNonNull(second, "Second word cannot be null.");
-        this.first = first;
-        this.second = second;
+        this(new Word[]{first, second});
     }
 
     public Command(Word first) {
-        this(first, Word.NONE);
+        this(new Word[]{first, Word.NONE});
     }
 
     public Word getSecondThenFirst() {
-        return second.equals(Word.NONE) ? first : second;
+        return getSecondWord().equals(Word.NONE) ? getFirstWord() : getSecondWord();
     }
 
     public Word getFirstWord() {
-        return first;
+        return words.getFirst();
     }
 
     public Word getSecondWord() {
-        return second;
+        return words.size() > 1 ? words.get(1) : Word.NONE;
     }
 
     @Override
     public String toString() {
-        return String.format("%s %s", first.getName(), second.getName());
+        return String.format("%s %s", getFirstWord().getName(), getSecondWord().getName());
     }
 
     @Override
@@ -46,14 +55,11 @@ public class Command {
 
         Command command = (Command) o;
 
-        if (!first.equals(command.first)) return false;
-        return second.equals(command.second);
+        return words.equals(command.words);
     }
 
     @Override
     public int hashCode() {
-        int result = first.hashCode();
-        result = 31 * result + second.hashCode();
-        return result;
+        return words.hashCode();
     }
 }
