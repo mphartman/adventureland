@@ -3,6 +3,7 @@ package hartman.games.adventureland.engine;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -13,6 +14,11 @@ public class Command {
 
     private final LinkedList<Word> words = new LinkedList<>();
 
+    /**
+     * Creates a new command from the given list of words.
+     *
+     * @throws IllegalArgumentException if wordList is empty or all elements are null
+     */
     public Command(Word... wordList) {
         if (wordList.length == 0) {
             throw new IllegalArgumentException("Must have at least one word.");
@@ -43,9 +49,21 @@ public class Command {
         return words.size() > 1 ? words.get(1) : Word.NONE;
     }
 
+    /**
+     * Return the word from this Command's word list at the given element position.
+     * Position 1 represents the first word, 2 represents the second, and so on.
+     */
+    public Optional<Word> getWord(int position) {
+        if (position > 0 && position <= words.size()) {
+            return Optional.of(words.get(position - 1));
+        } else {
+            return Optional.empty();
+        }
+    }
+
     @Override
     public String toString() {
-        return String.format("%s %s", getFirstWord().getName(), getSecondWord().getName());
+        return words.stream().map(Word::getName).collect(Collectors.joining(" "));
     }
 
     @Override

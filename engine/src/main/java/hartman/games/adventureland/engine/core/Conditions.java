@@ -40,31 +40,45 @@ public final class Conditions {
     }
 
     /**
+     * TRUE if word matches the Command word at the given position (1 based index)
+     */
+    public static Condition wordMatches(Word word, int position) {
+        return (command, gameState) -> command.getWord(position).map(word::matches).orElse(Boolean.FALSE);
+    }
+
+    /**
+     * TRUE if Command first word matches any of the given words.
+     */
+    public static Condition anyMatchesWord(int position, Word... words) {
+        return (command, gameState) -> stream(words).anyMatch(word -> wordMatches(word, position).matches(command, gameState));
+    }
+
+    /**
      * TRUE if word matches Command first word
      */
     public static Condition firstWordMatches(Word word) {
-        return ((command, gameState) -> word.matches(command.getFirstWord()));
+        return wordMatches(word, 1);
     }
 
     /**
      * TRUE if Command first word matches any of the given words.
      */
     public static Condition anyMatchesFirstWord(Word... words) {
-        return (command, gameState) -> stream(words).anyMatch(verb -> verb.matches(command.getFirstWord()));
+        return anyMatchesWord(1, words);
     }
 
     /**
      * TRUE if word matches Command second word
      */
     public static Condition secondWordMatches(Word word) {
-        return ((command, gameState) -> word.matches(command.getSecondWord()));
+        return wordMatches(word, 2);
     }
 
     /**
      * TRUE if Command second word matches any of the given words.
      */
     public static Condition anyMatchesSecondWord(Word... words) {
-        return (command, gameState) -> stream(words).anyMatch(noun -> noun.matches(command.getSecondWord()));
+        return anyMatchesWord(2, words);
     }
 
     /**
