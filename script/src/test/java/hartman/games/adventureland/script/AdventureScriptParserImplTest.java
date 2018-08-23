@@ -530,7 +530,7 @@ public class AdventureScriptParserImplTest {
 
         action.run(gameState, testDisplay, new Command(new Word("swim"), new Word("underwater")));
 
-        assertEquals("I\nam\ndrowning\n...\n...\n...\n", testDisplay.toString());
+        assertEquals(String.format("I%nam%ndrowning%n...%n...%n...%n"), testDisplay.toString());
 
     }
 }
