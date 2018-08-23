@@ -187,6 +187,10 @@ itemName
     :   Identifier
     ;
 
+itemDescription
+    :   StringLiteral
+    ;
+
 itemLocation
     :   (AT | IN)   roomName        #itemInRoom
     |   NOWHERE                     #itemIsNowhere
@@ -199,10 +203,6 @@ itemAliases
 
 itemAlias
     :   Identifier
-    ;
-
-itemDescription
-    :   StringLiteral
     ;
 
 vocabularyDeclaration

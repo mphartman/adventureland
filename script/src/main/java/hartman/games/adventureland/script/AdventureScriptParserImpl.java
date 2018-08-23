@@ -19,7 +19,6 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
-import org.antlr.v4.runtime.tree.RuleNode;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -61,10 +60,12 @@ import static hartman.games.adventureland.script.AdventureParser.ExitSouthContex
 import static hartman.games.adventureland.script.AdventureParser.ExitUpContext;
 import static hartman.games.adventureland.script.AdventureParser.ExitWestContext;
 import static hartman.games.adventureland.script.AdventureParser.GlobalParameterStartContext;
+import static hartman.games.adventureland.script.AdventureParser.ItemAliasesContext;
 import static hartman.games.adventureland.script.AdventureParser.ItemDeclarationContext;
 import static hartman.games.adventureland.script.AdventureParser.ItemInRoomContext;
 import static hartman.games.adventureland.script.AdventureParser.ItemIsInInventoryContext;
 import static hartman.games.adventureland.script.AdventureParser.ItemIsNowhereContext;
+import static hartman.games.adventureland.script.AdventureParser.ItemLocationContext;
 import static hartman.games.adventureland.script.AdventureParser.OccursDeclarationContext;
 import static hartman.games.adventureland.script.AdventureParser.ResultDecrementCounterContext;
 import static hartman.games.adventureland.script.AdventureParser.ResultDestroyContext;
@@ -299,77 +300,52 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
             Item.Builder builder = items.newItem()
                     .named(ctx.itemName().getText())
                     .describedAs(ctx.itemDescription().getText());
-
-            setAliases(ctx, builder);
-
-            setLocation(ctx, builder);
-
+            setAliases(ctx.itemAliases(), builder);
+            setLocation(ctx.itemLocation(), builder);
             return builder.build();
         }
 
-        private void setAliases(ItemDeclarationContext ctx, Item.Builder builder) {
-            ofNullable(ctx.itemAliases())
+        private void setAliases(ItemAliasesContext context, Item.Builder builder) {
+            ofNullable(context)
                     .ifPresent(aliasesContext -> ofNullable(aliasesContext.itemAlias())
                             .ifPresent(aliasContexts -> aliasContexts.stream()
                                     .map(RuleContext::getText)
                                     .forEach(s -> builder.alias(s).portable())));
         }
 
-        private void setLocation(ItemDeclarationContext thisItemCtx, Item.Builder builder) {
-            if (null != thisItemCtx.itemLocation()) {
-                thisItemCtx.itemLocation().accept(
-                        new AdventureBaseVisitor<Item.Builder>() {
-                            @Override
-                            public Item.Builder visitItemInRoom(ItemInRoomContext itemInRoomCtx) {
-                                return builder.in(rooms.stream()
-                                        .filter(room -> room.getName().equals(itemInRoomCtx.roomName().getText())).findFirst()
-                                        .orElseThrow(ParseCancellationException::new));
-                            }
+        private void setLocation(ItemLocationContext context, Item.Builder builder) {
+            ofNullable(context)
+                    .<Runnable>map(itemLocationContext -> () -> itemLocationContext.accept(new ItemLocationVisitor(builder, rooms)))
+                    .orElse(() -> builder.in(Room.NOWHERE))
+                    .run(); // Hack for ifPresentOrElse
+        }
+    }
 
-                            @Override
-                            public Item.Builder visitItemIsNowhere(ItemIsNowhereContext ctx) {
-                                return builder.in(Room.NOWHERE);
-                            }
+    private static class ItemLocationVisitor extends AdventureBaseVisitor<Item.Builder> {
+        private final Item.Builder builder;
+        private final List<Room> rooms;
 
-                            @Override
-                            public Item.Builder visitItemIsInInventory(ItemIsInInventoryContext ctx) {
-                                return builder.inInventory();
-                            }
-                        });
-            } else {
-                // find the closest previous room
-                ofNullable(thisItemCtx.getParent().getParent().accept(
-                        new AdventureBaseVisitor<String>() {
+        private ItemLocationVisitor(Item.Builder builder, List<Room> rooms) {
+            this.builder = builder;
+            this.rooms = rooms;
+        }
 
-                            private String roomName = null;
-                            private boolean shouldVisitNextChild = true;
+        @Override
+        public Item.Builder visitItemInRoom(ItemInRoomContext ctx) {
+            String roomName = ctx.roomName().getText();
+            return builder.in(rooms.stream()
+                    .filter(room -> room.getName().equals(roomName)).findFirst()
+                    .orElseThrow(ParseCancellationException::new));
+        }
 
-                            @Override
-                            public String visitRoomDeclaration(RoomDeclarationContext thatRoomCtx) {
-                                roomName = thatRoomCtx.roomName().getText();
-                                return super.visitRoomDeclaration(thatRoomCtx);
-                            }
+        @Override
+        public Item.Builder visitItemIsNowhere(ItemIsNowhereContext ctx) {
+            return builder.in(Room.NOWHERE);
+        }
 
-                            @Override
-                            public String visitItemDeclaration(ItemDeclarationContext thatItemCtx) {
-                                if (thisItemCtx.equals(thatItemCtx)) {
-                                    shouldVisitNextChild = false;
-                                    return roomName;
-                                }
-                                return super.visitItemDeclaration(thatItemCtx);
-                            }
-
-                            @Override
-                            protected boolean shouldVisitNextChild(RuleNode node, String currentResult) {
-                                return shouldVisitNextChild;
-                            }
-                        }
-                )).flatMap(roomName -> rooms.stream()
-                        .filter(room -> room.getName().equals(roomName))
-                        .findFirst())
-                        .ifPresent(builder::in);
-            }
-
+        @Override
+        public Item.Builder visitItemIsInInventory(ItemIsInInventoryContext ctx) {
+            return builder.inInventory();
         }
     }
 
