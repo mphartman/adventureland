@@ -3,6 +3,7 @@ package hartman.games.adventureland.engine;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class CommandTest {
 
@@ -22,4 +23,21 @@ public class CommandTest {
         assertEquals(new Word("second"), new Command(new Word("first"), new Word("second")).getSecondThenFirst());
     }
 
+    @Test
+    public void commandEquality() {
+        Command c1 = Command.NONE;
+        Command c2 = new Command(new Word("a"), new Word("b"));
+        Command c3 = new Command(new Word("a"), new Word("b"));
+        Command c4 = new Command(new Word("a"), new Word("c"));
+        Command c5 = new Command(new Word("d"), new Word("b"));
+
+        assertNotEquals(c1, c2);
+        assertNotEquals(c2, c1);
+        assertEquals(c2, c3);
+        assertEquals(c3, c2);
+        assertNotEquals(c3, c4);
+        assertNotEquals(c4, c3);
+        assertNotEquals(c4, c5);
+        assertNotEquals(c5, c4);
+    }
 }
