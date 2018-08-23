@@ -1,6 +1,18 @@
 grammar Adventure;
 
 //
+// comments
+//
+
+COMMENT
+    :   '/*' .*? '*/' -> skip
+    ;
+
+LINE_COMMENT
+    :   ('//' | '#') ~[\r\n]* -> skip
+    ;
+
+//
 // Keywords
 //
 
@@ -105,7 +117,7 @@ StringCharacters
 
 fragment
 StringCharacter
-	:	~["\\\r\n]
+	:	~["\\]
 	|	EscapeSequence
 	;
 
@@ -114,20 +126,8 @@ EscapeSequence
 	:	'\\' [btnfr"'\\]
 	;
 
-//
-// Whitespace and comments
-//
-
 WHITESPACE
     :  [ \t\r\n]+ -> skip
-    ;
-
-COMMENT
-    :   '/*' .*? '*/' -> skip
-    ;
-
-LINE_COMMENT
-    :   ('//' | '#') ~[\r\n]* -> skip
     ;
 
 adventure

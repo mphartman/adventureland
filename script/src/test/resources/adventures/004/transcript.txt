@@ -1,3 +1,6 @@
+
+            Welcome!
+
 I'm on the bridge of the starship.
 I can see the helm, navigator, science, tactical, communications and engineering stations.
 Inventory is empty.

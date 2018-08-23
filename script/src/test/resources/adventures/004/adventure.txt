@@ -2,7 +2,12 @@
 ## Test Adventure 004
 ##
 
+##
+## Parameters
+##
+
 start bridge
+
 
 ##
 ##  Rooms
@@ -46,6 +51,22 @@ item tricorder "a standard tricorder"
     nowhere
     called tricorder
 
+
+##
+## Occurs
+##
+
+/*
+ *
+ *  Introduction
+ *
+ */
+
+    occurs
+        when times 1
+        then print "
+            Welcome!
+"
 
 ##
 ## Actions
