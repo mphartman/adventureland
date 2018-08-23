@@ -69,7 +69,15 @@ item tricorder "a standard tricorder"
     occurs
         when times 1
         then print "
+
             Welcome!
+
+\==============_=_/ ____.---'---`---.____
+            \_ \    \----._________.----/
+              \ \   /  /    `-_-'
+          __,--`.`-'..'-_
+         /____          ||
+              `--.____,-'
 "
 
 ##
