@@ -74,9 +74,9 @@ public final class Rooms {
         }
 
         public RoomBuilder buildExit() {
-            Word direction = new Word(this.direction);
-            Rooms.this.words.add(direction);
-            RoomExitHolder roomExitHolder = new RoomExitHolder(direction, targetRoomName);
+            Word directionWord = new Word(this.direction);
+            Rooms.this.words.add(directionWord);
+            RoomExitHolder roomExitHolder = new RoomExitHolder(directionWord, targetRoomName);
             roomBuilder.addExit(roomExitHolder);
             return roomBuilder;
         }
