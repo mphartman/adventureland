@@ -40,13 +40,27 @@ public class DefaultDisplayTest {
     }
 
     @Test
-    public void lookShouldDescribeRoomAndItems() {
+    public void lookShouldDescribeRoomAndItem() {
         Room garage = new Room("garage", "A messy garage");
         Item wrench = new Item.Builder().named("wrench").describedAs("A monkey wrench").in(garage).build();
 
         display.look(garage, singletonList(wrench));
         assertTrue(out.toString().contains(garage.getDescription()));
         assertTrue(out.toString().contains(wrench.getDescription()));
+    }
+
+    @Test
+    public void lookShouldDescribeRoomAndMultipleItems() {
+        Room garage = new Room("garage", "A messy garage");
+        Item wrench = new Item.Builder().named("wrench").describedAs("A monkey wrench").in(garage).build();
+        Item hammer = new Item.Builder().named("hammer").describedAs("A hammer").in(garage).build();
+        Item toolbox = new Item.Builder().named("toolbox").describedAs("A toolbox").in(garage).build();
+
+        display.look(garage, asList(wrench, hammer, toolbox));
+        assertTrue(out.toString().contains(garage.getDescription()));
+        assertTrue(out.toString().contains(wrench.getDescription()));
+        assertTrue(out.toString().contains(hammer.getDescription()));
+        assertTrue(out.toString().contains(toolbox.getDescription()));
     }
 
     @Test
