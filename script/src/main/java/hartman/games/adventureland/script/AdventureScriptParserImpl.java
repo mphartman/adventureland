@@ -374,9 +374,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         @Override
         public Action visitOccursDeclaration(OccursDeclarationContext ctx) {
             Actions.ActionBuilder builder = actions.newAction();
-            if (null != ctx.Number()) {
-                builder.when(Conditions.random(Integer.parseInt(ctx.Number().getText())));
-            }
+            ofNullable(ctx.Number()).ifPresent(number -> builder.when(Conditions.random(Integer.parseInt(number.getText()))));
             actionResults(ctx.actionResultDeclaration(), builder);
             actionConditions(ctx.actionConditionDeclaration(), builder);
             return builder.build();
