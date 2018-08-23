@@ -306,7 +306,7 @@ public class AdventureScriptParserImplTest {
 
     @Test
     @AdventureScriptResource("/scripts/312adventure.txt")
-    public void actionWordsOnlyRecognizeFirstTwoWords() {
+    public void actionWordsRecognizeAllWords() {
         Adventure adventure = adventureScriptParsingRule.parse();
 
         Action action = adventure.getActions().iterator().next();
@@ -315,6 +315,9 @@ public class AdventureScriptParserImplTest {
         Display display = new TestDisplay();
 
         action.run(gameState, display, new Command(new Word("throw"), new Word("axe")));
+        assertNotEquals(String.format("Missed!%n"), display.toString());
+
+        action.run(gameState, display, new Command(new Word("throw"), new Word("axe"), new Word("at"), new Word("bear")));
         assertEquals(String.format("Missed!%n"), display.toString());
     }
 

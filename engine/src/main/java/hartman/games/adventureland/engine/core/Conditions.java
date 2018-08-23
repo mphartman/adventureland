@@ -54,34 +54,6 @@ public final class Conditions {
     }
 
     /**
-     * TRUE if word matches Command first word
-     */
-    public static Condition firstWordMatches(Word word) {
-        return wordMatches(word, 1);
-    }
-
-    /**
-     * TRUE if Command first word matches any of the given words.
-     */
-    public static Condition anyMatchesFirstWord(Word... words) {
-        return anyMatchesWord(1, words);
-    }
-
-    /**
-     * TRUE if word matches Command second word
-     */
-    public static Condition secondWordMatches(Word word) {
-        return wordMatches(word, 2);
-    }
-
-    /**
-     * TRUE if Command second word matches any of the given words.
-     */
-    public static Condition anyMatchesSecondWord(Word... words) {
-        return anyMatchesWord(2, words);
-    }
-
-    /**
      * True if player's requested noun represents a valid direction and that the current room
      * she is in has an exit matching that direction.
      */

@@ -10,10 +10,8 @@ import java.util.Set;
 import static hartman.games.adventureland.engine.Word.ANY;
 import static hartman.games.adventureland.engine.Word.NONE;
 import static hartman.games.adventureland.engine.Word.UNRECOGNIZED;
-import static hartman.games.adventureland.engine.core.Conditions.anyMatchesFirstWord;
-import static hartman.games.adventureland.engine.core.Conditions.anyMatchesSecondWord;
-import static hartman.games.adventureland.engine.core.Conditions.firstWordMatches;
-import static hartman.games.adventureland.engine.core.Conditions.secondWordMatches;
+import static hartman.games.adventureland.engine.core.Conditions.anyMatchesWord;
+import static hartman.games.adventureland.engine.core.Conditions.wordMatches;
 import static java.util.Arrays.asList;
 
 public final class Actions {
@@ -24,12 +22,23 @@ public final class Actions {
 
     public class ActionBuilder extends Action.Builder {
 
-        private ActionBuilder() {}
+        private ActionBuilder() {
+        }
+
+        public ActionBuilder onWordAt(int position, Word word) {
+            words.add(word);
+            when(wordMatches(word, position));
+            return this;
+        }
+
+        public ActionBuilder onAnyWordAt(int position, Word... wordList) {
+            words.addAll(asList(wordList));
+            when(anyMatchesWord(position, wordList));
+            return this;
+        }
 
         public ActionBuilder on(Word verb) {
-            words.add(verb);
-            when(firstWordMatches(verb));
-            return this;
+            return onWordAt(1, verb);
         }
 
         public ActionBuilder onNoFirstWord() {
@@ -45,15 +54,11 @@ public final class Actions {
         }
 
         public ActionBuilder onAnyFirstWords(Word... verbs) {
-            words.addAll(asList(verbs));
-            when(anyMatchesFirstWord(verbs));
-            return this;
+            return onAnyWordAt(1, verbs);
         }
 
         public ActionBuilder with(Word word) {
-            words.add(word);
-            when(secondWordMatches(word));
-            return this;
+            return onWordAt(2, word);
         }
 
         public ActionBuilder the(Word word) {
@@ -77,9 +82,7 @@ public final class Actions {
         }
 
         public ActionBuilder withAnySecondWords(Word... nouns) {
-            words.addAll(asList(nouns));
-            when(anyMatchesSecondWord(nouns));
-            return this;
+            return onAnyWordAt(2, nouns);
         }
 
         @Override

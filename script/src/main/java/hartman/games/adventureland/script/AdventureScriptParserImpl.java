@@ -25,7 +25,7 @@ import java.io.Reader;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -33,7 +33,6 @@ import static hartman.games.adventureland.script.AdventureParser.ActionCondition
 import static hartman.games.adventureland.script.AdventureParser.ActionDeclarationContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionResultDeclarationContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionWordAnyContext;
-import static hartman.games.adventureland.script.AdventureParser.ActionWordContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionWordDirectionContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionWordListContext;
 import static hartman.games.adventureland.script.AdventureParser.ActionWordNoneContext;
@@ -374,46 +373,19 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         }
 
         private void actionCommand(ActionDeclarationContext ctx, Actions.ActionBuilder builder) {
-            int wordSetCount = 0;
+            AtomicInteger position = new AtomicInteger(1);
             for (ActionWordOrListContext actionWordOrListContext : ctx.actionCommand().actionWordOrList()) {
 
-                if (wordSetCount >= 2) {
-                    break;
-                }
+                ofNullable(actionWordOrListContext.actionWord())
+                        .map(actionWordContext -> actionWordContext.accept(actionWordVisitor))
+                        .ifPresent(word -> builder.onWordAt(position.getAndIncrement(), word));
 
-                if (actionWord((wordSetCount == 0) ? builder::on : builder::with, actionWordOrListContext.actionWord())) {
-                    wordSetCount++;
-                }
-
-                if (actionWordList((wordSetCount == 0) ? builder::onAnyFirstWords : builder::withAnySecondWords, actionWordOrListContext.actionWordList())) {
-                    wordSetCount++;
-                }
+                ofNullable(actionWordOrListContext.actionWordList())
+                        .map(ActionWordListContext::actionWord)
+                        .map(actionWordContextList -> actionWordContextList.stream().map(actionWordContext -> actionWordContext.accept(actionWordVisitor)))
+                        .map(wordStream -> wordStream.toArray(Word[]::new))
+                        .ifPresent(list -> builder.onAnyWordAt(position.getAndIncrement(), list));
             }
-        }
-
-        private boolean actionWord(Consumer<Word> builderFn, ActionWordContext actionWordContext) {
-            if (null == actionWordContext) {
-                return false;
-            }
-            Word word = actionWordContext.accept(actionWordVisitor);
-            builderFn.accept(word);
-            return true;
-        }
-
-        private boolean actionWordList(Consumer<Word[]> builderFn, ActionWordListContext actionWordListContext) {
-            if (null == actionWordListContext) {
-                return false;
-            }
-
-            Word[] words = actionWordListContext.actionWord().stream()
-                    .map(actionWordContext -> actionWordContext.accept(actionWordVisitor))
-                    .toArray(Word[]::new);
-
-            if (words.length > 0) {
-                builderFn.accept(words);
-                return true;
-            }
-            return false;
         }
 
     }
