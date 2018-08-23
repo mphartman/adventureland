@@ -33,13 +33,6 @@ NOT             : 'not' | '!';
 THEN            : 'then';
 OCCURS          : 'occurs';
 
-NORTH           : 'north';
-SOUTH           : 'south';
-EAST            : 'east';
-WEST            : 'west';
-UP              : 'up';
-DOWN            : 'down';
-
 START           : 'start';
 
 WORDGROUP       : 'wordgroup';
@@ -167,12 +160,7 @@ roomExit
     ;
 
 exitDirection
-    :   NORTH   #exitNorth
-    |   SOUTH   #exitSouth
-    |   EAST    #exitEast
-    |   WEST    #exitWest
-    |   UP      #exitUp
-    |   DOWN    #exitDown
+    :   Identifier
     ;
 
 startParameter

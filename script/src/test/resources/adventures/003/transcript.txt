@@ -8,7 +8,7 @@ Inventory items: a bloody knife
 
 I'm at the top of long flight of stairs which lead down.
 Room exits: North, Down
-> go down (go Down)
+> go down (go down)
 
 I'm looking north down a long hallway. There are stairs leading up.
 Room exits: Up

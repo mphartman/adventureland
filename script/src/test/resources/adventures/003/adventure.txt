@@ -29,17 +29,17 @@ occurs
 ##
 
 room bedroom "I'm in a luxurious master bedroom with a huge king-size bed."
-    exit south top_stairs
+    exit South top_stairs
 
 room top_stairs "I'm at the top of long flight of stairs which lead down."
-    exit north bedroom
-    exit down front_hallway
+    exit North bedroom
+    exit Down front_hallway
 
 room front_hallway "I'm looking north down a long hallway. There are stairs leading up."
-    exit up top_stairs
+    exit Up top_stairs
 
 room outside "I'm outside. I've made it."
-    exit south front_hallway
+    exit South front_hallway
 
 
 ##

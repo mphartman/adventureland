@@ -78,10 +78,13 @@ public class AdventureScriptParserImplTest {
         assertEquals("hallway's north exit is to self", hallway, hallway.exit(new Word("north")));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     @AdventureScriptResource("/scripts/030adventure.txt")
-    public void badExitDirection() {
-        adventureScriptParsingRule.parse();
+    public void exitDirectsBackOnSelfGivenNoRoomName() {
+        Adventure adventure = adventureScriptParsingRule.parse();
+        Room room = adventure.getStartRoom();
+        assertTrue(room.hasExit(new Word("foobar")));
+        assertEquals(room, room.exit(new Word("foobar")));
     }
 
     @Test(expected = IllegalStateException.class)

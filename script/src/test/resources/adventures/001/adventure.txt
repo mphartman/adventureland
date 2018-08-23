@@ -1,10 +1,10 @@
 # Test Adventure 001
 
 room chamber "I'm in a square chamber."
-	exit east dungeon
+	exit East dungeon
 
 room dungeon "I'm in a gloomy dungeon."
-	exit west chamber
+	exit West chamber
 
 
 # Standard actions

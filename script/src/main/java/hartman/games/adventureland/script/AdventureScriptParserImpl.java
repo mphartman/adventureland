@@ -10,7 +10,6 @@ import hartman.games.adventureland.engine.core.Actions;
 import hartman.games.adventureland.engine.core.Conditions;
 import hartman.games.adventureland.engine.core.Items;
 import hartman.games.adventureland.engine.core.Results;
-import hartman.games.adventureland.engine.core.Words;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -53,12 +52,6 @@ import static hartman.games.adventureland.script.AdventureParser.ConditionItemIs
 import static hartman.games.adventureland.script.AdventureParser.ConditionItemIsPresentContext;
 import static hartman.games.adventureland.script.AdventureParser.ConditionRoomHasExitContext;
 import static hartman.games.adventureland.script.AdventureParser.ConditionTimesContext;
-import static hartman.games.adventureland.script.AdventureParser.ExitDownContext;
-import static hartman.games.adventureland.script.AdventureParser.ExitEastContext;
-import static hartman.games.adventureland.script.AdventureParser.ExitNorthContext;
-import static hartman.games.adventureland.script.AdventureParser.ExitSouthContext;
-import static hartman.games.adventureland.script.AdventureParser.ExitUpContext;
-import static hartman.games.adventureland.script.AdventureParser.ExitWestContext;
 import static hartman.games.adventureland.script.AdventureParser.GlobalParameterStartContext;
 import static hartman.games.adventureland.script.AdventureParser.ItemAliasesContext;
 import static hartman.games.adventureland.script.AdventureParser.ItemDeclarationContext;
@@ -292,46 +285,11 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
     }
 
     private static class RoomExitVisitor extends AdventureBaseVisitor<RoomExitHolder> {
-
-        private ExitDirectionVisitor exitDirectionVisitor = new ExitDirectionVisitor();
-
         @Override
         public RoomExitHolder visitRoomExit(RoomExitContext ctx) {
-            Word direction = ctx.exitDirection().accept(exitDirectionVisitor);
+            Word direction = new Word(ctx.exitDirection().getText());
             String roomName = ofNullable(ctx.roomName()).map(RuleContext::getText).orElse(null);
             return new RoomExitHolder(direction, roomName);
-        }
-    }
-
-    private static class ExitDirectionVisitor extends AdventureBaseVisitor<Word> {
-        @Override
-        public Word visitExitNorth(ExitNorthContext ctx) {
-            return Words.NORTH;
-        }
-
-        @Override
-        public Word visitExitSouth(ExitSouthContext ctx) {
-            return Words.SOUTH;
-        }
-
-        @Override
-        public Word visitExitEast(ExitEastContext ctx) {
-            return Words.EAST;
-        }
-
-        @Override
-        public Word visitExitWest(ExitWestContext ctx) {
-            return Words.WEST;
-        }
-
-        @Override
-        public Word visitExitUp(ExitUpContext ctx) {
-            return Words.UP;
-        }
-
-        @Override
-        public Word visitExitDown(ExitDownContext ctx) {
-            return Words.DOWN;
         }
     }
 
@@ -511,11 +469,9 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
     private static class ActionWordVisitor extends AdventureBaseVisitor<Word> {
 
         private final Function<String, Word> toWord;
-        private final ExitDirectionVisitor exitDirectionVisitor;
 
         private ActionWordVisitor(Vocabulary vocabulary) {
             this.toWord = text -> vocabulary.findMatch(text).orElse(new Word(text));
-            this.exitDirectionVisitor = new ExitDirectionVisitor();
         }
 
         @Override
@@ -525,7 +481,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         @Override
         public Word visitActionWordDirection(ActionWordDirectionContext ctx) {
-            return ctx.exitDirection().accept(exitDirectionVisitor);
+            return new Word(ctx.exitDirection().getText());
         }
 
         @Override
