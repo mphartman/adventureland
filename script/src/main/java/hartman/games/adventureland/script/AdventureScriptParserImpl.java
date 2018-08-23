@@ -221,6 +221,55 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         }
     }
 
+    private static class RoomHolder {
+        private final Room room;
+        private final List<RoomExitHolder> exits;
+
+        RoomHolder(Room room, List<RoomExitHolder> exits) {
+            this.room = room;
+            this.exits = exits;
+        }
+
+        Room getRoom() {
+            return room;
+        }
+
+        String getRoomName() {
+            return room.getName();
+        }
+
+        List<RoomExitHolder> getExits() {
+            return exits;
+        }
+
+        void setExitTowardsSelf(Word direction) {
+            room.setExitTowardsSelf(direction);
+        }
+
+        void setExit(Word direction, Room towards) {
+            room.setExit(direction, towards);
+        }
+
+    }
+
+    private static class RoomExitHolder {
+        private final Word direction;
+        private final String roomName;
+
+        RoomExitHolder(Word direction, String roomName) {
+            this.direction = direction;
+            this.roomName = roomName;
+        }
+
+        Word getDirection() {
+            return direction;
+        }
+
+        String getRoomName() {
+            return roomName;
+        }
+    }
+
     private static class RoomDeclarationVisitor extends AdventureBaseVisitor<RoomHolder> {
 
         private RoomExitVisitor roomExitVisitor = new RoomExitVisitor();
@@ -730,54 +779,4 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         }
     }
 
-}
-
-
-class RoomHolder {
-    private final Room room;
-    private final List<RoomExitHolder> exits;
-
-    RoomHolder(Room room, List<RoomExitHolder> exits) {
-        this.room = room;
-        this.exits = exits;
-    }
-
-    Room getRoom() {
-        return room;
-    }
-
-    String getRoomName() {
-        return room.getName();
-    }
-
-    List<RoomExitHolder> getExits() {
-        return exits;
-    }
-
-    void setExitTowardsSelf(Word direction) {
-        room.setExitTowardsSelf(direction);
-    }
-
-    void setExit(Word direction, Room towards) {
-        room.setExit(direction, towards);
-    }
-
-}
-
-class RoomExitHolder {
-    private final Word direction;
-    private final String roomName;
-
-    RoomExitHolder(Word direction, String roomName) {
-        this.direction = direction;
-        this.roomName = roomName;
-    }
-
-    Word getDirection() {
-        return direction;
-    }
-
-    String getRoomName() {
-        return roomName;
-    }
 }
