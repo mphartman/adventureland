@@ -19,6 +19,21 @@ import java.util.LinkedHashSet;
 import java.util.Scanner;
 import java.util.Set;
 
+import static hartman.games.adventureland.demo.Words.DOWN;
+import static hartman.games.adventureland.demo.Words.DROP;
+import static hartman.games.adventureland.demo.Words.EAST;
+import static hartman.games.adventureland.demo.Words.GET;
+import static hartman.games.adventureland.demo.Words.GO;
+import static hartman.games.adventureland.demo.Words.HELP;
+import static hartman.games.adventureland.demo.Words.INVENTORY;
+import static hartman.games.adventureland.demo.Words.LOOK;
+import static hartman.games.adventureland.demo.Words.NORTH;
+import static hartman.games.adventureland.demo.Words.OPEN;
+import static hartman.games.adventureland.demo.Words.QUIT;
+import static hartman.games.adventureland.demo.Words.SOUTH;
+import static hartman.games.adventureland.demo.Words.UP;
+import static hartman.games.adventureland.demo.Words.USE;
+import static hartman.games.adventureland.demo.Words.WEST;
 import static hartman.games.adventureland.engine.core.Actions.newActionSet;
 import static hartman.games.adventureland.engine.core.Conditions.carrying;
 import static hartman.games.adventureland.engine.core.Conditions.here;
@@ -42,21 +57,6 @@ import static hartman.games.adventureland.engine.core.Results.put;
 import static hartman.games.adventureland.engine.core.Results.putHere;
 import static hartman.games.adventureland.engine.core.Results.quit;
 import static hartman.games.adventureland.engine.core.Results.swap;
-import static hartman.games.adventureland.engine.core.Words.DOWN;
-import static hartman.games.adventureland.engine.core.Words.DROP;
-import static hartman.games.adventureland.engine.core.Words.EAST;
-import static hartman.games.adventureland.engine.core.Words.GET;
-import static hartman.games.adventureland.engine.core.Words.GO;
-import static hartman.games.adventureland.engine.core.Words.HELP;
-import static hartman.games.adventureland.engine.core.Words.INVENTORY;
-import static hartman.games.adventureland.engine.core.Words.LOOK;
-import static hartman.games.adventureland.engine.core.Words.NORTH;
-import static hartman.games.adventureland.engine.core.Words.OPEN;
-import static hartman.games.adventureland.engine.core.Words.QUIT;
-import static hartman.games.adventureland.engine.core.Words.SOUTH;
-import static hartman.games.adventureland.engine.core.Words.UP;
-import static hartman.games.adventureland.engine.core.Words.USE;
-import static hartman.games.adventureland.engine.core.Words.WEST;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 
@@ -264,9 +264,9 @@ public class HouseEscapeAdventure {
                 .on(kill).the(fly)
                 .when(here(fly))
                 .then(putHere(deadFly))
-                    .andThen(printf("%nWHACK! I got 'em! It's dead.%n"))
-                    .andThen(destroy(fly))
-                    .andThen(incrementCounter("deadFlies"))
+                .andThen(printf("%nWHACK! I got 'em! It's dead.%n"))
+                .andThen(destroy(fly))
+                .andThen(incrementCounter("deadFlies"))
                 .build();
 
         adventureActions.newAction()
@@ -404,4 +404,22 @@ public class HouseEscapeAdventure {
         return new Adventure(vocabulary, occurs.copyOfActions(), fullActionSet.copyOfActions(), itemSet.copyOfItems(), masterBedroom);
     }
 
+}
+
+final class Words {
+    static final Word HELP = new Word("HELP", "?");
+    static final Word QUIT = new Word("QUIT");
+    static final Word INVENTORY = new Word("INVENTORY", "I");
+    static final Word LOOK = new Word("LOOK", "L");
+    static final Word GO = new Word("GO", "GOTO", "ENTER", "WALK", "RUN", "EXIT", "LEAVE");
+    static final Word OPEN = new Word("OPEN", "UNLOCK");
+    static final Word GET = new Word("GET", "PICKUP", "GRAB", "TAKE");
+    static final Word DROP = new Word("DROP", "DISCARD");
+    static final Word USE = new Word("USE");
+    static final Word NORTH = new Word("North", "N");
+    static final Word SOUTH = new Word("South", "S");
+    static final Word UP = new Word("Up", "U");
+    static final Word DOWN = new Word("Down", "D");
+    static final Word EAST = new Word("East", "E");
+    static final Word WEST = new Word("West", "W");
 }

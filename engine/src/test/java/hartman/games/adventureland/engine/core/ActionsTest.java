@@ -13,6 +13,11 @@ import static hartman.games.adventureland.engine.Room.NOWHERE;
 import static hartman.games.adventureland.engine.Word.ANY;
 import static hartman.games.adventureland.engine.Word.NONE;
 import static hartman.games.adventureland.engine.Word.UNRECOGNIZED;
+import static hartman.games.adventureland.engine.core.TestWords.EAST;
+import static hartman.games.adventureland.engine.core.TestWords.GO;
+import static hartman.games.adventureland.engine.core.TestWords.NORTH;
+import static hartman.games.adventureland.engine.core.TestWords.SOUTH;
+import static hartman.games.adventureland.engine.core.TestWords.WEST;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -72,7 +77,7 @@ public class ActionsTest {
     public void builderReturnsActionWithConditionCapableOfMatchingAnyNoun() {
         Action action = Actions.newActionSet().newAction()
                 .onNoFirstWord()
-                .withAnySecondWords(Words.NORTH, Words.SOUTH, Words.EAST, Words.WEST)
+                .withAnySecondWords(NORTH, SOUTH, EAST, WEST)
                 .build();
         assertTrue(action.run(new GameState(NOWHERE), display, new Command(NONE, new Word("n"))));
         assertTrue(action.run(new GameState(NOWHERE), display, new Command(NONE, new Word("s"))));
@@ -82,10 +87,10 @@ public class ActionsTest {
         assertTrue(action.run(new GameState(NOWHERE), display, new Command(NONE, new Word("south"))));
         assertTrue(action.run(new GameState(NOWHERE), display, new Command(NONE, new Word("east"))));
         assertTrue(action.run(new GameState(NOWHERE), display, new Command(NONE, new Word("west"))));
-        assertTrue(action.run(new GameState(NOWHERE), display, new Command(NONE, Words.NORTH)));
-        assertTrue(action.run(new GameState(NOWHERE), display, new Command(NONE, Words.SOUTH)));
-        assertTrue(action.run(new GameState(NOWHERE), display, new Command(NONE, Words.EAST)));
-        assertTrue(action.run(new GameState(NOWHERE), display, new Command(NONE, Words.WEST)));
+        assertTrue(action.run(new GameState(NOWHERE), display, new Command(NONE, NORTH)));
+        assertTrue(action.run(new GameState(NOWHERE), display, new Command(NONE, SOUTH)));
+        assertTrue(action.run(new GameState(NOWHERE), display, new Command(NONE, EAST)));
+        assertTrue(action.run(new GameState(NOWHERE), display, new Command(NONE, WEST)));
         assertFalse(action.run(new GameState(NOWHERE), display, new Command(NONE, new Word("u"))));
         assertFalse(action.run(new GameState(NOWHERE), display, new Command(NONE, new Word("d"))));
     }
@@ -160,7 +165,7 @@ public class ActionsTest {
     public void testActionOnVerbWithNoNoun_CommandKnownVerbAndNoun() {
 
         Action action = Actions.newActionSet().newAction()
-                .on(Words.GO)
+                .on(GO)
                 .withNoSecondWord()
                 .then((command, gameState, display) -> gameState.setString("trap", "sprung"))
                 .build();
@@ -179,7 +184,7 @@ public class ActionsTest {
     public void testActionOnVerbWithAnyNoun_CommandKnownVerbAndNoun() {
 
         Action action = Actions.newActionSet().newAction()
-                .on(Words.GO)
+                .on(GO)
                 .withAnySecondWord()
                 .then((command, gameState, display) -> gameState.setString("shazam", "bam"))
                 .build();

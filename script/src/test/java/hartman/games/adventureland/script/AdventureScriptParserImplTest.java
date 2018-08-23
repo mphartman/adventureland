@@ -9,7 +9,6 @@ import hartman.games.adventureland.engine.Item;
 import hartman.games.adventureland.engine.Room;
 import hartman.games.adventureland.engine.Vocabulary;
 import hartman.games.adventureland.engine.Word;
-import hartman.games.adventureland.engine.core.Words;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -94,23 +93,10 @@ public class AdventureScriptParserImplTest {
     }
 
     @Test
-    @AdventureScriptResource("/scripts/050adventure.txt")
-    public void validRoomExitDirectionsAreAccepted() {
-        Adventure adventure = adventureScriptParsingRule.parse();
-        Room start = adventure.getStartRoom();
-        assertTrue(start.hasExit(Words.NORTH));
-        assertTrue(start.hasExit(Words.SOUTH));
-        assertTrue(start.hasExit(Words.EAST));
-        assertTrue(start.hasExit(Words.WEST));
-        assertTrue(start.hasExit(Words.UP));
-        assertTrue(start.hasExit(Words.DOWN));
-    }
-
-    @Test
     @AdventureScriptResource("/scripts/060adventure.txt")
     public void duplicateExitDirectionLastOneWins() {
         Adventure adventure = adventureScriptParsingRule.parse();
-        Room expectedSwamp = adventure.getStartRoom().exit(Words.NORTH);
+        Room expectedSwamp = adventure.getStartRoom().exit(new Word("North", "N"));
         assertEquals("swamp", expectedSwamp.getName());
     }
 
@@ -378,7 +364,7 @@ public class AdventureScriptParserImplTest {
 
         Room lair = new Room("lair", "A scary lair");
         Room hall = new Room("hall", "A hall");
-        lair.setExit(Words.NORTH, hall);
+        lair.setExit(new Word("North", "N"), hall);
 
         Action action = adventure.getActions().iterator().next();
 
