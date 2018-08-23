@@ -316,6 +316,20 @@ public class AdventureScriptParserImplTest {
     }
 
     @Test
+    @AdventureScriptResource("/scripts/312adventure.txt")
+    public void actionWordsOnlyRecognizeFirstTwoWords() {
+        Adventure adventure = adventureScriptParsingRule.parse();
+
+        Action action = adventure.getActions().iterator().next();
+
+        GameState gameState = new GameState(Room.NOWHERE);
+        Display display = new TestDisplay();
+
+        action.run(gameState, display, new Command(new Word("throw"), new Word("axe")));
+        assertEquals(String.format("Missed!%n"), display.toString());
+    }
+
+    @Test
     @AdventureScriptResource("/scripts/302adventure.txt")
     public void actionVerbAndPrintResult() {
         Adventure adventure = adventureScriptParsingRule.parse();

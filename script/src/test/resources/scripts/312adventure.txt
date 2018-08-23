@@ -1,0 +1,3 @@
+// Tests action with multiple words
+action throw axe "at" bear
+    then print "Missed!"
