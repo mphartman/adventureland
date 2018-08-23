@@ -123,10 +123,10 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
             Room startingRoom = getStartingRoom(adventureContext, rooms);
             Items items = getItems(adventureContext, rooms);
             Set<Item> itemSet = items.copyOfItems();
+            Actions occurs = getOccurs(adventureContext, itemSet, rooms);
             Vocabulary vocabulary = getVocabulary(adventureContext);
             Actions actions = getActions(adventureContext, vocabulary, itemSet, rooms);
             vocabulary = vocabulary.merge(actions.buildVocabulary());
-            Actions occurs = getOccurs(adventureContext, vocabulary, itemSet, rooms);
             return new Adventure(vocabulary, occurs.copyOfActions(), actions.copyOfActions(), itemSet, startingRoom);
         }
 
@@ -202,16 +202,16 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         private Actions getActions(AdventureContext adventureContext, Vocabulary vocabulary, Set<Item> items, List<Room> rooms) {
             Actions actions = Actions.newActionSet();
-            ActionDeclarationVisitor visitor = new ActionDeclarationVisitor(actions, vocabulary, items, rooms);
+            ActionDeclarationVisitor visitor = new ActionDeclarationVisitor(actions, items, rooms, vocabulary);
             adventureContext.gameElement().stream()
                     .filter(gameElementContext -> null != gameElementContext.actionDeclaration())
                     .forEach(gameElementContext -> gameElementContext.actionDeclaration().accept(visitor));
             return actions;
         }
 
-        private Actions getOccurs(AdventureContext adventureContext, Vocabulary vocabulary, Set<Item> items, List<Room> rooms) {
+        private Actions getOccurs(AdventureContext adventureContext, Set<Item> items, List<Room> rooms) {
             Actions actions = Actions.newActionSet();
-            OccursDeclarationVisitor visitor = new OccursDeclarationVisitor(actions, vocabulary, items, rooms);
+            OccursDeclarationVisitor visitor = new OccursDeclarationVisitor(actions, items, rooms);
             adventureContext.gameElement().stream()
                     .filter(gameElementContext -> null != gameElementContext.occursDeclaration())
                     .forEach(gameElementContext -> gameElementContext.occursDeclaration().accept(visitor));
@@ -438,19 +438,50 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         }
     }
 
-    private static class ActionDeclarationVisitor extends AdventureBaseVisitor<Action> {
-        protected final Actions actions;
-        protected final Vocabulary vocabulary;
-        protected final Set<Item> items;
-        protected final List<Room> rooms;
+    private static class OccursDeclarationVisitor extends AdventureBaseVisitor<Action> {
+        private final Actions actions;
+        private final Set<Item> items;
+        private final List<Room> rooms;
 
-        private final ActionWordVisitor actionWordVisitor;
-
-        private ActionDeclarationVisitor(Actions actions, Vocabulary vocabulary, Set<Item> items, List<Room> rooms) {
+        private OccursDeclarationVisitor(Actions actions, Set<Item> items, List<Room> rooms) {
             this.actions = actions;
-            this.vocabulary = vocabulary;
             this.items = items;
             this.rooms = rooms;
+        }
+
+        @Override
+        public Action visitOccursDeclaration(OccursDeclarationContext ctx) {
+            Actions.ActionBuilder builder = actions.newAction();
+            if (null != ctx.Number()) {
+                builder.when(Conditions.random(Integer.parseInt(ctx.Number().getText())));
+            }
+            actionResults(ctx.actionResultDeclaration(), builder);
+            actionConditions(ctx.actionConditionDeclaration(), builder);
+            return builder.build();
+        }
+
+        void actionResults(List<ActionResultDeclarationContext> contextList, Actions.ActionBuilder builder) {
+            ActionResultDeclarationVisitor visitor = new ActionResultDeclarationVisitor(items, rooms);
+            ofNullable(contextList).ifPresent(actionResultDeclarationContexts -> actionResultDeclarationContexts.stream()
+                    .map(actionResultDeclarationContext -> actionResultDeclarationContext.accept(visitor))
+                    .forEach(builder::then));
+        }
+
+        void actionConditions(List<ActionConditionDeclarationContext> contextList, Actions.ActionBuilder builder) {
+            ActionConditionDeclarationVisitor visitor = new ActionConditionDeclarationVisitor(items, rooms);
+            ofNullable(contextList).ifPresent(actionConditionDeclarationContexts -> actionConditionDeclarationContexts.stream()
+                    .map(actionConditionDeclarationContext -> actionConditionDeclarationContext.accept(visitor))
+                    .forEach(builder::when));
+        }
+    }
+
+    private static class ActionDeclarationVisitor extends OccursDeclarationVisitor {
+        private final Actions actions;
+        private final ActionWordVisitor actionWordVisitor;
+
+        private ActionDeclarationVisitor(Actions actions, Set<Item> items, List<Room> rooms, Vocabulary vocabulary) {
+            super(actions, items, rooms);
+            this.actions = actions;
             this.actionWordVisitor = new ActionWordVisitor(vocabulary);
         }
 
@@ -458,8 +489,8 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         public Action visitActionDeclaration(ActionDeclarationContext ctx) {
             Actions.ActionBuilder builder = actions.newAction();
             actionCommand(ctx, builder);
-            actionResults(ctx.actionResultDeclaration(), builder);
-            actionConditions(ctx.actionConditionDeclaration(), builder);
+            super.actionResults(ctx.actionResultDeclaration(), builder);
+            super.actionConditions(ctx.actionConditionDeclaration(), builder);
             return builder.build();
         }
 
@@ -506,27 +537,16 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
             return false;
         }
 
-        protected void actionResults(List<ActionResultDeclarationContext> contextList, Actions.ActionBuilder builder) {
-            ActionResultDeclarationVisitor visitor = new ActionResultDeclarationVisitor(items, rooms);
-            ofNullable(contextList).ifPresent(actionResultDeclarationContexts -> actionResultDeclarationContexts.stream()
-                    .map(actionResultDeclarationContext -> actionResultDeclarationContext.accept(visitor))
-                    .forEach(builder::then));
-        }
-
-        protected void actionConditions(List<ActionConditionDeclarationContext> contextList, Actions.ActionBuilder builder) {
-            ActionConditionDeclarationVisitor visitor = new ActionConditionDeclarationVisitor(items, rooms);
-            ofNullable(contextList).ifPresent(actionConditionDeclarationContexts -> actionConditionDeclarationContexts.stream()
-                    .map(actionConditionDeclarationContext -> actionConditionDeclarationContext.accept(visitor))
-                    .forEach(builder::when));
-        }
     }
 
     private static class ActionWordVisitor extends AdventureBaseVisitor<Word> {
 
-        private Function<String, Word> toWord;
+        private final Function<String, Word> toWord;
+        private final ExitDirectionVisitor exitDirectionVisitor;
 
         private ActionWordVisitor(Vocabulary vocabulary) {
             this.toWord = text -> vocabulary.findMatch(text).orElse(new Word(text));
+            this.exitDirectionVisitor = new ExitDirectionVisitor();
         }
 
         @Override
@@ -536,7 +556,7 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         @Override
         public Word visitActionWordDirection(ActionWordDirectionContext ctx) {
-            return ctx.exitDirection().accept(new ExitDirectionVisitor());
+            return ctx.exitDirection().accept(exitDirectionVisitor);
         }
 
         @Override
@@ -790,22 +810,4 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
         }
     }
 
-    private static class OccursDeclarationVisitor extends ActionDeclarationVisitor {
-
-        private OccursDeclarationVisitor(Actions actions, Vocabulary vocabulary, Set<Item> items, List<Room> rooms) {
-            super(actions, vocabulary, items, rooms);
-        }
-
-        @Override
-        public Action visitOccursDeclaration(OccursDeclarationContext ctx) {
-            Actions.ActionBuilder builder = actions.newAction();
-            if (null != ctx.Number()) {
-                builder.when(Conditions.random(Integer.parseInt(ctx.Number().getText())));
-            }
-            actionResults(ctx.actionResultDeclaration(), builder);
-            actionConditions(ctx.actionConditionDeclaration(), builder);
-            return builder.build();
-        }
-
-    }
 }
