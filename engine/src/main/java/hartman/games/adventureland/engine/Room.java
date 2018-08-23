@@ -8,9 +8,7 @@ import java.util.Set;
 
 /**
  * Rooms make up a connected network of nodes between which the player may move.
- *
  * A Room may have no more than one exit per direction but each exit may point to the same room.
- *
  * E.g. A room can only have one North exit but the North and Up exits can point reference the same destination.
  */
 public class Room {
@@ -108,14 +106,6 @@ public class Room {
 
     public Set<Exit> getExits() {
         return Collections.unmodifiableSet(exits);
-    }
-
-    @Override
-    public String toString() {
-        return "Room{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                '}';
     }
 
     @Override
