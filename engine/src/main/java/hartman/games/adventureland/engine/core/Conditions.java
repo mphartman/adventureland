@@ -54,7 +54,7 @@ public final class Conditions {
     }
 
     public static Condition wordUnrecognized(int position) {
-        return (command, gameState) -> command.getWord(position).map(Word::isUnrecognized).orElse(true);
+        return (command, gameState) -> command.getWord(position).map(Word::isUnrecognized).orElse(false);
     }
 
     /**
