@@ -236,7 +236,7 @@ actionCondition
     |   COUNTER_EQ word Number      # conditionCounterEquals
     |   COUNTER_LE word Number      # conditionCounterLessThan
     |   COUNTER_GT word Number      # conditionCounterGreaterThan
-    |   HAS_EXIT                    # conditionRoomHasExit
+    |   HAS_EXIT word?              # conditionRoomHasExit
     |   TIMES Number                # conditionTimes
     ;
 

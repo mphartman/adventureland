@@ -21,12 +21,12 @@ import java.util.Set;
 
 import static hartman.games.adventureland.engine.core.Actions.newActionSet;
 import static hartman.games.adventureland.engine.core.Conditions.carrying;
+import static hartman.games.adventureland.engine.core.Conditions.hasExitMatchingCommandWordAt;
 import static hartman.games.adventureland.engine.core.Conditions.here;
 import static hartman.games.adventureland.engine.core.Conditions.in;
 import static hartman.games.adventureland.engine.core.Conditions.not;
 import static hartman.games.adventureland.engine.core.Conditions.present;
 import static hartman.games.adventureland.engine.core.Conditions.random;
-import static hartman.games.adventureland.engine.core.Conditions.roomHasExit;
 import static hartman.games.adventureland.engine.core.Conditions.times;
 import static hartman.games.adventureland.engine.core.Results.destroy;
 import static hartman.games.adventureland.engine.core.Results.drop;
@@ -315,7 +315,7 @@ public class HouseEscapeAdventure {
 
         standardActions.newAction()
                 .on(GO)
-                .when(roomHasExit)
+                .when(hasExitMatchingCommandWordAt(2))
                 .then(go).andThen(look)
                 .build();
 
@@ -326,13 +326,13 @@ public class HouseEscapeAdventure {
 
         standardActions.newAction()
                 .onAnyFirstWords(directionWords.toArray(new Word[0])).withNoSecondWord()
-                .when(not(roomHasExit))
+                .when(not(hasExitMatchingCommandWordAt(1)))
                 .then(println("I can't go {verb} from here. Try one of the obvious exits."))
                 .build();
 
         standardActions.newAction()
                 .onAnyFirstWord().withNoSecondWord()
-                .when(roomHasExit)
+                .when(hasExitMatchingCommandWordAt(1))
                 .then(go).andThen(look)
                 .build();
 

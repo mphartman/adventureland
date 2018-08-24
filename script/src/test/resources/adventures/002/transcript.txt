@@ -1,13 +1,14 @@
-> go (go)
-
 > go far (go far‹?›)
 
-2
+1
 > go north (go north)
 
-4
+2
 > go east (go east)
 
 3
+> go (go)
+
+4
 > quit (quit)
 

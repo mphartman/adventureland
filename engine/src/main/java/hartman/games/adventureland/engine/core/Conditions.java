@@ -58,10 +58,18 @@ public final class Conditions {
     }
 
     /**
-     * True if player's requested noun represents a valid direction and that the current room
-     * she is in has an exit matching that direction.
+     * True if current room has exit matching given word
      */
-    public static final Condition roomHasExit = (command, gameState) -> gameState.getCurrentRoom().hasExit(command.getSecondThenFirst());
+    public static Condition hasExit(Word direction) {
+        return (command, gameState) -> gameState.getCurrentRoom().hasExit(direction);
+    }
+
+    /**
+     * True if current room has exit matching the word at the given position in the command word list
+     */
+    public static Condition hasExitMatchingCommandWordAt(int position) {
+        return (command, gameState) -> hasExit(command.getWordOrNone(position)).matches(command, gameState);
+    }
 
     /**
      * True if the player's current room is ROOM.

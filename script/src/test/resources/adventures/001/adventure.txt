@@ -33,7 +33,7 @@ action "go" unknown
     then print "I don't understand. That's not a valid direction."
 
 action "go" any
-    when has_exit
+    when has_exit $2
     then go
         and look
 

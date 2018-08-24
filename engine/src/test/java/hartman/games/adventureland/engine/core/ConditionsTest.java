@@ -14,6 +14,7 @@ import static hartman.games.adventureland.engine.core.Conditions.and;
 import static hartman.games.adventureland.engine.core.Conditions.carrying;
 import static hartman.games.adventureland.engine.core.Conditions.compareCounter;
 import static hartman.games.adventureland.engine.core.Conditions.exists;
+import static hartman.games.adventureland.engine.core.Conditions.hasExit;
 import static hartman.games.adventureland.engine.core.Conditions.hasMoved;
 import static hartman.games.adventureland.engine.core.Conditions.here;
 import static hartman.games.adventureland.engine.core.Conditions.in;
@@ -22,7 +23,6 @@ import static hartman.games.adventureland.engine.core.Conditions.not;
 import static hartman.games.adventureland.engine.core.Conditions.or;
 import static hartman.games.adventureland.engine.core.Conditions.present;
 import static hartman.games.adventureland.engine.core.Conditions.random;
-import static hartman.games.adventureland.engine.core.Conditions.roomHasExit;
 import static hartman.games.adventureland.engine.core.Conditions.stringEquals;
 import static hartman.games.adventureland.engine.core.Conditions.there;
 import static hartman.games.adventureland.engine.core.Conditions.times;
@@ -41,9 +41,9 @@ public class ConditionsTest {
         Room start = new Room("start", "start");
         GameState gameState = new GameState(start);
         Command command = new Command(GO, DOWN);
-        assertFalse(roomHasExit.matches(command, gameState));
+        assertFalse(hasExit(DOWN).matches(command, gameState));
         command = new Command(GO, UP);
-        assertFalse(roomHasExit.matches(command, gameState));
+        assertFalse(hasExit(UP).matches(command, gameState));
     }
 
     @Test
@@ -53,9 +53,9 @@ public class ConditionsTest {
         start.setExit(DOWN, end);
         GameState gameState = new GameState(start);
         Command command = new Command(GO, DOWN);
-        assertTrue(roomHasExit.matches(command, gameState));
+        assertTrue(hasExit(DOWN).matches(command, gameState));
         command = new Command(GO, UP);
-        assertFalse(roomHasExit.matches(command, gameState));
+        assertFalse(hasExit(UP).matches(command, gameState));
     }
 
     @Test

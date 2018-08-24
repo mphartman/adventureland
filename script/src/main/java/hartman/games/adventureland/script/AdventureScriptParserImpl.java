@@ -649,7 +649,15 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         @Override
         public Action.Condition visitConditionRoomHasExit(ConditionRoomHasExitContext ctx) {
-            return Conditions.roomHasExit;
+            if (null == ctx.word()) {
+                return Conditions.hasExitMatchingCommandWordAt(1);
+            }
+            String word = ctx.word().getText();
+            if (word.startsWith("$")) {
+                int position = Integer.parseInt(word.substring(1));
+                return Conditions.hasExitMatchingCommandWordAt(position);
+            }
+            return Conditions.hasExit(Word.of(word));
         }
 
         @Override

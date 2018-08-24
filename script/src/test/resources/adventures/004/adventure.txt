@@ -113,11 +113,11 @@ occurs
         and inventory
 
 action "go" any
-    when has_exit
+    when has_exit $2
     then go
         and look
 
-action (north, south, up, down, east, west) none
+action (north, south, up, down, east, west)
     when has_exit
     then go
         and look

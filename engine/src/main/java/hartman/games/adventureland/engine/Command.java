@@ -38,13 +38,16 @@ public class Command {
     }
 
     public Word getFirstWord() {
-        return words.isEmpty() ? Word.none() : words.getFirst();
+        return getWordOrNone(1);
     }
 
     public Word getSecondWord() {
-        return words.size() > 1 ? words.get(1) : Word.none();
+        return getWordOrNone(2);
     }
 
+    public Word getWordOrNone(int position) {
+        return getWord(position).orElse(Word.none());
+    }
     /**
      * Return the word from this Command's word list at the given element position.
      * Position 1 represents the first word, 2 represents the second, and so on.

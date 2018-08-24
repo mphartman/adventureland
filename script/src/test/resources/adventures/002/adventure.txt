@@ -24,17 +24,17 @@
 ## Actions
 ##
 
-    action "go" none
+    action "go" unknown
         then print "1"
 
-    action "go" unknown
-        then print "2"
-
     action "go" any
-        when has_exit
+        when has_exit $2
         then print "3"
 
     action "go" any
+        then print "2"
+
+    action "go"
         then print "4"
 
     action "quit"

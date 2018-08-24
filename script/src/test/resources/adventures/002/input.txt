@@ -1,5 +1,5 @@
-go
 go far
 go north
 go east
+go
 quit
