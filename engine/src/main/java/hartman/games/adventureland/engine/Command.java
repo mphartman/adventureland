@@ -33,17 +33,13 @@ public class Command {
         }
     }
 
-    public Word getFirstWord() {
-        return getWordOrNone(1);
-    }
-
-    public Word getSecondWord() {
-        return getWordOrNone(2);
-    }
-
+    /**
+     * Return the word at the given position, otherwise Word.NONE
+     */
     public Word getWordOrNone(int position) {
         return getWord(position).orElse(Word.NONE);
     }
+
     /**
      * Return the word from this Command's word list at the given element position.
      * Position 1 represents the first word, 2 represents the second, and so on.

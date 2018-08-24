@@ -9,7 +9,7 @@ public class ActionTest {
     @Test
     public void runShouldExecuteResultsWhenConditionsAreAllTrue() {
         Action action = new Action.Builder()
-                .when((command, gameState) -> new Word("SLAP").matches(command.getFirstWord()))
+                .when((command, gameState) -> new Word("SLAP").matches(command.getWordOrNone(1)))
                 .then((command, gameState, display) -> gameState.setString("MESSAGE", "Ouch! That hurts!"))
                 .build();
 

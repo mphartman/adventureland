@@ -19,8 +19,8 @@ public class DefaultCommandInterpreterTest {
         Vocabulary vocabulary = new Vocabulary(new HashSet<>(asList(new Word("JUMP"), (new Word("UP")))));
         DefaultCommandInterpreter interpreter = new DefaultCommandInterpreter(new Scanner("JUMP UP"), vocabulary);
         Command command = interpreter.nextCommand();
-        assertTrue(command.getFirstWord().matches(new Word("JUMP")));
-        assertTrue(command.getSecondWord().matches(new Word("UP")));
+        assertTrue(command.getWordOrNone(1).matches(new Word("JUMP")));
+        assertTrue(command.getWordOrNone(2).matches(new Word("UP")));
     }
 
     @Test
@@ -30,8 +30,8 @@ public class DefaultCommandInterpreterTest {
         Vocabulary vocabulary = new Vocabulary(new HashSet<>(asList(jump, up)));
         DefaultCommandInterpreter interpreter = new DefaultCommandInterpreter(new Scanner("j up"), vocabulary);
         Command command = interpreter.nextCommand();
-        assertTrue(command.getFirstWord().toString(), command.getFirstWord().matches(jump));
-        assertTrue(command.getSecondWord().toString(), command.getSecondWord().matches(up));
+        assertTrue(command.getWordOrNone(1).toString(), command.getWordOrNone(1).matches(jump));
+        assertTrue(command.getWordOrNone(2).toString(), command.getWordOrNone(2).matches(up));
     }
 
     @Test
@@ -39,8 +39,8 @@ public class DefaultCommandInterpreterTest {
         Vocabulary vocabulary = new Vocabulary(new HashSet<>(asList(new Word("JUMP"), new Word("UP"))));
         DefaultCommandInterpreter interpreter = new DefaultCommandInterpreter(new Scanner("KILL TROLL"), vocabulary);
         Command command = interpreter.nextCommand();
-        assertTrue(command.getFirstWord().isUnrecognized());
-        assertTrue(command.getSecondWord().isUnrecognized());
+        assertTrue(command.getWordOrNone(1).isUnrecognized());
+        assertTrue(command.getWordOrNone(2).isUnrecognized());
     }
 
     @Test(expected = IllegalStateException.class)
@@ -55,8 +55,8 @@ public class DefaultCommandInterpreterTest {
         Vocabulary vocabulary = new Vocabulary(new HashSet<>(asList(new Word("JAVELIN"), new Word("NORTH"))));
         DefaultCommandInterpreter interpreter = new DefaultCommandInterpreter(new Scanner("NORTH"), vocabulary);
         Command command = interpreter.nextCommand();
-        assertTrue(command.getFirstWord().matches(new Word("NORTH")));
-        assertTrue(command.getSecondWord().matches(Word.NONE));
+        assertTrue(command.getWordOrNone(1).matches(new Word("NORTH")));
+        assertTrue(command.getWordOrNone(2).matches(Word.NONE));
     }
 
     @Test
@@ -64,8 +64,8 @@ public class DefaultCommandInterpreterTest {
         Vocabulary vocabulary = new Vocabulary(new HashSet<>(asList(new Word("JAVELIN"), new Word("NORTH"))));
         DefaultCommandInterpreter interpreter = new DefaultCommandInterpreter(new Scanner("BANANAS"), vocabulary);
         Command command = interpreter.nextCommand();
-        assertTrue(command.getFirstWord().isUnrecognized());
-        assertTrue(command.getSecondWord().matches(Word.NONE));
+        assertTrue(command.getWordOrNone(1).isUnrecognized());
+        assertTrue(command.getWordOrNone(2).matches(Word.NONE));
     }
 
     @Test
@@ -73,8 +73,8 @@ public class DefaultCommandInterpreterTest {
         Vocabulary vocabulary = new Vocabulary(new HashSet<>(asList(new Word("JAVELIN"), new Word("NORTH"))));
         DefaultCommandInterpreter interpreter = new DefaultCommandInterpreter(new Scanner("NORTH PAJAMAS"), vocabulary);
         Command command = interpreter.nextCommand();
-        assertTrue(command.getFirstWord().matches(new Word("NORTH")));
-        assertTrue(command.getSecondWord().isUnrecognized());
+        assertTrue(command.getWordOrNone(1).matches(new Word("NORTH")));
+        assertTrue(command.getWordOrNone(2).isUnrecognized());
     }
 
     @Test
@@ -82,8 +82,8 @@ public class DefaultCommandInterpreterTest {
         Vocabulary vocabulary = new Vocabulary(new HashSet<>(asList(new Word("JAVELIN"), new Word("NORTH"))));
         DefaultCommandInterpreter interpreter = new DefaultCommandInterpreter(new Scanner("NORTH JAVELIN"), vocabulary);
         Command command = interpreter.nextCommand();
-        assertTrue(command.getFirstWord().matches(new Word("NORTH")));
-        assertTrue(command.getSecondWord().matches(new Word("JAVELIN")));
+        assertTrue(command.getWordOrNone(1).matches(new Word("NORTH")));
+        assertTrue(command.getWordOrNone(2).matches(new Word("JAVELIN")));
     }
 
     @Test
@@ -91,8 +91,8 @@ public class DefaultCommandInterpreterTest {
         Vocabulary vocabulary = new Vocabulary(new HashSet<>(asList(new Word("JAVELIN"), new Word("NORTH"))));
         DefaultCommandInterpreter interpreter = new DefaultCommandInterpreter(new Scanner("curious george"), vocabulary);
         Command command = interpreter.nextCommand();
-        assertTrue(command.getFirstWord().isUnrecognized());
-        assertTrue(command.getSecondWord().isUnrecognized());
+        assertTrue(command.getWordOrNone(1).isUnrecognized());
+        assertTrue(command.getWordOrNone(2).isUnrecognized());
     }
 
     @Test
@@ -100,8 +100,8 @@ public class DefaultCommandInterpreterTest {
         Vocabulary vocabulary = new Vocabulary(new HashSet<>(asList(new Word("throw"), new Word("axe"), new Word("at"), new Word("bear"))));
         DefaultCommandInterpreter interpreter = new DefaultCommandInterpreter(new Scanner("throw axe at bear"), vocabulary);
         Command command = interpreter.nextCommand();
-        assertTrue(command.getFirstWord().matches(new Word("THROW")));
-        assertTrue(command.getSecondWord().matches(new Word("AXE")));
+        assertTrue(command.getWordOrNone(1).matches(new Word("THROW")));
+        assertTrue(command.getWordOrNone(2).matches(new Word("AXE")));
         assertTrue(command.getWord(3).get().matches(new Word("at")));
         assertTrue(command.getWord(4).get().matches(new Word("bear")));
     }

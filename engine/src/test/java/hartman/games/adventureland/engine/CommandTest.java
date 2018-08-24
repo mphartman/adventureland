@@ -3,6 +3,7 @@ package hartman.games.adventureland.engine;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -10,7 +11,7 @@ public class CommandTest {
 
     @Test
     public void secondWordIsNoneGivenOnlyOneWord() {
-        assertEquals(Word.NONE, new Command(new Word("jam")).getSecondWord());
+        assertEquals(Word.NONE, new Command(new Word("jam")).getWordOrNone(2));
     }
 
     @Test
@@ -39,8 +40,8 @@ public class CommandTest {
     @Test
     public void commandAcceptsListOfWords() {
         Command command = new Command(new Word("apple"), new Word("banana"), new Word("carrot"), new Word("dog"));
-        assertEquals(new Word("apple"), command.getFirstWord());
-        assertEquals(new Word("banana"), command.getSecondWord());
+        assertEquals(new Word("apple"), command.getWordOrNone(1));
+        assertEquals(new Word("banana"), command.getWordOrNone(2));
     }
 
     @Test
@@ -71,4 +72,15 @@ public class CommandTest {
         Command command = new Command(Word.of("foo"));
         assertEquals(Word.NONE, command.getWordOrNone(2));
     }
+
+    @Test
+    public void commandNoneHasNoWords() {
+        assertFalse(Command.NONE.getWord(1).isPresent());
+        assertFalse(Command.NONE.getWord(2).isPresent());
+        assertFalse(Command.NONE.getWord(3).isPresent());
+        assertEquals(Word.NONE, Command.NONE.getWordOrNone(1));
+        assertEquals(Word.NONE, Command.NONE.getWordOrNone(2));
+        assertEquals(Word.NONE, Command.NONE.getWordOrNone(3));
+    }
+
 }
