@@ -33,14 +33,6 @@ public class Command {
         }
     }
 
-    public Command(Word first, Word second) {
-        this(new Word[]{first, second});
-    }
-
-    public Command(Word first) {
-        this(new Word[]{first, Word.none()});
-    }
-
     public Word getSecondThenFirst() {
         return getSecondWord().equals(Word.none()) ? getFirstWord() : getSecondWord();
     }
