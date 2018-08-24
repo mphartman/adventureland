@@ -96,12 +96,14 @@ public class DefaultCommandInterpreterTest {
     }
 
     @Test
-    public void multipleWordInput_FirstTwoWordsAllThatMatter() {
-        Vocabulary vocabulary = new Vocabulary(new HashSet<>(asList(new Word("throw"), new Word("axe"))));
+    public void multipleWordInput() {
+        Vocabulary vocabulary = new Vocabulary(new HashSet<>(asList(new Word("throw"), new Word("axe"), new Word("at"), new Word("bear"))));
         DefaultCommandInterpreter interpreter = new DefaultCommandInterpreter(new Scanner("throw axe at bear"), vocabulary);
         Command command = interpreter.nextCommand();
         assertTrue(command.getFirstWord().matches(new Word("THROW")));
         assertTrue(command.getSecondWord().matches(new Word("AXE")));
+        assertTrue(command.getWord(3).get().matches(new Word("at")));
+        assertTrue(command.getWord(4).get().matches(new Word("bear")));
     }
 
     @Test

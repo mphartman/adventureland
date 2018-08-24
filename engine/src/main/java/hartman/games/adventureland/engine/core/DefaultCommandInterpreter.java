@@ -39,9 +39,7 @@ public class DefaultCommandInterpreter implements CommandInterpreter {
                 while (lineScanner.hasNext()) {
                     words.add(vocabulary.findMatch(lineScanner.next()).orElse(Word.UNRECOGNIZED));
                 }
-                Word firstWord = pop(words);
-                Word secondWord = pop(words);
-                return new Command(firstWord, secondWord);
+                return new Command(words.toArray(new Word[0]));
             }
         }
 
@@ -52,8 +50,4 @@ public class DefaultCommandInterpreter implements CommandInterpreter {
         return lastLine;
     }
 
-    private Word pop(LinkedList<Word> words) {
-        if (words.isEmpty()) return Word.NONE;
-        return words.removeFirst();
-    }
 }
