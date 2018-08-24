@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 public class CommandTest {
 
@@ -55,4 +56,19 @@ public class CommandTest {
         assertNotEquals(command, command2);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void commandMustHaveAtLeastOneWord() {
+        new Command();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void commandMustHaveAtLeastOneNonNullWord() {
+        new Command(null, null);
+    }
+
+    @Test
+    public void commandFiltersOutNullWords() {
+        Command command = new Command(null, new Word("river"), null);
+        assertTrue(command.getWord(1).orElseThrow(AssertionError::new).matches(new Word("river")));
+    }
 }
