@@ -11,6 +11,10 @@ import java.util.Set;
  */
 public class Item extends Word {
 
+    public static Builder newItem(String name) {
+        return new Builder().named(name);
+    }
+
     public static class Builder {
         private String name;
         private String description;

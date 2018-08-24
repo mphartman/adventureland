@@ -517,13 +517,14 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         @Override
         public Action.Result visitResultGet(ResultGetContext ctx) {
-            return Results.get;
+            Item item = getItemOrFail(ctx.itemName().getText());
+            return Results.get(item);
         }
 
         @Override
         public Action.Result visitResultDrop(ResultDropContext ctx) {
             Item item = getItemOrFail(ctx.itemName().getText());
-            return Results.dropItem(item);
+            return Results.drop(item);
         }
 
         @Override

@@ -208,7 +208,8 @@ public class HouseEscapeAdventure {
 
         adventureActions.newAction()
                 .on(OPEN).with(door)
-                .when(here(lockedDoor)).and(not(present(key)))
+                .when(here(lockedDoor))
+                .and(not(present(key)))
                 .then(printf("%nIt's locked. I need some way to unlock it.%n"))
                 .build();
 
@@ -221,42 +222,51 @@ public class HouseEscapeAdventure {
         adventureActions.newAction()
                 .on(GET).with(key)
                 .when(here(key))
-                .then(get).andThen(printf("%nOkay. I got the key.%n"))
+                .then(get(key))
+                .andThen(printf("%nOkay. I got the key.%n"))
                 .build();
 
         adventureActions.newAction()
                 .on(DROP).with(key)
                 .when(carrying(key))
-                .then(drop).andThen(printf("%nI dropped the key.%n"))
+                .then(drop(key))
+                .andThen(printf("%nI dropped the key.%n"))
                 .build();
 
         adventureActions.newAction()
                 .on(OPEN).with(door)
-                .when(here(lockedDoor)).and(present(key))
-                .then(swap(lockedDoor, openDoor)).andThen(printf("<CLICK> That did it. It's unlocked.%n")).andThen(look)
+                .when(here(lockedDoor))
+                .and(present(key))
+                .then(swap(lockedDoor, openDoor))
+                .andThen(printf("<CLICK> That did it. It's unlocked.%n")).andThen(look)
                 .build();
 
         adventureActions.newAction()
                 .on(USE).with(key)
-                .when(here(lockedDoor)).and(present(key))
-                .then(swap(lockedDoor, openDoor)).andThen(printf("<CLICK> That did it. It's unlocked.%n")).andThen(look)
+                .when(here(lockedDoor))
+                .and(present(key))
+                .then(swap(lockedDoor, openDoor))
+                .andThen(printf("<CLICK> That did it. It's unlocked.%n")).andThen(look)
                 .build();
 
         adventureActions.newAction()
                 .on(GO).with(door)
                 .when(here(openDoor))
-                .then(gotoRoom(outside)).andThen(printf("%nYeah! I've made it outside!%n"))
+                .then(gotoRoom(outside))
+                .andThen(printf("%nYeah! I've made it outside!%n"))
                 .build();
 
         adventureActions.newAction()
                 .on(GET).with(flyswatter)
                 .when(here(flyswatter))
-                .then(get).andThen(printf("%nOkay. I picked up the flyswatter.%n"))
+                .then(get(flyswatter))
+                .andThen(printf("%nOkay. I picked up the flyswatter.%n"))
                 .build();
 
         adventureActions.newAction()
                 .on(kill).with(fly)
-                .when(here(fly)).and(not(carrying(flyswatter)))
+                .when(here(fly))
+                .and(not(carrying(flyswatter)))
                 .then(printf("%nSmack! I tried but I'm not fast enough. I need some sort of tool.%n"))
                 .build();
 
@@ -272,13 +282,15 @@ public class HouseEscapeAdventure {
         adventureActions.newAction()
                 .on(close).with(openWindow)
                 .when(here(openWindow))
-                .then(swap(openWindow, closedWindow)).andThen(println("It's closed. That should keep those pesky flies out of here."))
+                .then(swap(openWindow, closedWindow))
+                .andThen(println("It's closed. That should keep those pesky flies out of here."))
                 .build();
 
         adventureActions.newAction()
                 .on(OPEN).with(closedWindow)
                 .when(here(closedWindow))
-                .then(swap(closedWindow, openWindow)).andThen(println("It's open. A cool breeze greets me. I hear a buzzing sound coming from outside too."))
+                .then(swap(closedWindow, openWindow))
+                .andThen(println("It's open. A cool breeze greets me. I hear a buzzing sound coming from outside too."))
                 .build();
 
         adventureActions.newAction()
@@ -289,19 +301,23 @@ public class HouseEscapeAdventure {
         adventureActions.newAction()
                 .on(GET).with(redPanda)
                 .when(here(redPanda))
-                .then(get).andThen(println("%nOkay. I picked up the toy. It's a bit smelly but it's soft and I feel better carrying it.")).andThen(inventory)
+                .then(get(redPanda))
+                .andThen(println("%nOkay. I picked up the toy. It's a bit smelly but it's soft and I feel better carrying it.")).andThen(inventory)
                 .build();
 
         adventureActions.newAction()
                 .on(DROP).with(redPanda)
                 .when(carrying(redPanda))
-                .then(drop).andThen(look)
+                .then(drop(redPanda))
+                .andThen(look)
                 .build();
 
         adventureActions.newAction()
                 .on(OPEN).with(kennelWithDog)
                 .when(here(kennelWithDog))
-                .then(swap(kennelWithDog, emptyKennel)).andThen(putHere(dog)).andThen(println("A super cute little dog comes leaping out of the kennel!"))
+                .then(swap(kennelWithDog, emptyKennel))
+                .andThen(putHere(dog))
+                .andThen(println("A super cute little dog comes leaping out of the kennel!"))
                 .build();
 
         adventureActions.newAction()

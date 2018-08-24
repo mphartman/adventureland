@@ -254,7 +254,7 @@ actionResult
     |   GOTO roomName                               # resultGotoRoom
     |   PUT itemName roomName                       # resultPut
     |   PUT_HERE itemName                           # resultPutHere
-    |   GET                                         # resultGet
+    |   GET itemName                                # resultGet
     |   DROP itemName                               # resultDrop
     |   PUT_WITH i1=itemName i2=itemName            # resultPutWith
     |   DESTROY itemName                            # resultDestroy

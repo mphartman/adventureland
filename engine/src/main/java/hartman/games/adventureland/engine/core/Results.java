@@ -91,7 +91,7 @@ public final class Results {
     }
 
     /**
-     * Provides a callback with a list of items that the player carrying.
+     * Displays a list of items that the player is carrying.
      */
     public static final Result inventory = (command, gameState, display) -> gameState.inventory(display);
 
@@ -124,19 +124,16 @@ public final class Results {
     }
 
     /**
-     * Put item mentioned in Command Noun in Inventory.
+     * Put ITEM in Inventory.
      */
-    public static final Result get = ((command, gameState, display) -> gameState.putInInventory(command.getSecondWord()));
+    public static Result get(Item item) {
+        return (command, gameState, display) -> gameState.putInInventory(item);
+    }
 
     /**
-     * Drop item mentioned in Command Noun in current room.
+     * Drop ITEM in the current room.
      */
-    public static final Result drop = ((command, gameState, display) -> gameState.drop(command.getSecondWord()));
-
-    /**
-     * Drop item in current room.
-     */
-    public static Result dropItem(Item item) {
+    public static Result drop(Item item) {
         return (command, gameState, display) -> gameState.drop(item);
     }
 

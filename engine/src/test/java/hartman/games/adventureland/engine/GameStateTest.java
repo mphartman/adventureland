@@ -55,7 +55,7 @@ public class GameStateTest {
 
         Item dog = new Item.Builder().named("dog").alias("archie").portable().build();
         gameState = new GameState(Room.NOWHERE, singleton(dog));
-        gameState.putInInventory(new Word("archie"));
+        gameState.putInInventory(Item.newItem("archie").build());
         assertTrue("words matching items can be put into inventory", dog.isCarried());
     }
 
@@ -134,7 +134,7 @@ public class GameStateTest {
 
         Item candy = new Item.Builder().named("pez").alias("candy").build();
         gameState = new GameState(conferenceRoom, singleton(candy));
-        gameState.drop(new Word("candy"));
+        gameState.drop(candy);
         assertTrue(candy.isHere(conferenceRoom));
     }
 
@@ -154,10 +154,10 @@ public class GameStateTest {
 
         Item screwdriver = new Item.Builder().named("screwdriver").alias("flathead screwdriver").in(shed).build();
         gameState = new GameState(Room.NOWHERE, singleton(screwdriver));
-        assertTrue(gameState.exists(new Word("flathead screwdriver")));
+        assertTrue(gameState.exists(Item.newItem("flathead screwdriver").build()));
 
-        gameState.destroy(new Word("flathead screwdriver"));
-        assertFalse(gameState.exists(new Word("flathead screwdriver")));
+        gameState.destroy(screwdriver);
+        assertFalse(gameState.exists(screwdriver));
         assertTrue(screwdriver.isDestroyed());
 
     }
