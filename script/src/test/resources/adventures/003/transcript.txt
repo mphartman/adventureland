@@ -13,7 +13,7 @@ Room exits: North, Down
 I'm looking north down a long hallway. There are stairs leading up.
 Room exits: Up
 Room items: a closed door
-> inventory (inventory <none>)
+> inventory (inventory)
 
 Inventory items: a bloody knife
 > open door (open door)
@@ -29,7 +29,7 @@ They've spotted me carrying a weapon.
 I'm looking north down a long hallway. There are stairs leading up.
 Room exits: Up
 Room items: an open door
-I can still here the police outside. It doesn't look good that I'm carrying a bloody knife.
+I can still hear the police outside. It doesn't look good that I'm carrying a bloody knife.
 > close door (close door)
 
 Whew! That was close. I may want to get rid of this knife.
@@ -40,7 +40,7 @@ Inventory is empty.
 I'm looking north down a long hallway. There are stairs leading up.
 Room exits: Up
 Room items: a bloody knife, a closed door
-> inventory (inventory <none>)
+> inventory (inventory)
 
 Inventory is empty.
 > open door (open door)

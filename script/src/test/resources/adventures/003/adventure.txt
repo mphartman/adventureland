@@ -10,7 +10,7 @@ occurs
     when at front_hallway
         and here open_door
         and carrying knife
-    then print "I can still here the police outside. It doesn't look good that I'm carrying a bloody knife."
+    then print "I can still hear the police outside. It doesn't look good that I'm carrying a bloody knife."
 
 occurs
     when at outside

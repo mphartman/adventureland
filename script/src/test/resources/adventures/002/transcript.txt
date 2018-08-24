@@ -1,6 +1,5 @@
-> go (go <none>)
+> go (go)
 
-1
 > go far (go <unrecognized>)
 
 2
@@ -10,5 +9,5 @@
 > go east (go east)
 
 3
-> quit (quit <none>)
+> quit (quit)
 
