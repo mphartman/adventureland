@@ -1,10 +1,16 @@
 ?
+foo bar
+foo east
+get foo
+foo
+get help
+get
 go
+go crazy
 go up
 go east
 west
 i
 l up
 l
-south
 quit

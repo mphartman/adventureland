@@ -29,11 +29,8 @@ occurs
     when times 1
     then look
 
-action "go" none
-    then print "Go where?"
-
 action "go" unknown
-    then print "I can't go that way. It's not a valid direction."
+    then print "I don't understand. That's not a valid direction."
 
 action "go" any
     when has_exit
@@ -41,16 +38,19 @@ action "go" any
         and look
 
 action "go" any
-    then print "I can't go that way from here."
+    then print "I understand but I can't go that way from here."
+
+action "go"
+    then print "Go where?"
 
 
-action (north, south, up, down, east, west) none
+action (north, south, up, down, east, west)
     when has_exit
     then go
         and look
 
 action (north, south, up, down, east, west)
-    then print "I can't go {verb} from here."
+    then print "I can't go {word:1} from here."
 
 
 action "look"
@@ -63,25 +63,28 @@ action "quit"
     then quit
 
 action "help"
-    then print "A voice BOOOMS out:\nTry --> 'GO, LOOK, JUMP, SWIM, CLIMB, TAKE, DROP'\nand any other verbs you can think of..."
+    then print "A voice BOOOMS out:
+Try --> 'GO, LOOK, JUMP, SWIM, CLIMB, TAKE, DROP'
+and any other verbs you can think of..."
 
-
-# Unrecognized input
-
-action unrecognized
-    then print "Sorry, I don't know how to do that."
+##
+## Unrecognized input
+##
 
 action unrecognized unrecognized
-    then print  "Sorry, I don't know how to do that with that thing."
+    then print  "[1] Sorry, I don't know how to do that with that thing."
 
 action unrecognized any
-    then print "Sorry, I don't know how to that with a {noun}."
+    then print "[2] Sorry, I don't know how to that with a '{word:2}'."
 
 action any unrecognized
-    then print "I don't know how to {verb} with that thing."
+    then print "[3] I don't know how to '{word:1}' with that thing."
 
-action any none
-    then print "{verb} what?"
+action unrecognized
+    then print "[4] Sorry, I don't know how to do that."
 
 action any any
-    then print "I can't do that here right now."
+    then print "[5] I can't do that right now."
+
+action any
+    then print "[6] {word:1} what?"
