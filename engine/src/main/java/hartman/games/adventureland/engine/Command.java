@@ -10,9 +10,13 @@ import java.util.stream.Collectors;
  * The player's desired action represented by a two-word phrase.
  */
 public class Command {
-    public static final Command NONE = new Command(Word.NONE, Word.NONE);
+    public static final Command NONE = new Command();
 
     private final LinkedList<Word> words = new LinkedList<>();
+
+    private Command() {
+        // internal use only
+    }
 
     /**
      * Creates a new command from the given list of words.
@@ -34,19 +38,19 @@ public class Command {
     }
 
     public Command(Word first) {
-        this(new Word[]{first, Word.NONE});
+        this(new Word[]{first, Word.none()});
     }
 
     public Word getSecondThenFirst() {
-        return getSecondWord().equals(Word.NONE) ? getFirstWord() : getSecondWord();
+        return getSecondWord().equals(Word.none()) ? getFirstWord() : getSecondWord();
     }
 
     public Word getFirstWord() {
-        return words.getFirst();
+        return words.isEmpty() ? Word.none() : words.getFirst();
     }
 
     public Word getSecondWord() {
-        return words.size() > 1 ? words.get(1) : Word.NONE;
+        return words.size() > 1 ? words.get(1) : Word.none();
     }
 
     /**
@@ -63,7 +67,7 @@ public class Command {
 
     @Override
     public String toString() {
-        return words.stream().map(Word::getName).collect(Collectors.joining(" "));
+        return words.stream().map(Word::toString).collect(Collectors.joining(" "));
     }
 
     @Override

@@ -4,13 +4,14 @@ import org.junit.Test;
 
 import static hartman.games.adventureland.engine.Word.ANY;
 import static hartman.games.adventureland.engine.Word.NONE;
-import static hartman.games.adventureland.engine.Word.UNRECOGNIZED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 public class WordTest {
+
+    private Word UnrecognizedWord = Word.unrecognized("poppycock");
 
     @Test
     public void nounEqualityIsCaseSensitive() {
@@ -57,11 +58,11 @@ public class WordTest {
 
         assertTrue(new Word("ANY").matches(ANY));
 
-        assertNotEquals(ANY, UNRECOGNIZED);
-        assertNotEquals(UNRECOGNIZED, ANY);
+        assertNotEquals(ANY, UnrecognizedWord);
+        assertNotEquals(UnrecognizedWord, ANY);
 
-        assertTrue(ANY.matches(UNRECOGNIZED));
-        assertTrue(UNRECOGNIZED.matches(ANY));
+        assertTrue(ANY.matches(UnrecognizedWord));
+        assertTrue(UnrecognizedWord.matches(ANY));
 
         assertNotEquals(ANY, NONE);
         assertFalse(ANY.matches(NONE));
@@ -92,16 +93,16 @@ public class WordTest {
         assertFalse(NONE.matches(ANY));
         assertFalse(ANY.matches(NONE));
         assertTrue(ANY.matches(ANY));
-        assertTrue(ANY.matches(UNRECOGNIZED));
-        assertTrue(UNRECOGNIZED.matches(ANY));
-        assertFalse(NONE.matches(UNRECOGNIZED));
-        assertFalse(UNRECOGNIZED.matches(NONE));
-        assertTrue(UNRECOGNIZED.matches(UNRECOGNIZED));
+        assertTrue(ANY.matches(UnrecognizedWord));
+        assertTrue(UnrecognizedWord.matches(ANY));
+        assertFalse(NONE.matches(UnrecognizedWord));
+        assertFalse(UnrecognizedWord.matches(NONE));
+        assertTrue(UnrecognizedWord.matches(UnrecognizedWord));
         assertFalse(something.matches(NONE));
         assertFalse(NONE.matches(something));
         assertTrue(ANY.matches(something));
         assertTrue(something.matches(ANY));
-        assertFalse(UNRECOGNIZED.matches(something));
-        assertFalse(something.matches(UNRECOGNIZED));
+        assertFalse(UnrecognizedWord.matches(something));
+        assertFalse(something.matches(UnrecognizedWord));
     }
 }

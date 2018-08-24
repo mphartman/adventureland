@@ -20,12 +20,15 @@ public class Vocabulary {
 
     private Set<Word> filter(Set<Word> words) {
         return words.stream()
-                .filter(word -> !(word == null || word.equals(Word.UNRECOGNIZED) || word.equals(Word.NONE) || word.equals(Word.ANY)))
+                .filter(word -> !(word == null
+                        || word.matches(Word.unrecognized())
+                        || word.equals(Word.NONE)
+                        || word.equals(Word.ANY)))
                 .collect(Collectors.toSet());
     }
 
     public Optional<Word> findMatch(String word) {
-        return findMatch(new Word(word));
+        return findMatch(Word.of(word));
     }
 
     public Optional<Word> findMatch(Word word) {

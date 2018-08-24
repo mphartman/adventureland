@@ -37,7 +37,8 @@ public class DefaultCommandInterpreter implements CommandInterpreter {
             try (Scanner lineScanner = new Scanner(lastLine)) {
                 LinkedList<Word> words = new LinkedList<>();
                 while (lineScanner.hasNext()) {
-                    words.add(vocabulary.findMatch(lineScanner.next()).orElse(Word.UNRECOGNIZED));
+                    String next = lineScanner.next();
+                    words.add(vocabulary.findMatch(next).orElse(Word.unrecognized(next)));
                 }
                 return new Command(words.toArray(new Word[0]));
             }

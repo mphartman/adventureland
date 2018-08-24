@@ -10,9 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static hartman.games.adventureland.engine.Room.NOWHERE;
-import static hartman.games.adventureland.engine.Word.ANY;
-import static hartman.games.adventureland.engine.Word.NONE;
-import static hartman.games.adventureland.engine.Word.UNRECOGNIZED;
 import static hartman.games.adventureland.engine.core.TestWords.EAST;
 import static hartman.games.adventureland.engine.core.TestWords.GO;
 import static hartman.games.adventureland.engine.core.TestWords.NORTH;
@@ -58,7 +55,7 @@ public class ActionsTest {
                 .then((command, gameState, display) -> gameState.setFlag("verb"))
                 .build();
         GameState gameState = new GameState(NOWHERE);
-        action.run(gameState, display, new Command(new Word("beat"), NONE));
+        action.run(gameState, display, new Command(new Word("beat"), Word.none()));
         assertTrue(gameState.getFlag("verb"));
     }
 
@@ -69,7 +66,7 @@ public class ActionsTest {
                 .then((command, gameState, display) -> gameState.setFlag("noun"))
                 .build();
         GameState gameState = new GameState(NOWHERE);
-        action.run(gameState, display, new Command(NONE, new Word("fork")));
+        action.run(gameState, display, new Command(Word.none(), new Word("fork")));
         assertTrue(gameState.getFlag("noun"));
     }
 
@@ -79,20 +76,20 @@ public class ActionsTest {
                 .onNoFirstWord()
                 .withAnySecondWords(NORTH, SOUTH, EAST, WEST)
                 .build();
-        assertTrue(action.run(new GameState(NOWHERE), display, new Command(NONE, new Word("n"))));
-        assertTrue(action.run(new GameState(NOWHERE), display, new Command(NONE, new Word("s"))));
-        assertTrue(action.run(new GameState(NOWHERE), display, new Command(NONE, new Word("e"))));
-        assertTrue(action.run(new GameState(NOWHERE), display, new Command(NONE, new Word("w"))));
-        assertTrue(action.run(new GameState(NOWHERE), display, new Command(NONE, new Word("north"))));
-        assertTrue(action.run(new GameState(NOWHERE), display, new Command(NONE, new Word("south"))));
-        assertTrue(action.run(new GameState(NOWHERE), display, new Command(NONE, new Word("east"))));
-        assertTrue(action.run(new GameState(NOWHERE), display, new Command(NONE, new Word("west"))));
-        assertTrue(action.run(new GameState(NOWHERE), display, new Command(NONE, NORTH)));
-        assertTrue(action.run(new GameState(NOWHERE), display, new Command(NONE, SOUTH)));
-        assertTrue(action.run(new GameState(NOWHERE), display, new Command(NONE, EAST)));
-        assertTrue(action.run(new GameState(NOWHERE), display, new Command(NONE, WEST)));
-        assertFalse(action.run(new GameState(NOWHERE), display, new Command(NONE, new Word("u"))));
-        assertFalse(action.run(new GameState(NOWHERE), display, new Command(NONE, new Word("d"))));
+        assertTrue(action.run(new GameState(NOWHERE), display, new Command(Word.none(), new Word("n"))));
+        assertTrue(action.run(new GameState(NOWHERE), display, new Command(Word.none(), new Word("s"))));
+        assertTrue(action.run(new GameState(NOWHERE), display, new Command(Word.none(), new Word("e"))));
+        assertTrue(action.run(new GameState(NOWHERE), display, new Command(Word.none(), new Word("w"))));
+        assertTrue(action.run(new GameState(NOWHERE), display, new Command(Word.none(), new Word("north"))));
+        assertTrue(action.run(new GameState(NOWHERE), display, new Command(Word.none(), new Word("south"))));
+        assertTrue(action.run(new GameState(NOWHERE), display, new Command(Word.none(), new Word("east"))));
+        assertTrue(action.run(new GameState(NOWHERE), display, new Command(Word.none(), new Word("west"))));
+        assertTrue(action.run(new GameState(NOWHERE), display, new Command(Word.none(), NORTH)));
+        assertTrue(action.run(new GameState(NOWHERE), display, new Command(Word.none(), SOUTH)));
+        assertTrue(action.run(new GameState(NOWHERE), display, new Command(Word.none(), EAST)));
+        assertTrue(action.run(new GameState(NOWHERE), display, new Command(Word.none(), WEST)));
+        assertFalse(action.run(new GameState(NOWHERE), display, new Command(Word.none(), new Word("u"))));
+        assertFalse(action.run(new GameState(NOWHERE), display, new Command(Word.none(), new Word("d"))));
     }
 
     @Test
@@ -101,14 +98,14 @@ public class ActionsTest {
                 .onAnyFirstWords(new Word("kill", "k"), new Word("slay", "s"), new Word("murder", "m"))
                 .withNoSecondWord()
                 .build();
-        assertTrue(action.run(new GameState(NOWHERE), display, new Command(new Word("kill"), NONE)));
-        assertTrue(action.run(new GameState(NOWHERE), display, new Command(new Word("k"), NONE)));
-        assertTrue(action.run(new GameState(NOWHERE), display, new Command(new Word("slay"), NONE)));
-        assertTrue(action.run(new GameState(NOWHERE), display, new Command(new Word("s"), NONE)));
-        assertTrue(action.run(new GameState(NOWHERE), display, new Command(new Word("murder"), NONE)));
-        assertTrue(action.run(new GameState(NOWHERE), display, new Command(new Word("m"), NONE)));
-        assertFalse(action.run(new GameState(NOWHERE), display, new Command(new Word("hug"), NONE)));
-        assertFalse(action.run(new GameState(NOWHERE), display, new Command(new Word("kiss"), NONE)));
+        assertTrue(action.run(new GameState(NOWHERE), display, new Command(new Word("kill"), Word.none())));
+        assertTrue(action.run(new GameState(NOWHERE), display, new Command(new Word("k"), Word.none())));
+        assertTrue(action.run(new GameState(NOWHERE), display, new Command(new Word("slay"), Word.none())));
+        assertTrue(action.run(new GameState(NOWHERE), display, new Command(new Word("s"), Word.none())));
+        assertTrue(action.run(new GameState(NOWHERE), display, new Command(new Word("murder"), Word.none())));
+        assertTrue(action.run(new GameState(NOWHERE), display, new Command(new Word("m"), Word.none())));
+        assertFalse(action.run(new GameState(NOWHERE), display, new Command(new Word("hug"), Word.none())));
+        assertFalse(action.run(new GameState(NOWHERE), display, new Command(new Word("kiss"), Word.none())));
     }
 
     @Test
@@ -132,15 +129,13 @@ public class ActionsTest {
 
         assertTrue(vocab.findMatch(new Word("type")).isPresent());
         assertTrue(vocab.findMatch(new Word("drive")).isPresent());
-        assertTrue("Any always matches", vocab.findMatch(ANY).isPresent());
-        assertFalse(vocab.findMatch(NONE).isPresent());
-        assertFalse(vocab.findMatch(UNRECOGNIZED).isPresent());
+        assertTrue("Any always matches", vocab.findMatch(Word.any()).isPresent());
+        assertFalse(vocab.findMatch(Word.none()).isPresent());
 
         assertTrue(vocab.findMatch(new Word("keyboard")).isPresent());
         assertTrue(vocab.findMatch(new Word("chair")).isPresent());
-        assertTrue("Any always matches", vocab.findMatch(ANY).isPresent());
-        assertFalse(vocab.findMatch(NONE).isPresent());
-        assertFalse(vocab.findMatch(UNRECOGNIZED).isPresent());
+        assertTrue("Any always matches", vocab.findMatch(Word.any()).isPresent());
+        assertFalse(vocab.findMatch(Word.none()).isPresent());
     }
 
     @Test
@@ -171,7 +166,7 @@ public class ActionsTest {
                 .build();
 
         GameState gameState = new GameState(NOWHERE);
-        action.run(gameState, display, new Command(new Word("go"), NONE));
+        action.run(gameState, display, new Command(new Word("go"), Word.none()));
         assertEquals("sprung", gameState.getString("trap"));
 
         gameState = new GameState(NOWHERE);
@@ -190,7 +185,7 @@ public class ActionsTest {
                 .build();
 
         GameState gameState = new GameState(NOWHERE);
-        action.run(gameState, display, new Command(new Word("go"), NONE));
+        action.run(gameState, display, new Command(new Word("go"), Word.none()));
         assertEquals("", gameState.getString("shazam"));
 
         gameState = new GameState(NOWHERE);
@@ -198,7 +193,7 @@ public class ActionsTest {
         assertEquals("bam", gameState.getString("shazam"));
 
         gameState = new GameState(NOWHERE);
-        action.run(gameState, display, new Command(new Word("go"), UNRECOGNIZED));
+        action.run(gameState, display, new Command(new Word("go"), Word.unrecognized("far")));
         assertEquals("bam", gameState.getString("shazam"));
     }
 }

@@ -7,11 +7,9 @@ import hartman.games.adventureland.engine.Word;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import static hartman.games.adventureland.engine.Word.ANY;
-import static hartman.games.adventureland.engine.Word.NONE;
-import static hartman.games.adventureland.engine.Word.UNRECOGNIZED;
-import static hartman.games.adventureland.engine.core.Conditions.anyMatchesWord;
 import static hartman.games.adventureland.engine.core.Conditions.wordMatches;
+import static hartman.games.adventureland.engine.core.Conditions.wordMatchesAny;
+import static hartman.games.adventureland.engine.core.Conditions.wordUnrecognized;
 import static java.util.Arrays.asList;
 
 public final class Actions {
@@ -27,13 +25,18 @@ public final class Actions {
 
         public ActionBuilder onWordAt(int position, Word word) {
             words.add(word);
-            when(wordMatches(word, position));
+            when(wordMatches(position, word));
             return this;
         }
 
         public ActionBuilder onAnyWordAt(int position, Word... wordList) {
             words.addAll(asList(wordList));
-            when(anyMatchesWord(position, wordList));
+            when(wordMatchesAny(position, wordList));
+            return this;
+        }
+
+        public ActionBuilder onUnrecognizedWordAt(int position) {
+            when(wordUnrecognized(position));
             return this;
         }
 
@@ -42,15 +45,15 @@ public final class Actions {
         }
 
         public ActionBuilder onNoFirstWord() {
-            return on(NONE);
+            return on(Word.none());
         }
 
         public ActionBuilder onUnrecognizedFirstWord() {
-            return on(UNRECOGNIZED);
+            return onUnrecognizedWordAt(1);
         }
 
         public ActionBuilder onAnyFirstWord() {
-            return on(ANY);
+            return on(Word.any());
         }
 
         public ActionBuilder onAnyFirstWords(Word... verbs) {
@@ -61,28 +64,44 @@ public final class Actions {
             return onWordAt(2, word);
         }
 
-        public ActionBuilder the(Word word) {
-            return with(word);
-        }
-
         public ActionBuilder withNoSecondWord() {
-            return with(NONE);
+            return with(Word.none());
         }
 
         public ActionBuilder withUnrecognizedSecondWord() {
-            return with(UNRECOGNIZED);
+            return onUnrecognizedWordAt(2);
         }
 
         public ActionBuilder withAnySecondWord() {
-            return with(ANY);
-        }
-
-        public ActionBuilder anything() {
-            return withAnySecondWord();
+            return with(Word.any());
         }
 
         public ActionBuilder withAnySecondWords(Word... nouns) {
             return onAnyWordAt(2, nouns);
+        }
+
+        @Override
+        public ActionBuilder when(Action.Condition condition) {
+            super.when(condition);
+            return this;
+        }
+
+        @Override
+        public ActionBuilder and(Action.Condition condition) {
+            super.and(condition);
+            return this;
+        }
+
+        @Override
+        public ActionBuilder then(Action.Result result) {
+            super.then(result);
+            return this;
+        }
+
+        @Override
+        public ActionBuilder andThen(Action.Result result) {
+            super.andThen(result);
+            return this;
         }
 
         @Override

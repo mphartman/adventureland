@@ -1,6 +1,6 @@
 > go (go)
 
-> go far (go <unrecognized>)
+> go far (go far‹?›)
 
 2
 > go north (go north)

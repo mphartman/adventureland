@@ -41,11 +41,11 @@ public class VocabularyTest {
 
     @Test
     public void vocabularyShouldNotContainNullOrNoneOrUnrecognized() {
-        Vocabulary vocabulary = new Vocabulary(new LinkedHashSet<>(asList(null, new Word("collect"), Word.NONE, Word.ANY, Word.UNRECOGNIZED)));
+        Vocabulary vocabulary = new Vocabulary(new LinkedHashSet<>(asList(null, new Word("collect"), Word.NONE, Word.ANY, Word.unrecognized())));
 
         assertFalse(vocabulary.findMatch(Word.NONE).isPresent());
         assertTrue("Any matches Any so this is always true", vocabulary.findMatch(Word.ANY).isPresent());
-        assertFalse(vocabulary.findMatch(Word.UNRECOGNIZED).isPresent());
+        assertFalse(vocabulary.findMatch(Word.unrecognized()).isPresent());
         assertTrue(vocabulary.findMatch(new Word("collect")).isPresent());
     }
 }

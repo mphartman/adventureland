@@ -19,21 +19,6 @@ import java.util.LinkedHashSet;
 import java.util.Scanner;
 import java.util.Set;
 
-import static hartman.games.adventureland.demo.Words.DOWN;
-import static hartman.games.adventureland.demo.Words.DROP;
-import static hartman.games.adventureland.demo.Words.EAST;
-import static hartman.games.adventureland.demo.Words.GET;
-import static hartman.games.adventureland.demo.Words.GO;
-import static hartman.games.adventureland.demo.Words.HELP;
-import static hartman.games.adventureland.demo.Words.INVENTORY;
-import static hartman.games.adventureland.demo.Words.LOOK;
-import static hartman.games.adventureland.demo.Words.NORTH;
-import static hartman.games.adventureland.demo.Words.OPEN;
-import static hartman.games.adventureland.demo.Words.QUIT;
-import static hartman.games.adventureland.demo.Words.SOUTH;
-import static hartman.games.adventureland.demo.Words.UP;
-import static hartman.games.adventureland.demo.Words.USE;
-import static hartman.games.adventureland.demo.Words.WEST;
 import static hartman.games.adventureland.engine.core.Actions.newActionSet;
 import static hartman.games.adventureland.engine.core.Conditions.carrying;
 import static hartman.games.adventureland.engine.core.Conditions.here;
@@ -207,7 +192,7 @@ public class HouseEscapeAdventure {
         Actions adventureActions = newActionSet();
 
         adventureActions.newAction()
-                .on(OPEN).the(door)
+                .on(OPEN).with(door)
                 .when(here(lockedDoor)).and(not(present(key)))
                 .then(printf("%nIt's locked. I need some way to unlock it.%n"))
                 .build();
@@ -219,25 +204,25 @@ public class HouseEscapeAdventure {
                 .build();
 
         adventureActions.newAction()
-                .on(GET).the(key)
+                .on(GET).with(key)
                 .when(here(key))
                 .then(get).andThen(printf("%nOkay. I got the key.%n"))
                 .build();
 
         adventureActions.newAction()
-                .on(DROP).the(key)
+                .on(DROP).with(key)
                 .when(carrying(key))
                 .then(drop).andThen(printf("%nI dropped the key.%n"))
                 .build();
 
         adventureActions.newAction()
-                .on(OPEN).the(door)
+                .on(OPEN).with(door)
                 .when(here(lockedDoor)).and(present(key))
                 .then(swap(lockedDoor, openDoor)).andThen(printf("<CLICK> That did it. It's unlocked.%n")).andThen(look)
                 .build();
 
         adventureActions.newAction()
-                .on(USE).the(key)
+                .on(USE).with(key)
                 .when(here(lockedDoor)).and(present(key))
                 .then(swap(lockedDoor, openDoor)).andThen(printf("<CLICK> That did it. It's unlocked.%n")).andThen(look)
                 .build();
@@ -249,19 +234,19 @@ public class HouseEscapeAdventure {
                 .build();
 
         adventureActions.newAction()
-                .on(GET).the(flyswatter)
+                .on(GET).with(flyswatter)
                 .when(here(flyswatter))
                 .then(get).andThen(printf("%nOkay. I picked up the flyswatter.%n"))
                 .build();
 
         adventureActions.newAction()
-                .on(kill).the(fly)
+                .on(kill).with(fly)
                 .when(here(fly)).and(not(carrying(flyswatter)))
                 .then(printf("%nSmack! I tried but I'm not fast enough. I need some sort of tool.%n"))
                 .build();
 
         adventureActions.newAction()
-                .on(kill).the(fly)
+                .on(kill).with(fly)
                 .when(here(fly))
                 .then(putHere(deadFly))
                 .andThen(printf("%nWHACK! I got 'em! It's dead.%n"))
@@ -270,48 +255,48 @@ public class HouseEscapeAdventure {
                 .build();
 
         adventureActions.newAction()
-                .on(close).the(openWindow)
+                .on(close).with(openWindow)
                 .when(here(openWindow))
                 .then(swap(openWindow, closedWindow)).andThen(println("It's closed. That should keep those pesky flies out of here."))
                 .build();
 
         adventureActions.newAction()
-                .on(OPEN).the(closedWindow)
+                .on(OPEN).with(closedWindow)
                 .when(here(closedWindow))
                 .then(swap(closedWindow, openWindow)).andThen(println("It's open. A cool breeze greets me. I hear a buzzing sound coming from outside too."))
                 .build();
 
         adventureActions.newAction()
-                .on(yell).anything()
+                .on(yell).withAnySecondWord()
                 .then(printf("%n\"{noun}\"!!! Now what?%n"))
                 .build();
 
         adventureActions.newAction()
-                .on(GET).the(redPanda)
+                .on(GET).with(redPanda)
                 .when(here(redPanda))
                 .then(get).andThen(println("%nOkay. I picked up the toy. It's a bit smelly but it's soft and I feel better carrying it.")).andThen(inventory)
                 .build();
 
         adventureActions.newAction()
-                .on(DROP).the(redPanda)
+                .on(DROP).with(redPanda)
                 .when(carrying(redPanda))
                 .then(drop).andThen(look)
                 .build();
 
         adventureActions.newAction()
-                .on(OPEN).the(kennelWithDog)
+                .on(OPEN).with(kennelWithDog)
                 .when(here(kennelWithDog))
                 .then(swap(kennelWithDog, emptyKennel)).andThen(putHere(dog)).andThen(println("A super cute little dog comes leaping out of the kennel!"))
                 .build();
 
         adventureActions.newAction()
-                .on(GET).the(dog)
+                .on(GET).with(dog)
                 .when(here(dog))
                 .then(println("He's a bit too excited and very fast. I can't catch him. Maybe when he calms down."))
                 .build();
 
         adventureActions.newAction()
-                .on(pet).the(dog)
+                .on(pet).with(dog)
                 .when(here(dog))
                 .then(println("The dog loves me. His leg starts thumping on the floor."))
                 .build();
@@ -404,22 +389,19 @@ public class HouseEscapeAdventure {
         return new Adventure(vocabulary, occurs.copyOfActions(), fullActionSet.copyOfActions(), itemSet.copyOfItems(), masterBedroom);
     }
 
-}
-
-final class Words {
-    static final Word HELP = new Word("HELP", "?");
-    static final Word QUIT = new Word("QUIT");
-    static final Word INVENTORY = new Word("INVENTORY", "I");
-    static final Word LOOK = new Word("LOOK", "L");
-    static final Word GO = new Word("GO", "GOTO", "ENTER", "WALK", "RUN", "EXIT", "LEAVE");
-    static final Word OPEN = new Word("OPEN", "UNLOCK");
-    static final Word GET = new Word("GET", "PICKUP", "GRAB", "TAKE");
-    static final Word DROP = new Word("DROP", "DISCARD");
-    static final Word USE = new Word("USE");
-    static final Word NORTH = new Word("North", "N");
-    static final Word SOUTH = new Word("South", "S");
-    static final Word UP = new Word("Up", "U");
-    static final Word DOWN = new Word("Down", "D");
-    static final Word EAST = new Word("East", "E");
-    static final Word WEST = new Word("West", "W");
+    private static final Word HELP = new Word("HELP", "?");
+    private static final Word QUIT = new Word("QUIT");
+    private static final Word INVENTORY = new Word("INVENTORY", "I");
+    private static final Word LOOK = new Word("LOOK", "L");
+    private static final Word GO = new Word("GO", "GOTO", "ENTER", "WALK", "RUN", "EXIT", "LEAVE");
+    private static final Word OPEN = new Word("OPEN", "UNLOCK");
+    private static final Word GET = new Word("GET", "PICKUP", "GRAB", "TAKE");
+    private static final Word DROP = new Word("DROP", "DISCARD");
+    private static final Word USE = new Word("USE");
+    private static final Word NORTH = new Word("North", "N");
+    private static final Word SOUTH = new Word("South", "S");
+    private static final Word UP = new Word("Up", "U");
+    private static final Word DOWN = new Word("Down", "D");
+    private static final Word EAST = new Word("East", "E");
+    private static final Word WEST = new Word("West", "W");
 }

@@ -7,18 +7,44 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Word {
-    public static final Word UNRECOGNIZED = new Word("<unrecognized>");
+    private static final Word UNRECOGNIZED = new Word("<unrecognized>", false);
     public static final Word ANY = new Word("<any>");
     public static final Word NONE = new Word("<none>");
 
+    public static Word of(String name) {
+        return new Word(name);
+    }
+
+    public static Word none() {
+        return NONE;
+    }
+
+    public static Word any() {
+        return ANY;
+    }
+
+    public static Word unrecognized() {
+        return UNRECOGNIZED;
+    }
+
+    public static Word unrecognized(String name) {
+        return new Word(name, false);
+    }
+
     private final String name;
     private final Set<String> synonyms = new LinkedHashSet<>();
+    private final boolean recognized;
 
-    public Word(String name, String... synonyms) {
+    public Word(String name, boolean recognized, String... synonyms) {
         Objects.requireNonNull(name, "name cannot be null");
         this.name = name;
         this.synonyms.add(name.toUpperCase());
         this.synonyms.addAll(Arrays.stream(synonyms).map(String::toUpperCase).collect(Collectors.toSet()));
+        this.recognized = recognized;
+    }
+
+    public Word(String name, String... synonyms) {
+        this(name, true, synonyms);
     }
 
     public String getName() {
@@ -27,6 +53,7 @@ public class Word {
 
     public boolean matches(Word that) {
         if (equals(that)) return true;
+        if (this.isUnrecognized() && that.isUnrecognized()) return true;
         if (this == NONE && that == NONE) return true;
         if (this == NONE || that == NONE) return false;
         if (this == ANY || that == ANY) return true;
@@ -35,9 +62,20 @@ public class Word {
         return !intersection.isEmpty();
     }
 
+    public boolean isRecognized() {
+        return recognized;
+    }
+
+    public boolean isUnrecognized() {
+        return !recognized;
+    }
+
     @Override
     public String toString() {
-        return name;
+        if (recognized) {
+            return name;
+        }
+        return String.format("%s‹?›", name);
     }
 
     @Override

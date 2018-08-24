@@ -39,8 +39,8 @@ public class DefaultCommandInterpreterTest {
         Vocabulary vocabulary = new Vocabulary(new HashSet<>(asList(new Word("JUMP"), new Word("UP"))));
         DefaultCommandInterpreter interpreter = new DefaultCommandInterpreter(new Scanner("KILL TROLL"), vocabulary);
         Command command = interpreter.nextCommand();
-        assertTrue(command.getFirstWord().equals(Word.UNRECOGNIZED));
-        assertTrue(command.getSecondWord().equals(Word.UNRECOGNIZED));
+        assertTrue(command.getFirstWord().isUnrecognized());
+        assertTrue(command.getSecondWord().isUnrecognized());
     }
 
     @Test(expected = IllegalStateException.class)
@@ -64,7 +64,7 @@ public class DefaultCommandInterpreterTest {
         Vocabulary vocabulary = new Vocabulary(new HashSet<>(asList(new Word("JAVELIN"), new Word("NORTH"))));
         DefaultCommandInterpreter interpreter = new DefaultCommandInterpreter(new Scanner("BANANAS"), vocabulary);
         Command command = interpreter.nextCommand();
-        assertTrue(command.getFirstWord().matches(Word.UNRECOGNIZED));
+        assertTrue(command.getFirstWord().isUnrecognized());
         assertTrue(command.getSecondWord().matches(Word.NONE));
     }
 
@@ -74,7 +74,7 @@ public class DefaultCommandInterpreterTest {
         DefaultCommandInterpreter interpreter = new DefaultCommandInterpreter(new Scanner("NORTH PAJAMAS"), vocabulary);
         Command command = interpreter.nextCommand();
         assertTrue(command.getFirstWord().matches(new Word("NORTH")));
-        assertTrue(command.getSecondWord().matches(Word.UNRECOGNIZED));
+        assertTrue(command.getSecondWord().isUnrecognized());
     }
 
     @Test
@@ -91,8 +91,8 @@ public class DefaultCommandInterpreterTest {
         Vocabulary vocabulary = new Vocabulary(new HashSet<>(asList(new Word("JAVELIN"), new Word("NORTH"))));
         DefaultCommandInterpreter interpreter = new DefaultCommandInterpreter(new Scanner("curious george"), vocabulary);
         Command command = interpreter.nextCommand();
-        assertTrue(command.getFirstWord().matches(Word.UNRECOGNIZED));
-        assertTrue(command.getSecondWord().matches(Word.UNRECOGNIZED));
+        assertTrue(command.getFirstWord().isUnrecognized());
+        assertTrue(command.getSecondWord().isUnrecognized());
     }
 
     @Test

@@ -42,15 +42,19 @@ public final class Conditions {
     /**
      * TRUE if word matches the Command word at the given position (1 based index)
      */
-    public static Condition wordMatches(Word word, int position) {
+    public static Condition wordMatches(int position, Word word) {
         return (command, gameState) -> command.getWord(position).map(word::matches).orElse(Boolean.FALSE);
     }
 
     /**
      * TRUE if Command first word matches any of the given words.
      */
-    public static Condition anyMatchesWord(int position, Word... words) {
-        return (command, gameState) -> stream(words).anyMatch(word -> wordMatches(word, position).matches(command, gameState));
+    public static Condition wordMatchesAny(int position, Word... words) {
+        return (command, gameState) -> stream(words).anyMatch(word -> wordMatches(position, word).matches(command, gameState));
+    }
+
+    public static Condition wordUnrecognized(int position) {
+        return (command, gameState) -> command.getWord(position).map(Word::isUnrecognized).orElse(true);
     }
 
     /**
