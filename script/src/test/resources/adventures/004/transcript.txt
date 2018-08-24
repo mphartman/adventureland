@@ -11,24 +11,29 @@
 
 I'm on the bridge of the starship.
 I can see the helm, navigator, science, tactical, communications and engineering stations.
-Room exits: turbolift
-Inventory is empty.
+
+There is a single exit to the turbolift
+I'm not carrying anything right now.
 > go turbolift (go turbolift)
 
 I'm in the main turbolift.
-Room exits: bridge, engineering
+
+There are 2 obvious exits: bridge, engineering
 > go engineering (go engineering)
 
 I'm in main engineering.
-Room exits: turbolift
+
+There is a single exit to the turbolift
 > go turbolift (go turbolift)
 
 I'm in the main turbolift.
-Room exits: bridge, engineering
+
+There are 2 obvious exits: bridge, engineering
 > go bridge (go bridge)
 
 I'm on the bridge of the starship.
 I can see the helm, navigator, science, tactical, communications and engineering stations.
-Room exits: turbolift
+
+There is a single exit to the turbolift
 > quit (quit)
 

@@ -8,12 +8,15 @@ import hartman.games.adventureland.engine.Game;
 import hartman.games.adventureland.engine.GameState;
 import hartman.games.adventureland.engine.Vocabulary;
 import hartman.games.adventureland.engine.core.DefaultCommandInterpreter;
+import hartman.games.adventureland.engine.core.DefaultDisplay;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
@@ -54,20 +57,23 @@ public class AdventureScriptTest {
     }
 
     private void runAdventure(int id) {
-        TestDisplay display = new TestDisplay();
-        try {
-            String ident = String.format("%03d", id);
-            Adventure adventure = readAdventure(getClass().getResourceAsStream(String.format("/adventures/%s/adventure.txt", ident)));
-            CommandInterpreter interpreter = new TestCommandInterpreter(String.format("/adventures/%s/input.txt", ident), adventure.getVocabulary(), display);
-            Game game = new Game(adventure, interpreter, display);
-            GameState gameState = new GameState(adventure.getStartRoom(), adventure.getItems());
-            game.run(gameState);
-            String expected = readToString(getClass().getResourceAsStream(String.format("/adventures/%s/transcript.txt", ident)));
-            String actual = display.toString();
-            assertEquals(expected, actual);
-        } catch (Exception e) {
-            System.err.println(display.toString());
-            throw new RuntimeException(e);
+        StringWriter out = new StringWriter();
+        try (PrintWriter pw = new PrintWriter(out)) {
+            try {
+                String ident = String.format("%03d", id);
+                Adventure adventure = readAdventure(getClass().getResourceAsStream(String.format("/adventures/%s/adventure.txt", ident)));
+                Display display = new DefaultDisplay(pw);
+                CommandInterpreter interpreter = new TestCommandInterpreter(String.format("/adventures/%s/input.txt", ident), adventure.getVocabulary(), display);
+                Game game = new Game(adventure, interpreter, display);
+                GameState gameState = new GameState(adventure.getStartRoom(), adventure.getItems());
+                game.run(gameState);
+                String expected = readToString(getClass().getResourceAsStream(String.format("/adventures/%s/transcript.txt", ident)));
+                String actual = out.toString();
+                assertEquals(expected, actual);
+            } catch (Exception e) {
+                System.err.println(out.toString());
+                throw new RuntimeException(e);
+            }
         }
     }
 

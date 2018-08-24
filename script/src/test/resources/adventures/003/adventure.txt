@@ -111,7 +111,6 @@ wordgroup "west", "w"
 occurs
     when times 1
     then look
-        and inventory
 
 action "go" any
     when has_exit $2

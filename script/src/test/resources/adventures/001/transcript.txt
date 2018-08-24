@@ -1,5 +1,6 @@
 I'm in a square chamber.
-Room exits: East
+
+There is a single exit to the East
 > ? (help)
 
 A voice BOOOMS out:
@@ -35,21 +36,25 @@ I understand but I can't go that way from here.
 > go east (go east)
 
 I'm in a gloomy dungeon.
-Room exits: West
+
+There is a single exit to the West
 > west (West)
 
 I'm in a square chamber.
-Room exits: East
+
+There is a single exit to the East
 > i (inventory)
 
-Inventory is empty.
+I'm not carrying anything right now.
 > l up (look up)
 
 I'm in a square chamber.
-Room exits: East
+
+There is a single exit to the East
 > l (look)
 
 I'm in a square chamber.
-Room exits: East
+
+There is a single exit to the East
 > quit (quit)
 

@@ -76,17 +76,17 @@ public class DefaultDisplay implements Display {
     public void inventory(List<Item> itemsCarried) {
         StringBuilder buf = new StringBuilder();
         if (itemsCarried.isEmpty()) {
-            buf.append(format("I'm not carrying anything right now.%n"));
+            buf.append("I'm not carrying anything right now.");
         } else {
             buf.append("I'm carrying ");
             if (itemsCarried.size() == 1) {
-                buf.append(format("%s", itemsCarried.iterator().next().getDescription()));
+                buf.append(itemsCarried.iterator().next().getDescription());
             } else {
                 buf.append(format("%d things: ", itemsCarried.size()));
                 itemsCarried.forEach(item -> buf.append(format("%n - %s", item.getDescription())));
             }
-            buf.append(format("%n"));
         }
+        buf.append(format("%n"));
         print(buf.toString());
     }
 
