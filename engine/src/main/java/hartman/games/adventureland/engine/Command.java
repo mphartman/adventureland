@@ -42,7 +42,7 @@ public class Command {
     }
 
     public Word getWordOrNone(int position) {
-        return getWord(position).orElse(Word.none());
+        return getWord(position).orElse(Word.NONE);
     }
     /**
      * Return the word from this Command's word list at the given element position.

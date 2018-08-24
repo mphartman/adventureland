@@ -45,7 +45,7 @@ public final class Actions {
         }
 
         public ActionBuilder onNoFirstWord() {
-            return on(Word.none());
+            return on(Word.NONE);
         }
 
         public ActionBuilder onUnrecognizedFirstWord() {
@@ -53,7 +53,7 @@ public final class Actions {
         }
 
         public ActionBuilder onAnyFirstWord() {
-            return on(Word.any());
+            return on(Word.ANY);
         }
 
         public ActionBuilder onAnyFirstWords(Word... verbs) {
@@ -65,7 +65,7 @@ public final class Actions {
         }
 
         public ActionBuilder withNoSecondWord() {
-            return with(Word.none());
+            return with(Word.NONE);
         }
 
         public ActionBuilder withUnrecognizedSecondWord() {
@@ -73,7 +73,7 @@ public final class Actions {
         }
 
         public ActionBuilder withAnySecondWord() {
-            return with(Word.any());
+            return with(Word.ANY);
         }
 
         public ActionBuilder withAnySecondWords(Word... nouns) {

@@ -69,6 +69,6 @@ public class CommandTest {
     @Test
     public void commandWordOrNoneReturnsNoneGivenWordNotFound() {
         Command command = new Command(Word.of("foo"));
-        assertEquals(Word.none(), command.getWordOrNone(2));
+        assertEquals(Word.NONE, command.getWordOrNone(2));
     }
 }

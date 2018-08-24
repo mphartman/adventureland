@@ -15,14 +15,6 @@ public class Word {
         return new Word(name);
     }
 
-    public static Word none() {
-        return NONE;
-    }
-
-    public static Word any() {
-        return ANY;
-    }
-
     public static Word unrecognized() {
         return UNRECOGNIZED;
     }
@@ -60,10 +52,6 @@ public class Word {
         Set<String> intersection = new LinkedHashSet<>(synonyms);
         intersection.retainAll(that.synonyms);
         return !intersection.isEmpty();
-    }
-
-    public boolean isRecognized() {
-        return recognized;
     }
 
     public boolean isUnrecognized() {

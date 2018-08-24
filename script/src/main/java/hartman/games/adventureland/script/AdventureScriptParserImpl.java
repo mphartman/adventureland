@@ -410,12 +410,12 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         @Override
         public Word visitActionWordAny(ActionWordAnyContext ctx) {
-            return Word.any();
+            return Word.ANY;
         }
 
         @Override
         public Word visitActionWordNone(ActionWordNoneContext ctx) {
-            return Word.none();
+            return Word.NONE;
         }
 
         @Override
