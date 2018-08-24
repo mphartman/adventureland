@@ -33,10 +33,6 @@ public class Command {
         }
     }
 
-    public Word getSecondThenFirst() {
-        return getSecondWord().equals(Word.none()) ? getFirstWord() : getSecondWord();
-    }
-
     public Word getFirstWord() {
         return getWordOrNone(1);
     }

@@ -115,7 +115,7 @@ occurs
 
 action "go" any
     when has_exit $2
-    then go
+    then go $2
         and look
 
 action (north, south, up, down, east, west)

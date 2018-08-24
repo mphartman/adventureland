@@ -100,12 +100,6 @@ wordgroup "open", "unlock"
 wordgroup "get", "pickup", "grab", "take"
 wordgroup "drop", "discard"
 wordgroup "use"
-wordgroup "north", "n"
-wordgroup "south", "s"
-wordgroup "up", "u"
-wordgroup "down", "d"
-wordgroup "east", "e"
-wordgroup "west", "w"
 
 occurs
     when times 1
@@ -114,12 +108,7 @@ occurs
 
 action "go" any
     when has_exit $2
-    then go
-        and look
-
-action (north, south, up, down, east, west)
-    when has_exit
-    then go
+    then go $2
         and look
 
 action "look"

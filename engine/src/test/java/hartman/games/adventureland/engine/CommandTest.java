@@ -19,12 +19,6 @@ public class CommandTest {
     }
 
     @Test
-    public void returnFirstWordIfSecondWordIsNone() {
-        assertEquals(new Word("first"), new Command(new Word("first"), Word.NONE).getSecondThenFirst());
-        assertEquals(new Word("second"), new Command(new Word("first"), new Word("second")).getSecondThenFirst());
-    }
-
-    @Test
     public void commandEquality() {
         Command c1 = Command.NONE;
         Command c2 = new Command(new Word("a"), new Word("b"));
@@ -70,5 +64,11 @@ public class CommandTest {
     public void commandFiltersOutNullWords() {
         Command command = new Command(null, new Word("river"), null);
         assertTrue(command.getWord(1).orElseThrow(AssertionError::new).matches(new Word("river")));
+    }
+
+    @Test
+    public void commandWordOrNoneReturnsNoneGivenWordNotFound() {
+        Command command = new Command(Word.of("foo"));
+        assertEquals(Word.none(), command.getWordOrNone(2));
     }
 }

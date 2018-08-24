@@ -22,9 +22,16 @@ public final class Results {
     public static final Result quit = (command, gameState, display) -> gameState.quit();
 
     /**
-     * Change current room based on the given Command's second word if it's not NONE, otherwise the first word
+     * Change the current toom based on the given direction.
+     * @throws IllegalStateException if direction is not an exit from the current room.
      */
-    public static final Result go = (command, gameState, display) -> gameState.exitTowards(command.getSecondThenFirst());
+    public static Result go(Word direction) {
+        return (command, gameState, display) -> gameState.exitTowards(direction);
+    }
+
+    public static Result goInDirectionMatchingCommandWordAt(int position) {
+        return (command, gameState, display) -> go(command.getWordOrNone(position)).execute(command, gameState, display);
+    }
 
     /**
      * Asks gamestate to describe itself

@@ -69,7 +69,7 @@ public class ResultsTest {
 
         GameState gameState = new GameState(tower_first_floor);
 
-        go.execute(new Command(GO, UP), gameState, display);
+        go(UP).execute(new Command(GO, UP), gameState, display);
 
         assertEquals(tower_second_floor, gameState.getCurrentRoom());
     }
@@ -83,10 +83,10 @@ public class ResultsTest {
 
         GameState gameState = new GameState(firstFloor);
 
-        go.execute(new Command(UP, NONE), gameState, display);
+        go(UP).execute(new Command(UP, NONE), gameState, display);
         assertEquals(secondFloor, gameState.getCurrentRoom());
 
-        go.execute(new Command(DOWN, NONE), gameState, display);
+        go(DOWN).execute(new Command(DOWN, NONE), gameState, display);
         assertEquals(firstFloor, gameState.getCurrentRoom());
     }
 
@@ -96,7 +96,7 @@ public class ResultsTest {
         GameState gameState = new GameState(sealed_tomb);
         Command command = new Command(GO, UP);
 
-        go.execute(command, gameState, display);
+        go(UP).execute(command, gameState, display);
     }
 
     @Test

@@ -31,7 +31,7 @@ import static hartman.games.adventureland.engine.core.Conditions.times;
 import static hartman.games.adventureland.engine.core.Results.destroy;
 import static hartman.games.adventureland.engine.core.Results.drop;
 import static hartman.games.adventureland.engine.core.Results.get;
-import static hartman.games.adventureland.engine.core.Results.go;
+import static hartman.games.adventureland.engine.core.Results.goInDirectionMatchingCommandWordAt;
 import static hartman.games.adventureland.engine.core.Results.gotoRoom;
 import static hartman.games.adventureland.engine.core.Results.incrementCounter;
 import static hartman.games.adventureland.engine.core.Results.inventory;
@@ -316,7 +316,7 @@ public class HouseEscapeAdventure {
         standardActions.newAction()
                 .on(GO)
                 .when(hasExitMatchingCommandWordAt(2))
-                .then(go).andThen(look)
+                .then(goInDirectionMatchingCommandWordAt(2)).andThen(look)
                 .build();
 
         standardActions.newAction()
@@ -333,7 +333,7 @@ public class HouseEscapeAdventure {
         standardActions.newAction()
                 .onAnyFirstWord().withNoSecondWord()
                 .when(hasExitMatchingCommandWordAt(1))
-                .then(go).andThen(look)
+                .then(goInDirectionMatchingCommandWordAt(1)).andThen(look)
                 .build();
 
         standardActions.newAction()

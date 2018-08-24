@@ -468,7 +468,15 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         @Override
         public Action.Result visitResultGo(ResultGoContext ctx) {
-            return Results.go;
+            if (null == ctx.word()) {
+                return Results.goInDirectionMatchingCommandWordAt(1);
+            }
+            String word = ctx.word().getText();
+            if (word.startsWith("$")) {
+                int position = Integer.parseInt(word.substring(1));
+                return Results.goInDirectionMatchingCommandWordAt(position);
+            }
+            return Results.go(Word.of(word));
         }
 
         @Override

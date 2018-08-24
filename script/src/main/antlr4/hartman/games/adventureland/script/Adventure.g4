@@ -247,7 +247,7 @@ actionResultDeclaration
 actionResult
     :   PRINT message=StringLiteral                 # resultPrint
     |   LOOK                                        # resultLook
-    |   GO                                          # resultGo
+    |   GO word?                                    # resultGo
     |   (QUIT | GAME_OVER)                          # resultQuit
     |   INVENTORY                                   # resultInventory
     |   SWAP i1=itemName i2=itemName                # resultSwap
