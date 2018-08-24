@@ -83,8 +83,23 @@ public class HouseEscapeAdventure {
          * Vocabulary
          */
 
-        Word kill = new Word("KILL", "SWAT", "HURT", "HIT");
-        Word yell = new Word("YELL", "SHOUT", "SCREAM");
+        Word HELP = new Word("HELP", "?");
+        Word QUIT = new Word("QUIT");
+        Word INVENTORY = new Word("INVENTORY", "I");
+        Word LOOK = new Word("LOOK", "L");
+        Word GO = new Word("GO", "GOTO", "ENTER", "WALK", "RUN", "EXIT", "LEAVE");
+        Word OPEN = new Word("OPEN", "UNLOCK");
+        Word GET = new Word("GET", "PICKUP", "GRAB", "TAKE");
+        Word DROP = new Word("DROP", "DISCARD");
+        Word USE = new Word("USE");
+        Word NORTH = new Word("North", "N");
+        Word SOUTH = new Word("South", "S");
+        Word UP = new Word("Up", "U");
+        Word DOWN = new Word("Down", "D");
+        Word EAST = new Word("East", "E");
+        Word WEST = new Word("West", "W");
+        Word kill = new Word("Kill", "SWAT", "HURT", "HIT");
+        Word yell = new Word("Yell", "SHOUT", "SCREAM");
         Word pet = new Word("PET", "PAT");
         Word door = new Word("Door");
         Word close = new Word("CLOSE", "SHUT");
@@ -309,31 +324,33 @@ public class HouseEscapeAdventure {
         // movement
 
         standardActions.newAction()
-                .on(GO).withNoSecondWord()
-                .then(println("Where do you want me to go?"))
-                .build();
-
-        standardActions.newAction()
-                .on(GO)
+                .on(GO).withAnySecondWord()
                 .when(hasExitMatchingCommandWordAt(2))
-                .then(goInDirectionMatchingCommandWordAt(2)).andThen(look)
+                .then(goInDirectionMatchingCommandWordAt(2))
+                .andThen(look)
+                .build();
+
+        standardActions.newAction()
+                .on(GO).withAnySecondWord()
+                .then(println("{word:2} is not a valid exit from here."))
                 .build();
 
         standardActions.newAction()
                 .on(GO)
-                .then(println("I can't go that way. Try one of the obvious exits."))
+                .then(println("Go where?"))
                 .build();
 
         standardActions.newAction()
-                .onAnyFirstWords(directionWords.toArray(new Word[0])).withNoSecondWord()
+                .onAnyFirstWords(directionWords.toArray(new Word[0]))
                 .when(not(hasExitMatchingCommandWordAt(1)))
-                .then(println("I can't go {verb} from here. Try one of the obvious exits."))
+                .then(println("I can't go {word:1} from here. Try one of the obvious exits."))
                 .build();
 
         standardActions.newAction()
-                .onAnyFirstWord().withNoSecondWord()
+                .onAnyFirstWord()
                 .when(hasExitMatchingCommandWordAt(1))
-                .then(goInDirectionMatchingCommandWordAt(1)).andThen(look)
+                .then(goInDirectionMatchingCommandWordAt(1))
+                .andThen(look)
                 .build();
 
         standardActions.newAction()
@@ -342,19 +359,7 @@ public class HouseEscapeAdventure {
                 .build();
 
         standardActions.newAction()
-                .on(LOOK)
-                .withAnySecondWord()
-                .then(look)
-                .build();
-
-        standardActions.newAction()
                 .on(INVENTORY)
-                .then(inventory)
-                .build();
-
-        standardActions.newAction()
-                .on(INVENTORY)
-                .withAnySecondWord()
                 .then(inventory)
                 .build();
 
@@ -369,12 +374,12 @@ public class HouseEscapeAdventure {
                 .build();
 
         // handle unrecognized input
-        standardActions.newAction().onUnrecognizedFirstWord().then(println("Sorry, I don't know how to do that.")).build();
         standardActions.newAction().onUnrecognizedFirstWord().withUnrecognizedSecondWord().then(println("Sorry, I don't know how to do that with that thing.")).build();
-        standardActions.newAction().onUnrecognizedFirstWord().withAnySecondWord().then(println("Sorry, I don't know how to that with a {noun}.")).build();
-        standardActions.newAction().onAnyFirstWord().withUnrecognizedSecondWord().then(println("I don't know how to {verb} with that thing.")).build();
-        standardActions.newAction().onAnyFirstWord().withNoSecondWord().then(println("{verb} what?")).build();
-        standardActions.newAction().onAnyFirstWord().withAnySecondWord().then(println("I can't do that here right now.")).build();
+        standardActions.newAction().onUnrecognizedFirstWord().withAnySecondWord().then(println("Sorry, I don't know how to do that with a {word:2}.")).build();
+        standardActions.newAction().onUnrecognizedFirstWord().then(println("Sorry, I don't recognize that word.")).build();
+        standardActions.newAction().onAnyFirstWord().withUnrecognizedSecondWord().then(println("I don't know how to {word:1} with that thing.")).build();
+        standardActions.newAction().onAnyFirstWord().withAnySecondWord().then(println("I can't do that right now.")).build();
+        standardActions.newAction().onAnyFirstWord().then(println("{word:1} what?")).build();
 
         /*
          * All the actions for this adventure
@@ -389,19 +394,4 @@ public class HouseEscapeAdventure {
         return new Adventure(vocabulary, occurs.copyOfActions(), fullActionSet.copyOfActions(), itemSet.copyOfItems(), masterBedroom);
     }
 
-    private static final Word HELP = new Word("HELP", "?");
-    private static final Word QUIT = new Word("QUIT");
-    private static final Word INVENTORY = new Word("INVENTORY", "I");
-    private static final Word LOOK = new Word("LOOK", "L");
-    private static final Word GO = new Word("GO", "GOTO", "ENTER", "WALK", "RUN", "EXIT", "LEAVE");
-    private static final Word OPEN = new Word("OPEN", "UNLOCK");
-    private static final Word GET = new Word("GET", "PICKUP", "GRAB", "TAKE");
-    private static final Word DROP = new Word("DROP", "DISCARD");
-    private static final Word USE = new Word("USE");
-    private static final Word NORTH = new Word("North", "N");
-    private static final Word SOUTH = new Word("South", "S");
-    private static final Word UP = new Word("Up", "U");
-    private static final Word DOWN = new Word("Down", "D");
-    private static final Word EAST = new Word("East", "E");
-    private static final Word WEST = new Word("West", "W");
 }
