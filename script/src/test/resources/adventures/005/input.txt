@@ -1,0 +1,4 @@
+go front seat
+look dash
+push button
+exit van

@@ -97,4 +97,9 @@ public class AdventureScriptTest {
         runAdventure(4);
     }
 
+    @Test
+    public void testAdventure5() {
+        runAdventure(5);
+    }
+
 }
