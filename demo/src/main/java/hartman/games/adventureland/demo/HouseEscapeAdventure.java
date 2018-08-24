@@ -36,7 +36,7 @@ import static hartman.games.adventureland.engine.core.Results.gotoRoom;
 import static hartman.games.adventureland.engine.core.Results.incrementCounter;
 import static hartman.games.adventureland.engine.core.Results.inventory;
 import static hartman.games.adventureland.engine.core.Results.look;
-import static hartman.games.adventureland.engine.core.Results.printf;
+import static hartman.games.adventureland.engine.core.Results.print;
 import static hartman.games.adventureland.engine.core.Results.println;
 import static hartman.games.adventureland.engine.core.Results.put;
 import static hartman.games.adventureland.engine.core.Results.putHere;
@@ -164,13 +164,18 @@ public class HouseEscapeAdventure {
 
         // the fly
         occurs.newAction()
-                .when(in(kitchen)).and(not(here(fly))).and(here(openWindow)).and(random(50))
-                .then(put(fly, kitchen)).andThen(printf("%nA fly comes in through the open window and buzzes past my ear!%n"))
+                .when(in(kitchen))
+                .and(not(here(fly)))
+                .and(here(openWindow))
+                .and(random(50))
+                .then(put(fly, kitchen))
+                .andThen(println("A fly comes in through the open window and buzzes past my ear!"))
                 .build();
 
         // Archie the dog
         occurs.newAction()
-                .when(in(kitchen)).and(random(30))
+                .when(in(kitchen))
+                .and(random(30))
                 .then(println("I hear a faint whimper as if from a dog coming from the West."))
                 .build();
 
@@ -189,7 +194,7 @@ public class HouseEscapeAdventure {
         // user prompt
         occurs.newAction()
                 .when(not(in(outside)))
-                .then(printf("%nWhat should I do? "))
+                .then(print("> "))
                 .build();
 
         // game end
@@ -210,27 +215,28 @@ public class HouseEscapeAdventure {
                 .on(OPEN).with(door)
                 .when(here(lockedDoor))
                 .and(not(present(key)))
-                .then(printf("%nIt's locked. I need some way to unlock it.%n"))
+                .then(println("It's locked. I need some way to unlock it."))
                 .build();
 
         adventureActions.newAction()
                 .on(GO).with(door)
                 .when(here(lockedDoor))
-                .then(printf("%nI can't. It's locked. Perhaps try using the key?%n"))
+                .then(println("I can't. It's locked. Perhaps try using the key?"))
                 .build();
 
         adventureActions.newAction()
                 .on(GET).with(key)
                 .when(here(key))
                 .then(get(key))
-                .andThen(printf("%nOkay. I got the key.%n"))
+                .andThen(println("Okay. I got the key."))
+                .andThen(inventory)
                 .build();
 
         adventureActions.newAction()
                 .on(DROP).with(key)
                 .when(carrying(key))
                 .then(drop(key))
-                .andThen(printf("%nI dropped the key.%n"))
+                .andThen(println("I dropped the key."))
                 .build();
 
         adventureActions.newAction()
@@ -238,7 +244,8 @@ public class HouseEscapeAdventure {
                 .when(here(lockedDoor))
                 .and(present(key))
                 .then(swap(lockedDoor, openDoor))
-                .andThen(printf("<CLICK> That did it. It's unlocked.%n")).andThen(look)
+                .andThen(println("<CLICK> That did it. It's unlocked."))
+                .andThen(look)
                 .build();
 
         adventureActions.newAction()
@@ -246,35 +253,37 @@ public class HouseEscapeAdventure {
                 .when(here(lockedDoor))
                 .and(present(key))
                 .then(swap(lockedDoor, openDoor))
-                .andThen(printf("<CLICK> That did it. It's unlocked.%n")).andThen(look)
+                .andThen(println("<CLICK> That did it. It's unlocked."))
+                .andThen(look)
                 .build();
 
         adventureActions.newAction()
                 .on(GO).with(door)
                 .when(here(openDoor))
                 .then(gotoRoom(outside))
-                .andThen(printf("%nYeah! I've made it outside!%n"))
+                .andThen(println("Yeah! I've made it outside!"))
                 .build();
 
         adventureActions.newAction()
                 .on(GET).with(flyswatter)
                 .when(here(flyswatter))
                 .then(get(flyswatter))
-                .andThen(printf("%nOkay. I picked up the flyswatter.%n"))
+                .andThen(println("Okay. I picked up the flyswatter."))
+                .andThen(inventory)
                 .build();
 
         adventureActions.newAction()
                 .on(kill).with(fly)
                 .when(here(fly))
                 .and(not(carrying(flyswatter)))
-                .then(printf("%nSmack! I tried but I'm not fast enough. I need some sort of tool.%n"))
+                .then(println("Smack! I tried but I'm not fast enough. I need some sort of tool."))
                 .build();
 
         adventureActions.newAction()
                 .on(kill).with(fly)
                 .when(here(fly))
                 .then(putHere(deadFly))
-                .andThen(printf("%nWHACK! I got 'em! It's dead.%n"))
+                .andThen(println("WHACK! I got 'em! It's dead."))
                 .andThen(destroy(fly))
                 .andThen(incrementCounter("deadFlies"))
                 .build();
@@ -295,14 +304,15 @@ public class HouseEscapeAdventure {
 
         adventureActions.newAction()
                 .on(yell).withAnySecondWord()
-                .then(printf("%n\"{noun}\"!!! Now what?%n"))
+                .then(println("{word:2}!!! Now what?"))
                 .build();
 
         adventureActions.newAction()
                 .on(GET).with(redPanda)
                 .when(here(redPanda))
                 .then(get(redPanda))
-                .andThen(println("%nOkay. I picked up the toy. It's a bit smelly but it's soft and I feel better carrying it.")).andThen(inventory)
+                .andThen(println("Okay. I picked up the toy. It's a bit smelly but it's soft and I feel better carrying it."))
+                .andThen(inventory)
                 .build();
 
         adventureActions.newAction()
@@ -390,10 +400,10 @@ public class HouseEscapeAdventure {
                 .build();
 
         // handle unrecognized input
-        standardActions.newAction().onUnrecognizedFirstWord().withUnrecognizedSecondWord().then(println("Sorry, I don't know how to do that with that thing.")).build();
+        standardActions.newAction().onUnrecognizedFirstWord().withUnrecognizedSecondWord().then(println("Sorry, I don't know how to do that.")).build();
         standardActions.newAction().onUnrecognizedFirstWord().withAnySecondWord().then(println("Sorry, I don't know how to do that with a {word:2}.")).build();
         standardActions.newAction().onUnrecognizedFirstWord().then(println("Sorry, I don't recognize that word.")).build();
-        standardActions.newAction().onAnyFirstWord().withUnrecognizedSecondWord().then(println("I don't know how to {word:1} with that thing.")).build();
+        standardActions.newAction().onAnyFirstWord().withUnrecognizedSecondWord().then(println("I don't know how to {word:1} that thing.")).build();
         standardActions.newAction().onAnyFirstWord().withAnySecondWord().then(println("I can't do that right now.")).build();
         standardActions.newAction().onAnyFirstWord().then(println("{word:1} what?")).build();
 
