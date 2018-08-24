@@ -139,13 +139,13 @@ public class ResultsTest {
 
     @Test
     public void printShouldReplaceNounPlaceholderGivenTemplateMessage() {
-        print("This is the noun \"{noun}\"").execute(new Command(NONE, new Word("pop")), new GameState(Room.NOWHERE), display);
+        print("This is the noun \"{word:2}\"").execute(new Command(NONE, new Word("pop")), new GameState(Room.NOWHERE), display);
         assertEquals("This is the noun \"pop\"", display.toString());
     }
 
     @Test
     public void printShouldReplaceVerbPlaceholderGivenTemplateMessage() {
-        print("I don't know how to \"{verb}\"").execute(new Command(new Word("Dance"), NONE), new GameState(Room.NOWHERE), display);
+        print("I don't know how to \"{word:1}\"").execute(new Command(new Word("Dance"), NONE), new GameState(Room.NOWHERE), display);
         assertEquals("I don't know how to \"Dance\"", display.toString());
     }
 
@@ -426,7 +426,7 @@ public class ResultsTest {
         gameState.setCounter("operand", 42);
         gameState.setFlag("result", true);
 
-        Results.print("Every programmer knows that {verb}ing a {noun} is like {string:term} + {counter:operand} is {flag:result}").execute(new Command(new Word("fly"), new Word("kite")), gameState, display);
+        Results.print("Every programmer knows that {word:1}ing a {word:2} is like {string:term} + {counter:operand} is {flag:result}").execute(new Command(new Word("fly"), new Word("kite")), gameState, display);
         assertEquals("Every programmer knows that flying a kite is like x + 42 is true", display.toString());
     }
 }

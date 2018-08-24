@@ -4,6 +4,7 @@ import hartman.games.adventureland.engine.Action.Result;
 import hartman.games.adventureland.engine.Display;
 import hartman.games.adventureland.engine.Item;
 import hartman.games.adventureland.engine.Room;
+import hartman.games.adventureland.engine.Word;
 
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -30,8 +31,7 @@ public final class Results {
      */
     public static final Result look = (command, gameState, display) -> gameState.describe(display);
 
-    private static Pattern verbPlaceholderPattern = Pattern.compile("\\{verb\\}");
-    private static Pattern nounPlaceholderPattern = Pattern.compile("\\{noun\\}");
+    private static Pattern wordPlaceholderPattern = Pattern.compile("\\{word:(.+?)\\}");
     private static Pattern counterPlaceholderPattern = Pattern.compile("\\{counter:(.+?)\\}");
     private static Pattern flagPlaceholderPattern = Pattern.compile("\\{flag:(.+?)\\}");
     private static Pattern stringPlaceholderPattern = Pattern.compile("\\{string:(.+?)\\}");
@@ -57,10 +57,9 @@ public final class Results {
     public static Result print(String message) {
         return (command, gameState, display) -> {
             String output = message;
-            output = resolvePlaceholder(output, verbPlaceholderPattern, counter -> command.getFirstWord().getName());
-            output = resolvePlaceholder(output, nounPlaceholderPattern, counter -> command.getSecondWord().getName());
+            output = resolvePlaceholder(output, wordPlaceholderPattern, pos -> command.getWord(Integer.parseInt(pos)).orElse(new Word("")).getName());
             output = resolvePlaceholder(output, counterPlaceholderPattern, counter -> String.valueOf(gameState.getCounter(counter)));
-            output = resolvePlaceholder(output, flagPlaceholderPattern, counter -> String.valueOf(gameState.getFlag(counter)));
+            output = resolvePlaceholder(output, flagPlaceholderPattern, flag -> String.valueOf(gameState.getFlag(flag)));
             output = resolvePlaceholder(output, stringPlaceholderPattern, gameState::getString);
             display.print(output);
         };
