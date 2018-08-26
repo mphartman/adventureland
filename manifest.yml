@@ -1,0 +1,8 @@
+---
+applications:
+- name: adventureland-api
+  memory: 1G
+  instances: 1
+  path: api/target/adventureland-api-0.1.0.jar
+  services:
+    - adventureland-sandbox
