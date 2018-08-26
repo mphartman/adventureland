@@ -1,19 +1,26 @@
 language: java
 sudo: false
 install: true
-
 addons:
   sonarcloud:
     organization: mphartman-github
     token:
-      secure: 'aaWwBl4P5Rgz3HaUjK0gFRzUx1whXcV8zyjZddVSnU7Uq7/J//jkx18gZNVctXzyoMh+GBJxyFlSxLnPhP/tupkDboqLR13j86i0slE6gXrheZopU8wDIUXl3XkZCQc9/bA0T6QWITwy2S5tUfB+KQnN/K+X+mSrVoHBF0AOIm6HZPsVvQ9nyjalb5+fvHbO2cldwaAFGN3UPzx0tyVqKylKBbvMpcudzHi5jcPpg0snQ+HwPCSstapw4auHeJrToT5lzuKUbM339+PFI29mQHB3b0MZkRC7nYITmtjEr3hYDlzvfMrIs8o1M41ItSKUfsWoAyMmf7r8on/2mPv5nPPkShLjh+o0KLJnNpL7/icirkG/ITAA8Aj0Z2ZkTgMbFvhmHzKjFVgbpmkPftRWdBr9AdYZFKcUKNUOvJ8KUTe0dUV6gijPRmWgNNMqFbseE5VwIBTgQuAU3T92zCFuEiDV2UmXQogm+ueFs69VqQXAuQJq1gPItxd8qqGfoM7v/9f28WA7iAON+nmjkDD+bdIPF63OFCcyUGKIMatDYc7OAbLY4bhv+zkcanKljZUEMA29mt78LEKjnSCfxP6ZzmT7pHXwKyooqYl3qp6VmjiQmzFMa0hiZvx+11gbrEBQiIju29w3BpOpn5nwaFSla0Z2lTPvp/mj1uQUWd5gEMY='
+      secure: aaWwBl4P5Rgz3HaUjK0gFRzUx1whXcV8zyjZddVSnU7Uq7/J//jkx18gZNVctXzyoMh+GBJxyFlSxLnPhP/tupkDboqLR13j86i0slE6gXrheZopU8wDIUXl3XkZCQc9/bA0T6QWITwy2S5tUfB+KQnN/K+X+mSrVoHBF0AOIm6HZPsVvQ9nyjalb5+fvHbO2cldwaAFGN3UPzx0tyVqKylKBbvMpcudzHi5jcPpg0snQ+HwPCSstapw4auHeJrToT5lzuKUbM339+PFI29mQHB3b0MZkRC7nYITmtjEr3hYDlzvfMrIs8o1M41ItSKUfsWoAyMmf7r8on/2mPv5nPPkShLjh+o0KLJnNpL7/icirkG/ITAA8Aj0Z2ZkTgMbFvhmHzKjFVgbpmkPftRWdBr9AdYZFKcUKNUOvJ8KUTe0dUV6gijPRmWgNNMqFbseE5VwIBTgQuAU3T92zCFuEiDV2UmXQogm+ueFs69VqQXAuQJq1gPItxd8qqGfoM7v/9f28WA7iAON+nmjkDD+bdIPF63OFCcyUGKIMatDYc7OAbLY4bhv+zkcanKljZUEMA29mt78LEKjnSCfxP6ZzmT7pHXwKyooqYl3qp6VmjiQmzFMa0hiZvx+11gbrEBQiIju29w3BpOpn5nwaFSla0Z2lTPvp/mj1uQUWd5gEMY=
 jdk:
-  - oraclejdk8
-
+- oraclejdk8
 script:
-  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar
-
+- mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar
 cache:
   directories:
-    - "$HOME/.m2/repository"
-    - "$HOME/.sonar/cache"
+  - "$HOME/.m2/repository"
+  - "$HOME/.sonar/cache"
+deploy:
+  provider: cloudfoundry
+  api: https://api.run.pivotal.io
+  username: mphartman@me.com
+  password:
+    secure: SLN7cTH+efO4zPeFACZszsDtgaeGq1P//WUKqCnocLh12YIwOkyhHFtEaV+TUF8+L2J6YBNF0LJxmNcURImsYpq4ig8HzddO6cwr2MKw+u3VRWom8U0ioXGDwbe2ZR5bIA4ppNzImcyp2jQpBKeKXrwxdve/Nbejv74Wku77Iamhd9Ic2fMT/1G9aGpFJeKuV8JLGs8y52tJTOaV+iyxJoLK/ZMixrjDnCta9GyaFFehVANIyzBpAebKYnwh32MKgshVLMEGbIrNtC7ivjcOy33Mb0lJltFagD2ZyzeGw7UJamdOibGoiklI1XUO5bP9Ul5a0BmlK3RpOBnpCLrcwlbXHwjdZgv3ds0WabLI7ycMBmwV9X5WqRo4sMXySuIANheFXbUQr4WMh/0EMmaLDBvwjAGXx4JequWk+BferPmptrZB2m8JKPojPmpld5q7k0iQn0Kd8jPW9Vc661mUyEXMaYVb20QLiJl+MKneEDfAZZAO0TCakQfXP/Vv3nXL/CGgHzP2QGCCNCuwZCy9BkMNcqNWT6nQRURwOAKLg3kkCeeeP+j7ayvEXyzfjp7EMR+AchqrpE0wdRH43SXszj4U29IcOr/22tz+wUGlMKWSDMzrwyzzHo7x+IRddcQd5JichOVqR3UDibaIfWPYEnT7C//3dwM8sVhelt8fFAQ=
+  organization: waterdeep
+  space: development
+  on:
+    repo: mphartman/adventureland
