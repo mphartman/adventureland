@@ -13,6 +13,7 @@
 		<module>demo</module>
 		<module>script</module>
 		<module>app</module>
+		<module>api</module>
     </modules>
 
 </project>
