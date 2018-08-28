@@ -24,3 +24,4 @@ deploy:
   space: development
   on:
     repo: mphartman/adventureland
+    branch: master
