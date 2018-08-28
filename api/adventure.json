@@ -7,10 +7,12 @@
   },
   "_links": {
     "games": {
-      "href": "/adventures/2/games"
+      "href": "/adventures/2/games",
+      "method": "GET"
     },
     "start": {
-      "href": "/adventures/2/games"
+      "href": "/adventures/2/games",
+      "method": "POST"
     },
     "self": {
       "href": "/adventures/2"

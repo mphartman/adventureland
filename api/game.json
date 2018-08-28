@@ -6,13 +6,16 @@
   },
   "_links": {
     "takeTurn": {
-      "href": "/adventures/2/games/2/turns"
+      "href": "/adventures/2/games/2/turns",
+      "method": "POST"
     },
     "quit": {
-      "href": "/adventures/2/games/2"
+      "href": "/adventures/2/games/2",
+      "method": "DELETE"
     },
     "save": {
-      "href": "/adventures/2/games/2/saves"
+      "href": "/adventures/2/games/2/saves",
+      "method": "POST"
     },
     "adventure": {
       "href": "/adventures/2"

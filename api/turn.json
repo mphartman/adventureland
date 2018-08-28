@@ -1,0 +1,17 @@
+{
+  "turn": {
+    "timestamp": "2018-08-22T12:00:00.000Z",
+    "number": 1,
+    "command": "go east",
+    "output": "I can't go that way."
+  },
+  "_links": {
+    "game": {
+      "href": "/adventures/2/games/2",
+      "method": "GET"
+    },
+    "self": {
+      "href": "/adventures/2/games/2/turns/1"
+    }
+  }
+}
