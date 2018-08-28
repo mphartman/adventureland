@@ -1,23 +1,28 @@
 package hartman.games.adventureland.api;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import org.springframework.data.annotation.Id;
+import org.springframework.hateoas.Identifiable;
+
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "games")
-public class Game extends AbstractEntity {
+public class Game implements Identifiable<String> {
 
     public enum Status {
         READY, RUNNING, PAUSED, GAME_OVER
     }
 
-    @ManyToOne
+    @Id
+    private String id;
+
     private Adventure adventure;
     private String player;
     private LocalDateTime startTime;
     private Status status = Status.READY;
+
+    @Override
+    public String getId() {
+        return id;
+    }
 
     public Adventure getAdventure() {
         return adventure;
@@ -51,4 +56,18 @@ public class Game extends AbstractEntity {
         this.status = status;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Game game = (Game) o;
+
+        return id.equals(game.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
 }

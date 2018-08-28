@@ -10,7 +10,7 @@ import org.springframework.data.rest.core.annotation.RestResource;
 import java.util.Optional;
 
 @RepositoryRestResource
-public interface AdventureRepository extends PagingAndSortingRepository<Adventure, Long> {
+public interface AdventureRepository extends PagingAndSortingRepository<Adventure, String> {
 
     @RestResource(path = "byTitle", rel = "title")
     Optional<Adventure> findByTitle(@Param("title") String title);

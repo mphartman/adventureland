@@ -1,17 +1,26 @@
 package hartman.games.adventureland.api;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.hateoas.Identifiable;
+
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "adventures")
-public class Adventure extends AbstractEntity {
+@Document(collection = "adventures")
+public class Adventure implements Identifiable<String> {
+
+    @Id
+    private String id;
 
     private String title;
     private String author;
     private LocalDateTime published;
     private String version;
+
+    @Override
+    public String getId() {
+        return id;
+    }
 
     public String getTitle() {
         return title;
@@ -43,5 +52,20 @@ public class Adventure extends AbstractEntity {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Adventure adventure = (Adventure) o;
+
+        return id.equals(adventure.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }
