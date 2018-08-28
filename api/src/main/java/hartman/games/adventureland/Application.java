@@ -12,7 +12,7 @@ import org.springframework.hateoas.hal.DefaultCurieProvider;
 @EnableJpaAuditing
 public class Application {
 
-    private final static String CURIE_NAMESPACE = "adventureland";
+    private static final String CURIE_NAMESPACE = "adventureland";
 
     @Bean
     public CurieProvider curieProvider() {
