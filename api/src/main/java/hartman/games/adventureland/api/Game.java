@@ -19,9 +19,6 @@ public class Game extends AbstractEntity {
     private LocalDateTime startTime;
     private Status status = Status.READY;
 
-    public Game() {
-    }
-
     public Adventure getAdventure() {
         return adventure;
     }

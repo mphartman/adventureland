@@ -13,9 +13,6 @@ public class Adventure extends AbstractEntity {
     private LocalDateTime published;
     private String version;
 
-    public Adventure() {
-    }
-
     public String getTitle() {
         return title;
     }
