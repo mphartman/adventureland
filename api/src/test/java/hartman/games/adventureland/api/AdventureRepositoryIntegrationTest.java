@@ -14,8 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class AdventureRepositoryIntegrationTest extends AbstractIntegrationTest {
 
-    @Autowired
-    AdventureRepository repository;
+    @Autowired AdventureRepository repository;
 
     @Test
     public void createsNewAdventure() {
@@ -65,11 +64,6 @@ public class AdventureRepositoryIntegrationTest extends AbstractIntegrationTest 
     }
 
     private Adventure createAdventure() {
-        Adventure adventure = new Adventure();
-        adventure.setTitle("Shenanigans");
-        adventure.setAuthor("Archie Hartman");
-        adventure.setVersion("0.0.1");
-        adventure.setPublished(LocalDateTime.of(2018, 8, 27, 13, 28, 0));
-        return adventure;
+        return new Adventure(null, "Shenanigans", "Archie", LocalDateTime.now(), "1.0.0");
     }
 }

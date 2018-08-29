@@ -1,73 +1,57 @@
 package hartman.games.adventureland.api;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.hateoas.Identifiable;
 
 import java.time.LocalDateTime;
 
+@Data
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
+@Document(collection = "games")
 public class Game implements Identifiable<String> {
 
     public enum Status {
-        READY, RUNNING, PAUSED, GAME_OVER
+        /**
+         * Game is ready to start accepting player input in the form of turns.
+         */
+        READY,
+        /**
+         * Game is currently running and cannot accept a turn.
+         */
+        RUNNING,
+        /**
+         * Game is not running and cannot accept player input.
+         */
+        PAUSED,
+        /**
+         * Game is over.
+         */
+        GAME_OVER
     }
 
-    @Id
-    private String id;
-
-    private Adventure adventure;
+    private @Id String id;
+    private @DBRef Adventure adventure;
     private String player;
     private LocalDateTime startTime;
     private Status status = Status.READY;
 
-    @Override
-    public String getId() {
-        return id;
+    @JsonIgnore
+    public boolean isReady() {
+        return Status.READY.equals(status);
     }
 
-    public Adventure getAdventure() {
-        return adventure;
-    }
-
-    public void setAdventure(Adventure adventure) {
-        this.adventure = adventure;
-    }
-
-    public String getPlayer() {
-        return player;
-    }
-
-    public void setPlayer(String player) {
-        this.player = player;
-    }
-
-    public LocalDateTime getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Game game = (Game) o;
-
-        return id.equals(game.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return id.hashCode();
+    @JsonIgnore
+    public boolean isSaveable() {
+        return !status.equals(Status.GAME_OVER);
     }
 }
