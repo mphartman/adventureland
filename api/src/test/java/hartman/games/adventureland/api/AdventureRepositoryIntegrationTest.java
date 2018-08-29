@@ -1,20 +1,24 @@
 package hartman.games.adventureland.api;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.annotation.DirtiesContext;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class AdventureRepositoryIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired AdventureRepository repository;
+
+    @Before
+    public void deleteAll() {
+        repository.deleteAll();
+    }
 
     @Test
     public void createsNewAdventure() {
@@ -64,6 +68,6 @@ public class AdventureRepositoryIntegrationTest extends AbstractIntegrationTest 
     }
 
     private Adventure createAdventure() {
-        return new Adventure(null, "Shenanigans", "Archie", LocalDateTime.now(), "1.0.0");
+        return new Adventure(null, "Shenanigans", "Archie Hartman", LocalDateTime.now(), "1.0.0");
     }
 }
