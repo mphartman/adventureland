@@ -28,6 +28,8 @@ public class GameResourceProcessor implements ResourceProcessor<Resource<Game>> 
             resource.add(entityLinks.linkForSingleResource(game).slash("/saves").withRel("save"));
         }
 
+        resource.add(entityLinks.linkToSingleResource(Adventure.class, game.getAdventureId()).withRel("adventure"));
+
         return resource;
     }
 }

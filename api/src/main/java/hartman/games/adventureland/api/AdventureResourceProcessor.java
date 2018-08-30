@@ -24,7 +24,7 @@ public class AdventureResourceProcessor implements ResourceProcessor<Resource<Ad
 
         Adventure adventure = resource.getContent();
 
-        resource.add(entityLinks.linkForSingleResource(adventure).slash(GAMES).withRel(GAMES_REL));
+        resource.add(entityLinks.linkToCollectionResource(Game.class).withRel(GAMES_REL));
 
         return resource;
     }

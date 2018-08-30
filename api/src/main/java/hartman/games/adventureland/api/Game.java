@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.hateoas.Identifiable;
 
@@ -19,6 +18,22 @@ import java.time.LocalDateTime;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Document(collection = "games")
 public class Game implements Identifiable<String> {
+
+    private @Id String id;
+    private String adventureId;
+    private String player;
+    private LocalDateTime startTime;
+    private Status status = Status.READY;
+
+    @JsonIgnore
+    public boolean isReady() {
+        return Status.READY.equals(status);
+    }
+
+    @JsonIgnore
+    public boolean isSaveable() {
+        return !status.equals(Status.GAME_OVER);
+    }
 
     public enum Status {
         /**
@@ -39,19 +54,4 @@ public class Game implements Identifiable<String> {
         GAME_OVER
     }
 
-    private @Id String id;
-    private @DBRef Adventure adventure;
-    private String player;
-    private LocalDateTime startTime;
-    private Status status = Status.READY;
-
-    @JsonIgnore
-    public boolean isReady() {
-        return Status.READY.equals(status);
-    }
-
-    @JsonIgnore
-    public boolean isSaveable() {
-        return !status.equals(Status.GAME_OVER);
-    }
 }
