@@ -6,7 +6,7 @@ import org.springframework.data.rest.core.annotation.RestResource;
 
 import java.util.List;
 
-@RepositoryRestResource
+@RepositoryRestResource(exported = false)
 interface GameRepository extends MongoRepository<Game, String> {
 
     @RestResource(path = "byAdventure", rel = "adventure")

@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.hateoas.Identifiable;
 
 import java.time.LocalDateTime;
@@ -17,10 +18,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Document(collection = "games")
+@RestResource
 public class Game implements Identifiable<String> {
 
     private @Id String id;
-    private String adventureId;
+    private @JsonIgnore String adventureId;
     private String player;
     private LocalDateTime startTime;
     private Status status = Status.READY;
