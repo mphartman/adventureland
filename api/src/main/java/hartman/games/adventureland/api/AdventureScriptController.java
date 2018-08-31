@@ -21,12 +21,12 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 @RestController
 @RequestMapping(path = "/adventures/{id}/upload")
-public class AdventureScriptUploadController {
+public class AdventureScriptController {
 
     private AdventureScriptRepository repository;
 
     @Autowired
-    public AdventureScriptUploadController(AdventureScriptRepository repository) {
+    public AdventureScriptController(AdventureScriptRepository repository) {
         this.repository = repository;
     }
 
@@ -46,7 +46,7 @@ public class AdventureScriptUploadController {
         adventureScript.setScript(scriptText);
         repository.save(adventureScript);
 
-        return ResponseEntity.created(linkTo(AdventureScriptUploadController.class, adventure.getId()).toUri()).build();
+        return ResponseEntity.created(linkTo(AdventureScriptController.class, adventure.getId()).toUri()).build();
     }
 
     private String fileToString(MultipartFile file) throws IOException {
