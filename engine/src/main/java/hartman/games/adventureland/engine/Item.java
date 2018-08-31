@@ -1,5 +1,6 @@
 package hartman.games.adventureland.engine;
 
+import java.io.Serializable;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -9,7 +10,8 @@ import java.util.Set;
  * Items are either "objects" like keys, swords, lamps, and mud while other items
  * are "scenery" like trees, signs, crypts, tables, altars, donkeys, etc.
  */
-public class Item extends Word {
+public class Item extends Word implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     public static Builder newItem(String name) {
         return new Builder().named(name);

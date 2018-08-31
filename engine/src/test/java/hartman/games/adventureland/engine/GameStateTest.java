@@ -2,6 +2,11 @@ package hartman.games.adventureland.engine;
 
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -159,6 +164,32 @@ public class GameStateTest {
         gameState.destroy(screwdriver);
         assertFalse(gameState.exists(screwdriver));
         assertTrue(screwdriver.isDestroyed());
+
+    }
+
+    @Test
+    public void serializedAndDeserializedObjectsShouldEqual() throws IOException, ClassNotFoundException {
+        Room office = new Room("office", "A dank corporate office.");
+        office.setExitTowardsSelf(new Word("left"));
+        Set<Item> items = singleton(new Item.Builder().named("axe").build());
+        GameState gameState = new GameState(office, items);
+        gameState.setCounter("kills", 100);
+        gameState.setFlag("alive", true);
+        gameState.setString("color", "blue");
+
+        ByteArrayOutputStream baos =new ByteArrayOutputStream();
+        try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+            oos.writeObject(gameState);
+            oos.flush();
+        }
+
+        GameState actual;
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        try (ObjectInputStream ois = new ObjectInputStream(bais)) {
+            actual = (GameState) ois.readObject();
+        }
+
+        assertEquals(gameState, actual);
 
     }
 }
