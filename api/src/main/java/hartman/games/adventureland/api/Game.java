@@ -1,6 +1,5 @@
 package hartman.games.adventureland.api;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -29,16 +28,6 @@ public class Game extends AbstractEntity {
     private @NonNull String player;
     private LocalDateTime startTime;
     private Status status = Status.READY;
-
-    @JsonIgnore
-    public boolean isReady() {
-        return Status.READY.equals(status);
-    }
-
-    @JsonIgnore
-    public boolean isSaveable() {
-        return !status.equals(Status.GAME_OVER);
-    }
 
     public enum Status {
         /**

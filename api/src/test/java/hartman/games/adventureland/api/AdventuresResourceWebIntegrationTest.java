@@ -164,11 +164,44 @@ public class AdventuresResourceWebIntegrationTest extends AbstractWebIntegration
      * Follow the adventure link.
      * Post to the games link
      */
-    private MockHttpServletResponse createNewGame(MockHttpServletResponse response) {
-        return response;
+    private MockHttpServletResponse createNewGame(MockHttpServletResponse response) throws Exception {
+
+        Link adventureLink = getDiscovererFor(response).findLinkWithRel(ADVENTURE_REL, response.getContentAsString());
+
+        response = mvc.perform(get(adventureLink.expand().getHref())).
+                andExpect(status().isOk()).
+                andExpect(linkWithRelIsPresent(Link.REL_SELF)).
+                andExpect(linkWithRelIsPresent(GAMES_REL)).
+                andReturn().getResponse();
+
+        ClassPathResource resource = new ClassPathResource("game.json");
+        byte[] data = Files.readAllBytes(resource.getFile().toPath());
+
+        Link gamesLink = getDiscovererFor(response).findLinkWithRel(GAMES_REL, response.getContentAsString());
+
+        response = mvc.perform(
+                post(gamesLink.expand().getHref())
+                        .content(data)
+                        .contentType(MediaType.APPLICATION_JSON)).
+                andExpect(status().isCreated()).
+                andExpect(linkWithRelIsPresent(Link.REL_SELF)).
+                andReturn().getResponse();
+
+        return mvc.perform(get(response.getHeader("Location"))).andReturn().getResponse();
     }
 
-    private void verifyGame(MockHttpServletResponse response) {
+    private void verifyGame(MockHttpServletResponse response) throws Exception {
 
+        Link selfLink = getDiscovererFor(response).findLinkWithRel(Link.REL_SELF, response.getContentAsString());
+
+        mvc.perform(get(selfLink.expand().getHref())).
+                andDo(MockMvcResultHandlers.print()).
+                andExpect(status().isOk()).
+                andExpect(linkWithRelIsPresent(Link.REL_SELF)).
+                andExpect(linkWithRelIsPresent(ADVENTURE_REL)).
+                andExpect(jsonPath("$.player", is("Michael"))).
+                andExpect(jsonPath("$.startTime", is("2018-08-31T19:43:12.951"))).
+                andExpect(jsonPath("$.status", is("Ready"))).
+                andReturn().getResponse();
     }
 }

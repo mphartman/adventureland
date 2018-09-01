@@ -27,7 +27,7 @@ public class GameController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getGame(@PathVariable("id") Long id) {
+    public ResponseEntity<Resource<Game>> getGame(@PathVariable("id") Long id) {
 
         Optional<Game> maybeGame = repository.findById(id);
 
