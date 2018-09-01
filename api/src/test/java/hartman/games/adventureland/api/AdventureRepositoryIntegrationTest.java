@@ -1,6 +1,5 @@
 package hartman.games.adventureland.api;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -11,11 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class AdventureRepositoryIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired AdventureRepository repository;
-
-    @Before
-    public void deleteAll() {
-        repository.deleteAll();
-    }
 
     @Test
     public void createsNewAdventure() {

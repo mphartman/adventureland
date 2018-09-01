@@ -8,8 +8,10 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
+import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -25,6 +27,10 @@ import javax.persistence.Table;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AdventureScript extends AbstractEntity {
 
-    private @OneToOne @NonNull Adventure adventure;
+    @OneToOne(cascade = CascadeType.MERGE, optional = false)
+    @MapsId
+    @NonNull
+    private Adventure adventure;
+
     private @NonNull @Lob String script;
 }

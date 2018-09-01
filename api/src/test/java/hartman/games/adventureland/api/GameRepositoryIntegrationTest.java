@@ -1,6 +1,5 @@
 package hartman.games.adventureland.api;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -14,20 +13,10 @@ public class GameRepositoryIntegrationTest extends AbstractIntegrationTest {
     @Autowired GameRepository gameRepository;
     @Autowired AdventureRepository adventureRepository;
 
-    private Adventure adventure;
-
-    @Before
-    public void createAdventure() {
-        adventure = adventureRepository.save(new Adventure("Test Adventure", "Archie", LocalDate.now(), "0.0.1"));
-    }
-
-    @Before
-    public void deleteAll() {
-        gameRepository.deleteAll();
-    }
-
     @Test
     public void createsNewGame() {
+        Adventure adventure = adventureRepository.save(new Adventure("Test Adventure", "Archie", LocalDate.now(), "0.0.1"));
+
         Long before = gameRepository.count();
 
         Game game = new Game(adventure, "Player One", LocalDateTime.now(), Game.Status.READY);

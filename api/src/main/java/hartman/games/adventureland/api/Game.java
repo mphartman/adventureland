@@ -27,7 +27,7 @@ import java.time.LocalDateTime;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Game extends AbstractEntity {
 
-    private @NonNull @ManyToOne Adventure adventure;
+    private @NonNull @ManyToOne(optional = false) Adventure adventure;
     private @NonNull String player;
     private LocalDateTime startTime;
     private Status status = Status.READY;

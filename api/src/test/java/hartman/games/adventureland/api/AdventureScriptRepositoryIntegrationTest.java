@@ -1,6 +1,5 @@
 package hartman.games.adventureland.api;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -13,20 +12,10 @@ public class AdventureScriptRepositoryIntegrationTest extends AbstractIntegratio
     @Autowired AdventureScriptRepository adventureScriptRepository;
     @Autowired AdventureRepository adventureRepository;
 
-    private Adventure adventure;
-
-    @Before
-    public void createAdventure() {
-        adventure = adventureRepository.save(new Adventure("Test Adventure", "Archie", LocalDate.now(), "0.0.1"));
-
-    }
-    @Before
-    public void deleteAll() {
-        adventureScriptRepository.deleteAll();
-    }
-
     @Test
     public void createsScript() {
+        Adventure adventure = adventureRepository.save(new Adventure("Test Adventure", "Archie", LocalDate.now(), "0.0.1"));
+
         Long before = adventureScriptRepository.count();
 
         AdventureScript script = new AdventureScript(adventure, "room forest \"I'm in a forest.\"");
@@ -36,5 +25,19 @@ public class AdventureScriptRepositoryIntegrationTest extends AbstractIntegratio
 
         assertThat(scripts).hasSize(before.intValue() + 1);
         assertThat(scripts).contains(script);
+    }
+
+    @Test
+    public void deletesScript() {
+        Adventure adventure = adventureRepository.save(new Adventure("Test Adventure", "Archie", LocalDate.now(), "0.0.1"));
+
+        Long before = adventureScriptRepository.count();
+
+        AdventureScript script = new AdventureScript(adventure, "room forest \"I'm in a forest.\"");
+        script = adventureScriptRepository.save(script);
+
+        adventureScriptRepository.delete(script);
+
+        assertThat(adventureRepository.findById(adventure.getId())).isNotEmpty();
     }
 }
