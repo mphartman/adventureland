@@ -66,6 +66,14 @@ public class AdventuresResourceWebIntegrationTest extends AbstractWebIntegration
         verifyScript(response);
     }
 
+    @Test
+    public void startNewGame() throws Exception {
+        MockHttpServletResponse response = accessRootResource();
+        response = createNewAdventure(response);
+        response = uploadAdventureScript(response);
+        response = createNewGame(response);
+        verifyGame(response);
+    }
 
     /**
      * - Creates a new {@link Adventure} by looking up the adventure link posting the content of adventure.json.
@@ -106,8 +114,14 @@ public class AdventuresResourceWebIntegrationTest extends AbstractWebIntegration
                 andExpect(status().isOk()).
                 andExpect(linkWithRelIsPresent(Link.REL_SELF)).
                 andExpect(linkWithRelIsPresent(GAMES_REL)).
-                andExpect(linkWithRelIsNotPresent(START_REL)).
+                andExpect(linkWithRelIsPresent(START_REL)).
                 andExpect(linkWithRelIsPresent(UPLOAD_REL)).
+                andExpect(jsonPath("$.title", is("Archie's Great Escape"))).
+                andExpect(jsonPath("$.author", is("Archie Hartman"))).
+                andExpect(jsonPath("$.publishedDate", is("2018-08-31"))).
+                andExpect(jsonPath("$.version", is("0.0.1"))).
+                andExpect(jsonPath("$.script").doesNotExist()).
+                andExpect(jsonPath("$.games").doesNotExist()).
                 andReturn().getResponse();
     }
 
@@ -144,5 +158,17 @@ public class AdventuresResourceWebIntegrationTest extends AbstractWebIntegration
                 andExpect(linkWithRelIsPresent(Link.REL_SELF)).
                 andExpect(linkWithRelIsPresent(ADVENTURE_REL)).
                 andReturn().getResponse();
+    }
+
+    /**
+     * Follow the adventure link.
+     * Post to the games link
+     */
+    private MockHttpServletResponse createNewGame(MockHttpServletResponse response) {
+        return response;
+    }
+
+    private void verifyGame(MockHttpServletResponse response) {
+
     }
 }
