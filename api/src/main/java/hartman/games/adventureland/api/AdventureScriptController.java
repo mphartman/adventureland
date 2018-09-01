@@ -36,7 +36,7 @@ public class AdventureScriptController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getScriptUpload(@PathVariable("id") String adventureId) {
+    public ResponseEntity<Resource<AdventureScript>> getScriptUpload(@PathVariable("id") String adventureId) {
         return adventureRepository.findById(adventureId)
                 .map(adventure -> repository.findByAdventureId(adventure.getId())
                         .map(script -> toResource(adventure, script))
@@ -52,7 +52,7 @@ public class AdventureScriptController {
     }
 
     @PostMapping
-    public ResponseEntity<?> handleScriptUpload(@PathVariable("id") String adventureId, @RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseEntity<Resource<AdventureScript>> handleScriptUpload(@PathVariable("id") String adventureId, @RequestParam("file") MultipartFile file) throws IOException {
 
         Optional<Adventure> maybeAdventure = adventureRepository.findById(adventureId);
         if (!maybeAdventure.isPresent()) {
