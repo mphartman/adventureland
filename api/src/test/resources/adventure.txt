@@ -1,0 +1,90 @@
+# Test Adventure 001
+
+room chamber "I'm in a square chamber."
+	exit East dungeon
+
+room dungeon "I'm in a gloomy dungeon."
+	exit West chamber
+
+
+# Standard actions
+
+wordgroup "help", "?"
+wordgroup "quit"
+wordgroup "inventory", "i"
+wordgroup "look", "l"
+wordgroup "go", "goto", "enter", "walk", "run", "exit", "leave"
+wordgroup "open", "unlock"
+wordgroup "get", "pickup", "grab", "take"
+wordgroup "drop", "discard"
+wordgroup "use"
+wordgroup "north", "n"
+wordgroup "south", "s"
+wordgroup "up", "u"
+wordgroup "down", "d"
+wordgroup "east", "e"
+wordgroup "west", "w"
+
+occurs
+    when times 1
+    then look
+
+action "go" unknown
+    then print "I don't understand. That's not a valid direction."
+
+action "go" any
+    when has_exit $2
+    then go $2
+        and look
+
+action "go" any
+    then print "I understand but I can't go that way from here."
+
+action "go"
+    then print "Go where?"
+
+
+action (north, south, up, down, east, west)
+    when has_exit
+    then go
+        and look
+
+action (north, south, up, down, east, west)
+    then print "I can't go {word:1} from here."
+
+
+action "look"
+    then look
+
+action "inventory"
+    then inventory
+
+action "quit"
+    then quit
+
+action "help"
+    then print "A voice BOOOMS out:
+Try --> 'GO, LOOK, JUMP, SWIM, CLIMB, TAKE, DROP'
+and any other verbs you can think of..."
+
+##
+## Unrecognized input
+##
+
+action unrecognized unrecognized
+    then print  "[1] Sorry, I don't know how to do that with that thing."
+
+action unrecognized any
+    then print "[2] Sorry, I don't know how to that with a '{word:2}'."
+
+action any unrecognized
+    then print "[3] I don't know how to '{word:1}' with that thing."
+
+action unrecognized
+    then print "[4] Sorry, I don't know how to do that."
+
+action any any
+    then print "[5] I can't do that right now."
+
+action any
+    then print "[6] {word:1} what?"

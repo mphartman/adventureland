@@ -1,6 +1,7 @@
 package hartman.games.adventureland.api;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityLinks;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
@@ -23,20 +25,41 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 @RequestMapping(path = "/adventures/{id}/upload")
 public class AdventureScriptController {
 
+    private AdventureRepository adventureRepository;
     private AdventureScriptRepository repository;
+    private EntityLinks entityLinks;
 
-    @Autowired
-    public AdventureScriptController(AdventureScriptRepository repository) {
+    public AdventureScriptController(AdventureRepository adventureRepository, AdventureScriptRepository repository, EntityLinks entityLinks) {
+        this.adventureRepository = adventureRepository;
         this.repository = repository;
+        this.entityLinks = entityLinks;
     }
 
     @GetMapping
-    public ResponseEntity<?> getScriptUpload(@PathVariable("id") Adventure adventure) {
-        return ResponseEntity.ok(new Resource<>(repository.findByAdventureId(adventure.getId())));
+    public ResponseEntity<?> getScriptUpload(@PathVariable("id") String adventureId) {
+        return adventureRepository.findById(adventureId)
+                .map(adventure -> repository.findByAdventureId(adventure.getId())
+                        .map(script -> toResource(adventure, script))
+                        .map(ResponseEntity::ok)
+                        .orElseGet(() -> ResponseEntity.notFound().build()))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    private Resource<AdventureScript> toResource(Adventure adventure, AdventureScript script) {
+        Link adventureRel = entityLinks.linkToSingleResource(adventure).withRel("adventure");
+        Link selfRel = linkTo(AdventureScriptController.class, adventure.getId()).withSelfRel();
+        return new Resource<>(script, selfRel, adventureRel);
     }
 
     @PostMapping
-    public ResponseEntity<?> handleScriptUpload(@PathVariable("id") Adventure adventure, @RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseEntity<?> handleScriptUpload(@PathVariable("id") String adventureId, @RequestParam("file") MultipartFile file) throws IOException {
+
+        Optional<Adventure> maybeAdventure = adventureRepository.findById(adventureId);
+        if (!maybeAdventure.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Adventure adventure = maybeAdventure.get();
 
         String scriptText = fileToString(file);
 

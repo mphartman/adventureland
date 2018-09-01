@@ -1,5 +1,6 @@
 package hartman.games.adventureland.api;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,6 @@ import org.springframework.hateoas.Identifiable;
 public class AdventureScript implements Identifiable<String> {
 
     private @Id String id;
-    private String adventureId;
+    private @JsonIgnore String adventureId;
     private String script;
 }

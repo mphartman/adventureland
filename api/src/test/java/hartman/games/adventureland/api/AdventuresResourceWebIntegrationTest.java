@@ -7,6 +7,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import java.nio.file.Files;
@@ -14,6 +15,7 @@ import java.nio.file.Files;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -39,13 +41,10 @@ public class AdventuresResourceWebIntegrationTest extends AbstractWebIntegration
     }
 
     private MockHttpServletResponse accessRootResource() throws Exception {
-
-        MockHttpServletResponse response = mvc.perform(get("/")). //
+        return mvc.perform(get("/")). //
                 andExpect(status().isOk()). //
                 andExpect(linkWithRelIsPresent(ADVENTURES_REL)). //
                 andReturn().getResponse();
-
-        return response;
     }
 
 
@@ -58,6 +57,15 @@ public class AdventuresResourceWebIntegrationTest extends AbstractWebIntegration
         response = createNewAdventure(response);
         verifyAdventure(response);
     }
+
+    @Test
+    public void uploadAdventureScript() throws Exception {
+        MockHttpServletResponse response = accessRootResource();
+        response = createNewAdventure(response);
+        response = uploadAdventureScript(response);
+        verifyScript(response);
+    }
+
 
     /**
      * - Creates a new {@link Adventure} by looking up the adventure link posting the content of adventure.json.
@@ -87,13 +95,11 @@ public class AdventuresResourceWebIntegrationTest extends AbstractWebIntegration
 
 
     /**
-     * Follows the {@code order} link and asserts only the self link being present so that no further navigation is
-     * possible anymore.
+     * Follows the {@code adventure} link and asserts response has the self, games, start and upload links.
      */
     private void verifyAdventure(MockHttpServletResponse response) throws Exception {
 
-        Link adventureLink = getDiscovererFor(response)
-                .findLinkWithRel(ADVENTURE_REL, response.getContentAsString());
+        Link adventureLink = getDiscovererFor(response).findLinkWithRel(ADVENTURE_REL, response.getContentAsString());
 
         mvc.perform(get(adventureLink.expand().getHref())).
                 andDo(MockMvcResultHandlers.print()).
@@ -105,4 +111,38 @@ public class AdventuresResourceWebIntegrationTest extends AbstractWebIntegration
                 andReturn().getResponse();
     }
 
+    /**
+     * Posts an adventure script file to the upload link of an adventure resource.
+     * Then follows the URI returned from the Location header.
+     */
+    private MockHttpServletResponse uploadAdventureScript(MockHttpServletResponse response) throws Exception {
+
+        Link uploadLink = getDiscovererFor(response)
+                .findLinkWithRel(UPLOAD_REL, response.getContentAsString());
+
+        ClassPathResource resource = new ClassPathResource("adventure.txt");
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("file", "adventure.txt", "text/plain", resource.getInputStream());
+
+        MockHttpServletResponse result = mvc
+                .perform(
+                        multipart(uploadLink.expand().getHref())
+                                .file(mockMultipartFile)
+                                .characterEncoding("UTF-8"))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse();
+
+        return mvc.perform(get(result.getHeader("Location"))).andReturn().getResponse();
+    }
+
+    private void verifyScript(MockHttpServletResponse response) throws Exception {
+
+        Link selfLink = getDiscovererFor(response).findLinkWithRel(Link.REL_SELF, response.getContentAsString());
+
+        mvc.perform(get(selfLink.expand().getHref())).
+                andDo(MockMvcResultHandlers.print()).
+                andExpect(status().isOk()).
+                andExpect(linkWithRelIsPresent(Link.REL_SELF)).
+                andExpect(linkWithRelIsPresent(ADVENTURE_REL)).
+                andReturn().getResponse();
+    }
 }
