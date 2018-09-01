@@ -12,6 +12,9 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.time.LocalDate;
 
+/**
+ * Information about an adventure story.
+ */
 @Entity
 @Table(name = "adventure")
 @Data

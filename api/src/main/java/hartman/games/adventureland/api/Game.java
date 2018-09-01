@@ -14,6 +14,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 
+/**
+ * An instance of an adventure being played.
+ */
 @Entity
 @Table(name = "game")
 @Data
