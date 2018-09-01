@@ -1,13 +1,13 @@
 package hartman.games.adventureland.api;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-interface GameRepository extends MongoRepository<Game, String> {
+interface GameRepository extends PagingAndSortingRepository<Game, Long> {
 
-    List<Game> findByAdventureId(String adventureId);
+    List<Game> findByAdventureId(Long adventureId);
 
 }

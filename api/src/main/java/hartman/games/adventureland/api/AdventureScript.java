@@ -1,26 +1,30 @@
 package hartman.games.adventureland.api;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.hateoas.Identifiable;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
+import javax.persistence.Entity;
+import javax.persistence.Lob;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 /**
  * The text of the adventure.
  */
+@Entity
+@Table(name = "script")
 @Data
+@RequiredArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Document(collection = "scripts")
-public class AdventureScript implements Identifiable<String> {
+public class AdventureScript extends AbstractEntity {
 
-    private @Id String id;
-    private @JsonIgnore String adventureId;
-    private String script;
+    private @OneToOne @NonNull Adventure adventure;
+    private @NonNull @Lob String script;
 }

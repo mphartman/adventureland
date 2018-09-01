@@ -27,7 +27,7 @@ public class GameController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getGame(@PathVariable("id") String id) {
+    public ResponseEntity<?> getGame(@PathVariable("id") Long id) {
 
         Optional<Game> maybeGame = repository.findById(id);
 
@@ -37,8 +37,8 @@ public class GameController {
 
         Game game = maybeGame.get();
         Resource<Game> resource = new Resource<>(game);
-        resource.add(linkTo(GameController.class, game.getAdventureId(), game.getId()).withSelfRel());
-        resource.add(entityLinks.linkToSingleResource(Adventure.class, game.getAdventureId()).withRel("adventure"));
+        resource.add(linkTo(GameController.class, game.getAdventure().getId(), game.getId()).withSelfRel());
+        resource.add(entityLinks.linkToSingleResource(Adventure.class, game.getAdventure().getId()).withRel("adventure"));
         return ResponseEntity.ok(resource);
     }
 

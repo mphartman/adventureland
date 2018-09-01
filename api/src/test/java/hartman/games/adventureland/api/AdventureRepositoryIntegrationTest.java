@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -30,6 +30,6 @@ public class AdventureRepositoryIntegrationTest extends AbstractIntegrationTest 
     }
 
     private Adventure createAdventure() {
-        return new Adventure(null, "Shenanigans", "Archie Hartman", LocalDateTime.now(), "1.0.0");
+        return new Adventure("Shenanigans", "Archie Hartman", LocalDate.now(), "1.0.0");
     }
 }

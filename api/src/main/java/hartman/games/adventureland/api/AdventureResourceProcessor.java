@@ -29,7 +29,9 @@ public class AdventureResourceProcessor implements ResourceProcessor<Resource<Ad
 
         resource.add(entityLinks.linkForSingleResource(adventure).slash(GAMES).withRel(GAMES_REL));
 
-        resource.add(entityLinks.linkForSingleResource(adventure).slash(GAMES).withRel(START_REL));
+        if (null != adventure.getScript()) {
+            resource.add(entityLinks.linkForSingleResource(adventure).slash(GAMES).withRel(START_REL));
+        }
 
         if (null != adventure.getId()) {
             resource.add(ControllerLinkBuilder.linkTo(AdventureScriptController.class, adventure.getId()).withRel(UPLOAD_REL));

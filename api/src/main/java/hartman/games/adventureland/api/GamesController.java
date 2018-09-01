@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -24,29 +25,37 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 public class GamesController {
 
     private GameRepository repository;
+    private AdventureRepository adventureRepository;
 
     @Autowired
-    public GamesController(GameRepository repository) {
+    public GamesController(GameRepository repository, AdventureRepository adventureRepository) {
         this.repository = repository;
+        this.adventureRepository = adventureRepository;
     }
 
     @GetMapping
-    public ResponseEntity<?> getGames(@PathVariable("adventureId") Adventure adventure) {
-        List<Game> games = repository.findByAdventureId(adventure.getId());
+    public ResponseEntity<Resources<Resource<Game>>> getGames(@PathVariable("adventureId") Long adventureId) {
+        List<Game> games = repository.findByAdventureId(adventureId);
 
         List<Resource<Game>> resources = games.stream()
-                .map(game -> new Resource<>(game, linkTo(GameController.class, adventure.getId(), game.getId()).withSelfRel()))
+                .map(game -> new Resource<>(game, linkTo(GameController.class, adventureId, game.getId()).withSelfRel()))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(new Resources<>(resources));
     }
 
     @PostMapping
-    public ResponseEntity<?> startNewGame(@PathVariable("adventureId") Adventure adventure, @RequestBody Game game) {
+    public ResponseEntity<Resource<Game>> startNewGame(@PathVariable("adventureId") Long adventureId, @RequestBody Game game) {
 
-        game.setId(null);
+        Optional<Adventure> maybeAdventure = adventureRepository.findById(adventureId);
+        if (!maybeAdventure.isPresent()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Adventure adventure = maybeAdventure.get();
+
+        game.setAdventure(adventure);
         game.setStatus(Game.Status.READY);
-        game.setAdventureId(adventure.getId());
         if (null == game.getStartTime()) {
             game.setStartTime(LocalDateTime.now());
         }
@@ -55,6 +64,7 @@ public class GamesController {
         ControllerLinkBuilder selfLink = linkTo(GameController.class, adventure.getId(), game.getId());
         Resource<Game> resource = new Resource<>(game, selfLink.withSelfRel());
         URI location = selfLink.toUri();
+
         return ResponseEntity.created(location).body(resource);
     }
 }
