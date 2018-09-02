@@ -50,7 +50,6 @@ COUNTER_EQ      : 'counterEq';
 COUNTER_LE      : 'counterLe';
 COUNTER_GT      : 'counterGt';
 HAS_EXIT        : 'hasExit' | 'has_exit';
-TIMES           : 'times';
 
 PRINT           : 'print';
 LOOK            : 'look';
@@ -237,7 +236,6 @@ actionCondition
     |   COUNTER_LE word Number      # conditionCounterLessThan
     |   COUNTER_GT word Number      # conditionCounterGreaterThan
     |   HAS_EXIT word?              # conditionRoomHasExit
-    |   TIMES Number                # conditionTimes
     ;
 
 actionResultDeclaration

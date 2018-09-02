@@ -30,8 +30,9 @@
 ##
 
     occurs
-        when times 1
+        when !flag init
         then set_flag doors_locked on
+            and set_flag init yes
 
     occurs
         when at outside
@@ -45,8 +46,9 @@
  */
 
     occurs
-        when times 1
-        then print "
+        when !flag intro_shown
+        then set_flag intro_shown yes
+            and print "
      ______________________...........____
    ,';---------.===================--''''''' ._
   /.'         :'    :     : :     `.           `.
@@ -62,10 +64,7 @@
        '...'         `--'            \ `...'  :-----:;;:'`
                                       '......'
 "
-
-    occurs
-        when times 1
-        then look
+        and look
 
     occurs
         when in front_seat

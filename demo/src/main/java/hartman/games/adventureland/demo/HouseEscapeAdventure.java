@@ -24,10 +24,10 @@ import static hartman.games.adventureland.engine.core.Conditions.carrying;
 import static hartman.games.adventureland.engine.core.Conditions.hasExitMatchingCommandWordAt;
 import static hartman.games.adventureland.engine.core.Conditions.here;
 import static hartman.games.adventureland.engine.core.Conditions.in;
+import static hartman.games.adventureland.engine.core.Conditions.isFlagSet;
 import static hartman.games.adventureland.engine.core.Conditions.not;
 import static hartman.games.adventureland.engine.core.Conditions.present;
 import static hartman.games.adventureland.engine.core.Conditions.random;
-import static hartman.games.adventureland.engine.core.Conditions.times;
 import static hartman.games.adventureland.engine.core.Results.destroy;
 import static hartman.games.adventureland.engine.core.Results.drop;
 import static hartman.games.adventureland.engine.core.Results.get;
@@ -41,6 +41,7 @@ import static hartman.games.adventureland.engine.core.Results.println;
 import static hartman.games.adventureland.engine.core.Results.put;
 import static hartman.games.adventureland.engine.core.Results.putHere;
 import static hartman.games.adventureland.engine.core.Results.quit;
+import static hartman.games.adventureland.engine.core.Results.setFlag;
 import static hartman.games.adventureland.engine.core.Results.swap;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -152,14 +153,10 @@ public class HouseEscapeAdventure {
         Actions occurs = newActionSet();
 
         occurs.newAction()
-                .when(times(1))
+                .when(isFlagSet("init"))
                 .then(println(introduction))
-                .build();
-
-        // `look` on game startup
-        occurs.newAction()
-                .when(times(1))
-                .then(look)
+                .andThen(look)
+                .andThen(setFlag("init", false))
                 .build();
 
         // the fly

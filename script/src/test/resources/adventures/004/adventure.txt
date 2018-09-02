@@ -67,8 +67,9 @@ item tricorder "a standard tricorder"
  */
 
     occurs
-        when times 1
-        then print "
+        when !flag show_intro
+        then set_flag show_intro on
+            and print "
 
             Welcome!
 
@@ -79,6 +80,8 @@ item tricorder "a standard tricorder"
          /____          ||
               `--.____,-'
 "
+            and look
+            and inventory
 
 ##
 ## Actions
@@ -100,11 +103,6 @@ wordgroup "open", "unlock"
 wordgroup "get", "pickup", "grab", "take"
 wordgroup "drop", "discard"
 wordgroup "use"
-
-occurs
-    when times 1
-    then look
-        and inventory
 
 action "go" any
     when has_exit $2

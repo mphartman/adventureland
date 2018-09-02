@@ -1,8 +1,6 @@
 package hartman.games.adventureland.engine.core;
 
 import hartman.games.adventureland.engine.Action.Condition;
-import hartman.games.adventureland.engine.Command;
-import hartman.games.adventureland.engine.GameState;
 import hartman.games.adventureland.engine.Item;
 import hartman.games.adventureland.engine.Room;
 import hartman.games.adventureland.engine.Word;
@@ -123,21 +121,6 @@ public final class Conditions {
      */
     public static Condition hasMoved(Item item) {
         return (command, gameState) -> item.hasMoved();
-    }
-
-    /**
-     * Returns true for the given number of times.
-     */
-    public static Condition times(int times) {
-        return new Condition() {
-
-            private int counter;
-
-            @Override
-            public boolean matches(Command command, GameState gameState) {
-                return counter++ < times;
-            }
-        };
     }
 
     /**
