@@ -57,11 +57,11 @@ public class GameServiceImpl implements GameService {
         CommandInterpreter interpreter = new StringCommandInterpreter(inputCommand, adventure.getVocabulary());
         StringWriter displayOut = new StringWriter();
         DefaultDisplay display = new DefaultDisplay(new PrintWriter(displayOut));
-        hartman.games.adventureland.engine.Game _game = new hartman.games.adventureland.engine.Game(adventure, interpreter, display);
+        hartman.games.adventureland.engine.Game engineGame = new hartman.games.adventureland.engine.Game(adventure, interpreter, display);
 
         GameState gameState = game.load().orElse(new GameState(adventure.getStartRoom(), adventure.getItems()));
 
-        gameState = _game.takeTurn(gameState, interpreter);
+        gameState = engineGame.takeTurn(gameState, interpreter);
         Turn turn = new Turn(game, inputCommand, displayOut.toString());
 
         return new GameStateTurnTuple(gameState, turn);
