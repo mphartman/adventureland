@@ -44,7 +44,7 @@ public class DefaultCommandInterpreter implements CommandInterpreter {
             }
         }
 
-        throw new IllegalStateException("Need input.");
+        return Command.NONE;
     }
 
     protected String getLastLine() {

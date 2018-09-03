@@ -26,9 +26,8 @@ wordgroup "east", "e"
 wordgroup "west", "w"
 
 occurs
-    when !flag "intro"
+    when times 1
     then look
-        and set_flag "intro" yes
 
 action "go" unknown
     then print "I don't understand. That's not a valid direction."

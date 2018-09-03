@@ -51,7 +51,6 @@ import static hartman.games.adventureland.script.AdventureParser.ConditionItemHa
 import static hartman.games.adventureland.script.AdventureParser.ConditionItemIsHereContext;
 import static hartman.games.adventureland.script.AdventureParser.ConditionItemIsPresentContext;
 import static hartman.games.adventureland.script.AdventureParser.ConditionRoomHasExitContext;
-import static hartman.games.adventureland.script.AdventureParser.ConditionTimesContext;
 import static hartman.games.adventureland.script.AdventureParser.GlobalParameterStartContext;
 import static hartman.games.adventureland.script.AdventureParser.ItemAliasesContext;
 import static hartman.games.adventureland.script.AdventureParser.ItemDeclarationContext;
@@ -669,11 +668,6 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
             return Conditions.hasExit(Word.of(word));
         }
 
-        @Override
-        public Action.Condition visitConditionTimes(ConditionTimesContext ctx) {
-            int val = Integer.parseInt(ctx.Number().getText());
-            return Conditions.times(val);
-        }
     }
 
 }

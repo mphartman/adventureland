@@ -3,8 +3,10 @@
 ##
 
 occurs
-    when times 1
+    when !flag show_intro
     then print "Welcome!\nThis is \"test\" adventure #3.\n"
+        and look
+        and set_flag show_intro true
 
 occurs
     when at front_hallway
@@ -107,10 +109,6 @@ wordgroup "up", "u"
 wordgroup "down", "d"
 wordgroup "east", "e"
 wordgroup "west", "w"
-
-occurs
-    when times 1
-    then look
 
 action "go" any
     when has_exit $2

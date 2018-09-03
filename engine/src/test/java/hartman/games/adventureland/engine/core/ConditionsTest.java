@@ -25,7 +25,6 @@ import static hartman.games.adventureland.engine.core.Conditions.present;
 import static hartman.games.adventureland.engine.core.Conditions.random;
 import static hartman.games.adventureland.engine.core.Conditions.stringEquals;
 import static hartman.games.adventureland.engine.core.Conditions.there;
-import static hartman.games.adventureland.engine.core.Conditions.times;
 import static hartman.games.adventureland.engine.core.TestWords.DOWN;
 import static hartman.games.adventureland.engine.core.TestWords.GO;
 import static hartman.games.adventureland.engine.core.TestWords.NORTH;
@@ -189,23 +188,6 @@ public class ConditionsTest {
         assertTrue(hasMoved(item).matches(command, gameState));
         item.drop(Room.NOWHERE);
         assertFalse(hasMoved(item).matches(command, gameState));
-    }
-
-    @Test
-    public void timesShouldReturnTrueForTheGivenNumberOfTimes() {
-        GameState gameState = new GameState(Room.NOWHERE);
-
-        Condition zero = times(0);
-        assertFalse(zero.matches(Command.NONE, gameState));
-        assertFalse(zero.matches(Command.NONE, gameState));
-
-        Condition once = times(1);
-        assertTrue(once.matches(Command.NONE, gameState));
-        assertFalse(once.matches(Command.NONE, gameState));
-
-        Condition never = times(-1);
-        assertFalse(never.matches(Command.NONE, gameState));
-        assertFalse(never.matches(Command.NONE, gameState));
     }
 
     @Test

@@ -1,47 +1,38 @@
 package hartman.games.adventureland.api;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
+import javax.persistence.Entity;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Information about an adventure story.
+ */
 @Entity
-@Table(name = "adventures")
+@Table(name = "adventure")
+@Data
+@RequiredArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode(callSuper = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Adventure extends AbstractEntity {
 
-    private String title;
-    private String author;
-    private LocalDateTime published;
-    private String version;
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public LocalDateTime getPublished() {
-        return published;
-    }
-
-    public void setPublished(LocalDateTime published) {
-        this.published = published;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
+    private @NonNull String title;
+    private @NonNull String author;
+    private @NonNull LocalDate publishedDate;
+    private @NonNull String version;
+    private @JsonIgnore @OneToMany(mappedBy = "adventure", orphanRemoval = true) List<Game> games = new ArrayList<>();
+    private @JsonIgnore @OneToOne(mappedBy = "adventure", orphanRemoval = true) AdventureScript script;
 }

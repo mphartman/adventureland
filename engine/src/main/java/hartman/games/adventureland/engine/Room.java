@@ -1,5 +1,6 @@
 package hartman.games.adventureland.engine;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -11,11 +12,14 @@ import java.util.Set;
  * A Room may have no more than one exit per direction but each exit may point to the same room.
  * E.g. A room can only have one North exit but the North and Up exits can point reference the same destination.
  */
-public class Room {
+public class Room implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     public static final Room NOWHERE = new Room("nowhere", "I am no where.  It's dark and I am alone.");
 
-    public static class Exit {
+    public static class Exit implements Serializable {
+        private static final long serialVersionUID = 1L;
+
         private final Word direction;
         private final Room room;
 

@@ -1,5 +1,6 @@
 package hartman.games.adventureland.engine;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -14,7 +15,9 @@ import static java.util.stream.Collectors.toList;
  * The state of the game world which consists of the player's current position
  * and a toSet of flags which the adventure's actions may toSet and interpret.
  */
-public class GameState {
+public class GameState implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final Map<String, Boolean> flags = new HashMap<>();
     private final Map<String, Integer> counters = new HashMap<>();
     private final Map<String, String> strings = new HashMap<>();
@@ -150,4 +153,29 @@ public class GameState {
                 .anyMatch(i -> i.matches(item) && !i.isDestroyed());
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GameState gameState = (GameState) o;
+
+        if (running != gameState.running) return false;
+        if (!flags.equals(gameState.flags)) return false;
+        if (!counters.equals(gameState.counters)) return false;
+        if (!strings.equals(gameState.strings)) return false;
+        if (!items.equals(gameState.items)) return false;
+        return currentRoom.equals(gameState.currentRoom);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = flags.hashCode();
+        result = 31 * result + counters.hashCode();
+        result = 31 * result + strings.hashCode();
+        result = 31 * result + items.hashCode();
+        result = 31 * result + (running ? 1 : 0);
+        result = 31 * result + currentRoom.hashCode();
+        return result;
+    }
 }

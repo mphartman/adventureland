@@ -1,12 +1,15 @@
 package hartman.games.adventureland.engine;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class Word {
+public class Word implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private static final Word UNRECOGNIZED = new Word("<unrecognized>", false);
     public static final Word ANY = new Word("<any>");
     public static final Word NONE = new Word("<none>");
