@@ -27,5 +27,5 @@ import javax.persistence.Table;
 public class AdventureScript extends AbstractEntity {
 
     private @OneToOne(optional = false) @MapsId @NonNull Adventure adventure;
-    private @NonNull @Lob String script;
+    private @Lob String script;
 }
