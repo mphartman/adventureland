@@ -12,7 +12,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import javax.persistence.Entity;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -43,7 +42,7 @@ public class Game extends AbstractEntity {
     private @NonNull String player;
     private LocalDateTime startTime;
     private Status status = Status.READY;
-    private @JsonIgnore @Lob byte[] currentState;
+    private @JsonIgnore byte[] currentState;
     private @JsonIgnore @OneToMany(mappedBy = "game", orphanRemoval = true) List<Turn> turns = new ArrayList<>();
 
     public enum Status {

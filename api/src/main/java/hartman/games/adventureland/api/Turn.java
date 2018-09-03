@@ -10,7 +10,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import javax.persistence.Entity;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
@@ -31,5 +30,5 @@ public class Turn extends AbstractEntity {
     private @JsonIgnore @NonNull @ManyToOne(optional = false) Game game;
     private @OrderColumn LocalDateTime timestamp = LocalDateTime.now();
     private @NonNull String command;
-    private @NonNull @Lob String output;
+    private @NonNull String output;
 }

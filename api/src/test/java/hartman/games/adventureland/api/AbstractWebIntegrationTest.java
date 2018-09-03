@@ -1,8 +1,11 @@
 package hartman.games.adventureland.api;
 
+import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
+import org.flywaydb.test.annotation.FlywayTest;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.hateoas.LinkDiscoverer;
 import org.springframework.hateoas.LinkDiscoverers;
@@ -27,6 +30,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // to disable use of in-memory database for JPA integration test
+@FlywayTest
+@AutoConfigureEmbeddedDatabase
 @SpringBootTest
 public abstract class AbstractWebIntegrationTest {
 

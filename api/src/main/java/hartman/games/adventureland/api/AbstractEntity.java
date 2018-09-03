@@ -20,7 +20,7 @@ import javax.persistence.MappedSuperclass;
 @EqualsAndHashCode
 public class AbstractEntity implements Identifiable<Long> {
 
-	private final @Id @GeneratedValue(strategy = GenerationType.AUTO) @JsonIgnore Long id;
+	private final @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @JsonIgnore Long id;
 
 	protected AbstractEntity() {
 		this.id = null;
