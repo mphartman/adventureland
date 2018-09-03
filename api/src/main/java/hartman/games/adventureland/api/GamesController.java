@@ -1,5 +1,9 @@
 package hartman.games.adventureland.api;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
@@ -45,7 +49,7 @@ public class GamesController {
     }
 
     @PostMapping
-    public ResponseEntity<Resource<Game>> startNewGame(@PathVariable("adventureId") Long adventureId, @RequestBody Game game) {
+    public ResponseEntity<Resource<Game>> startNewGame(@PathVariable("adventureId") Long adventureId, @RequestBody GameDTO gameDto) {
 
         Optional<Adventure> maybeAdventure = adventureRepository.findById(adventureId);
         if (!maybeAdventure.isPresent()) {
@@ -54,11 +58,9 @@ public class GamesController {
 
         Adventure adventure = maybeAdventure.get();
 
-        game.setAdventure(adventure);
+        Game game = new Game(adventure, gameDto.getPlayer());
         game.setStatus(Game.Status.READY);
-        if (null == game.getStartTime()) {
-            game.setStartTime(LocalDateTime.now());
-        }
+        game.setStartTime(LocalDateTime.now());
         game = repository.save(game);
 
         ControllerLinkBuilder selfLink = linkTo(GameController.class, adventure.getId(), game.getId());
@@ -66,5 +68,12 @@ public class GamesController {
         URI location = selfLink.toUri();
 
         return ResponseEntity.created(location).body(resource);
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class GameDTO {
+        private String player;
     }
 }
