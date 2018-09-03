@@ -5,8 +5,8 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-interface GameRepository extends CrudRepository<Game, Long> {
+interface TurnRepository extends CrudRepository<Turn, Long> {
 
-    List<Game> findByAdventureId(@Param("adventureId") long adventureId);
+    List<Turn> findByGameId(@Param("gameId") long gameId);
 
 }

@@ -13,7 +13,6 @@ public class AdventureResourceProcessor implements ResourceProcessor<Resource<Ad
     private static final String GAMES = "/games";
     private static final String GAMES_REL = "games";
     private static final String START_REL = "start";
-    private static final String UPLOAD = "/upload";
     private static final String UPLOAD_REL = "upload";
 
     private final RepositoryEntityLinks entityLinks;

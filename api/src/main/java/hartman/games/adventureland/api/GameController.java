@@ -9,9 +9,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
-
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/adventures/{adventureId}/games/{id}")
@@ -27,19 +26,19 @@ public class GameController {
     }
 
     @GetMapping
-    public ResponseEntity<Resource<Game>> getGame(@PathVariable("id") Long id) {
+    public ResponseEntity<Resource<Game>> findOne(@PathVariable("id") long id) {
+        return repository.findById(id)
+                .map(this::toResource)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 
-        Optional<Game> maybeGame = repository.findById(id);
-
-        if (!maybeGame.isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        Game game = maybeGame.get();
+    private Resource<Game> toResource(Game game) {
         Resource<Game> resource = new Resource<>(game);
         resource.add(linkTo(GameController.class, game.getAdventure().getId(), game.getId()).withSelfRel());
         resource.add(entityLinks.linkToSingleResource(Adventure.class, game.getAdventure().getId()).withRel("adventure"));
-        return ResponseEntity.ok(resource);
+        resource.add(linkTo(methodOn(TurnsController.class, game.getAdventure().getId(), game.getId()).takeTurn(game.getId(), null)).withRel("takeTurn"));
+        return resource;
     }
 
 }

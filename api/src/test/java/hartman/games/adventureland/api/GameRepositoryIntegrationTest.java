@@ -4,7 +4,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -19,7 +18,7 @@ public class GameRepositoryIntegrationTest extends AbstractIntegrationTest {
 
         Long before = gameRepository.count();
 
-        Game game = new Game(adventure, "Player One", LocalDateTime.now(), Game.Status.READY);
+        Game game = new Game(adventure, "Player One");
         gameRepository.save(game);
 
         Iterable<Game> games = gameRepository.findAll();

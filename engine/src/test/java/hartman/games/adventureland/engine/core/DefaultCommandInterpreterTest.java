@@ -43,11 +43,12 @@ public class DefaultCommandInterpreterTest {
         assertTrue(command.getWordOrNone(2).isUnrecognized());
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void noInput_BlankLinesConsumed_ThrowsException() {
+    @Test
+    public void noInput_BlankLinesConsumed_ReturnsCommandNone() {
         Vocabulary vocabulary = new Vocabulary(new HashSet<>(asList(new Word("JAVELIN"), new Word("NORTH"))));
         DefaultCommandInterpreter interpreter = new DefaultCommandInterpreter(new Scanner("\n\n\n\n"), vocabulary);
-        interpreter.nextCommand();
+        Command command = interpreter.nextCommand();
+        assertEquals(Command.NONE, command);
     }
 
     @Test
