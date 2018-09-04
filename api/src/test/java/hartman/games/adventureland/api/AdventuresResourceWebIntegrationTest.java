@@ -29,6 +29,8 @@ public class AdventuresResourceWebIntegrationTest extends AbstractWebIntegration
     private static final String START_REL = "start";
     private static final String UPLOAD_REL = "upload";
     private static final String ADVENTURE_REL = "adventure";
+    private static final String GAME_REL = "game";
+    private static final String TAKE_TURN_REL = "takeTurn";
 
     @Test
     public void exposesAdventuresResourceViaRootResource() throws Exception {
@@ -73,6 +75,16 @@ public class AdventuresResourceWebIntegrationTest extends AbstractWebIntegration
         response = uploadAdventureScript(response);
         response = createNewGame(response);
         verifyGame(response);
+    }
+
+    @Test
+    public void takeTurn() throws Exception {
+        MockHttpServletResponse response = accessRootResource();
+        response = createNewAdventure(response);
+        response = uploadAdventureScript(response);
+        response = createNewGame(response);
+        response = postNewTurn(response);
+        verifyTurn(response);
     }
 
     /**
@@ -200,7 +212,49 @@ public class AdventuresResourceWebIntegrationTest extends AbstractWebIntegration
                 andExpect(linkWithRelIsPresent(Link.REL_SELF)).
                 andExpect(linkWithRelIsPresent(ADVENTURE_REL)).
                 andExpect(jsonPath("$.player", is("Michael"))).
+                andExpect(jsonPath("$.startTime").exists()).
                 andExpect(jsonPath("$.status", is("Ready"))).
                 andReturn().getResponse();
     }
+
+    private MockHttpServletResponse postNewTurn(MockHttpServletResponse source) throws Exception {
+
+        Link gameLink = getDiscovererFor(source).findLinkWithRel(Link.REL_SELF, source.getContentAsString());
+
+        MockHttpServletResponse response = mvc.perform(get(gameLink.expand().getHref()))
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+
+        Link taketurnLink = getDiscovererFor(response).findLinkWithRel(TAKE_TURN_REL, response.getContentAsString());
+
+        ClassPathResource resource = new ClassPathResource("turn.json");
+        byte[] data = Files.readAllBytes(resource.getFile().toPath());
+
+        response = mvc.perform(
+                post(taketurnLink.expand().getHref())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(data)).
+                andExpect(status().isOk()).
+                andReturn().getResponse();
+
+        return response;
+    }
+
+    private void verifyTurn(MockHttpServletResponse response) throws Exception {
+
+        Link selfLink = getDiscovererFor(response).findLinkWithRel(Link.REL_SELF, response.getContentAsString());
+
+        mvc.perform(get(selfLink.expand().getHref())).
+                andDo(MockMvcResultHandlers.print()).
+                andExpect(status().isOk()).
+                andExpect(linkWithRelIsPresent(Link.REL_SELF)).
+                andExpect(linkWithRelIsPresent(GAME_REL)).
+                andExpect(jsonPath("$.game.player", is("Michael"))).
+                andExpect(jsonPath("$.game.status", is("Running"))).
+                andExpect(jsonPath("$.command", is("look"))).
+                andExpect(jsonPath("$.timestamp").exists()).
+                andExpect(jsonPath("$.output").exists()).
+                andReturn().getResponse();
+    }
+
 }
