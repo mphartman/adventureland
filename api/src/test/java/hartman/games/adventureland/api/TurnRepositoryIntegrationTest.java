@@ -27,4 +27,19 @@ public class TurnRepositoryIntegrationTest extends AbstractIntegrationTest {
         assertThat(turns).contains(turn);
     }
 
+    @Test
+    public void findsTurnsByGameId() {
+        Adventure adventure = adventureRepository.save(new Adventure("Test Adventure", "Tester", LocalDate.now(), "1.0.0"));
+        Game game1 = gameRepository.save(new Game(adventure, "Player One"));
+        Game game2 = gameRepository.save(new Game(adventure, "Player Two"));
+        Game game3 = gameRepository.save(new Game(adventure, "Player Three"));
+
+        Turn turn11 = repository.save(new Turn(game1, "help", "Help is on the way"));
+        Turn turn21 = repository.save(new Turn(game2, "help", "Help is on the way"));
+        Turn turn22 = repository.save(new Turn(game2, "look", "There are shadows all around."));
+
+        assertThat(repository.findByGameId(game1.getId())).hasSize(1).contains(turn11);
+        assertThat(repository.findByGameId(game2.getId())).hasSize(2).contains(turn21, turn22);
+        assertThat(repository.findByGameId(game3.getId())).isEmpty();
+    }
 }
