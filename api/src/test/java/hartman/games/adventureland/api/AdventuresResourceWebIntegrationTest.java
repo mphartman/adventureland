@@ -249,8 +249,6 @@ public class AdventuresResourceWebIntegrationTest extends AbstractWebIntegration
                 andExpect(status().isOk()).
                 andExpect(linkWithRelIsPresent(Link.REL_SELF)).
                 andExpect(linkWithRelIsPresent(GAME_REL)).
-                andExpect(jsonPath("$.game.player", is("Michael"))).
-                andExpect(jsonPath("$.game.status", is("Running"))).
                 andExpect(jsonPath("$.command", is("look"))).
                 andExpect(jsonPath("$.timestamp").exists()).
                 andExpect(jsonPath("$.output").exists()).
