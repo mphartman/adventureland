@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -41,5 +42,16 @@ public class TurnRepositoryIntegrationTest extends AbstractIntegrationTest {
         assertThat(repository.findByGameId(game1.getId())).hasSize(1).contains(turn11);
         assertThat(repository.findByGameId(game2.getId())).hasSize(2).contains(turn21, turn22);
         assertThat(repository.findByGameId(game3.getId())).isEmpty();
+    }
+
+    @Test
+    public void savesLargeAmountOfOutputText() {
+        Adventure adventure = adventureRepository.save(new Adventure("Test Adventure", "Tester", LocalDate.now(), "1.0.0"));
+        Game game = gameRepository.save(new Game(adventure, "Player One"));
+        // create a string made up of 1024 copies of string "*"
+        final String largeOutput = String.join("", Collections.nCopies(1024, "*"));
+        Turn turn = repository.save(new Turn(game, "help", largeOutput));
+
+        assertThat(repository.findById(turn.getId())).isNotEmpty().hasValueSatisfying(t -> assertThat(t.getOutput()).isEqualTo(largeOutput));
     }
 }
