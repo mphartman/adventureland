@@ -14,7 +14,7 @@ import static org.junit.Assert.assertFalse;
 public class GameTest {
 
     @Test
-    public void gameShouldInvokeAllOccursAfterActions() {
+    public void gameTurnShouldInvokeAllOccursAfterActions() {
 
         AtomicInteger sequence = new AtomicInteger();
 
@@ -52,7 +52,7 @@ public class GameTest {
         GameState gameState = new GameState(adventure.getStartRoom(), adventure.getItems());
 
         Game game = new Game(adventure, () -> Command.NONE, new TestDisplay(), gameState);
-        gameState = game.run();
+        gameState = game.takeTurn(Command.NONE);
 
         assertFalse(gameState.isRunning());
         assertEquals(2, gameState.getCounter("occurs1"));
