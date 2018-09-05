@@ -14,7 +14,7 @@ import static org.junit.Assert.assertFalse;
 public class GameTest {
 
     @Test
-    public void gameShouldInvokeAllOccursBeforeActions() {
+    public void gameShouldInvokeAllOccursAfterActions() {
 
         AtomicInteger sequence = new AtomicInteger();
 
@@ -51,37 +51,14 @@ public class GameTest {
         Adventure adventure = new Adventure(vocabulary, new LinkedHashSet<>(asList(occurs1, occurs2, occurs3)), singleton(quit), emptySet(), Room.NOWHERE);
         GameState gameState = new GameState(adventure.getStartRoom(), adventure.getItems());
 
-        Game game = new Game(adventure, () -> Command.NONE, new TestDisplay());
-        gameState = game.run(gameState);
+        Game game = new Game(adventure, () -> Command.NONE, new TestDisplay(), gameState);
+        gameState = game.run();
 
         assertFalse(gameState.isRunning());
-        assertEquals(1, gameState.getCounter("occurs1"));
-        assertEquals(2, gameState.getCounter("occurs2"));
-        assertEquals(3, gameState.getCounter("occurs3"));
-        assertEquals(4, gameState.getCounter("quit"));
+        assertEquals(2, gameState.getCounter("occurs1"));
+        assertEquals(3, gameState.getCounter("occurs2"));
+        assertEquals(4, gameState.getCounter("occurs3"));
+        assertEquals(1, gameState.getCounter("quit"));
     }
-
-    @Test
-    public void runShouldReturnWhenGameStateIsNotRunning() {
-
-        Action occurs = new Action.Builder()
-                .then((command, gameState, display) -> gameState.quit())
-                .build();
-
-        Action action = new Action.Builder()
-                .then((command, gameState, display) -> gameState.setString("action", "Should not have been called."))
-                .build();
-
-        Vocabulary vocabulary = new Vocabulary(emptySet());
-        Adventure adventure = new Adventure(vocabulary, singleton(occurs), singleton(action), emptySet(), Room.NOWHERE);
-        GameState gameState = new GameState(adventure.getStartRoom(), adventure.getItems());
-
-        Game game = new Game(adventure, () -> Command.NONE, new TestDisplay());
-        gameState = game.run(gameState);
-
-        assertFalse(gameState.isRunning());
-        assertEquals("", gameState.getString("action"));
-    }
-
 
 }

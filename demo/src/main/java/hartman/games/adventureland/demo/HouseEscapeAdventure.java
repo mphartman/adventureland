@@ -53,8 +53,8 @@ public class HouseEscapeAdventure {
         CommandInterpreter interpreter = new ConsoleInterpreter(adventure.getVocabulary());
         Display display = new ConsoleDisplay();
         GameState gameState = new GameState(adventure.getStartRoom(), adventure.getItems());
-        Game game = new Game(adventure, interpreter, display);
-        game.run(gameState);
+        Game game = new Game(adventure, interpreter, display, gameState);
+        game.run();
     }
 
     private static class ConsoleInterpreter extends DefaultCommandInterpreter {
@@ -153,10 +153,10 @@ public class HouseEscapeAdventure {
         Actions occurs = newActionSet();
 
         occurs.newAction()
-                .when(isFlagSet("init"))
+                .when(not(isFlagSet("init")))
                 .then(println(introduction))
                 .andThen(look)
-                .andThen(setFlag("init", false))
+                .andThen(setFlag("init", true))
                 .build();
 
         // the fly

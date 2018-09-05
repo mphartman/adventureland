@@ -28,10 +28,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @SpringBootApplication
-public class AdventurelandApplication implements CommandLineRunner {
+public class ConsoleApplication implements CommandLineRunner {
 
     public static void main(String[] args) {
-        SpringApplication.run(AdventurelandApplication.class, args);
+        SpringApplication.run(ConsoleApplication.class, args);
     }
 
     private Options options;
@@ -88,8 +88,8 @@ public class AdventurelandApplication implements CommandLineRunner {
         CommandInterpreter interpreter = new ConsoleInterpreter(adventure.getVocabulary());
         Display display = new ConsoleDisplay();
         GameState gameState = new GameState(adventure.getStartRoom(), adventure.getItems());
-        Game game = new Game(adventure, interpreter, display);
-        game.run(gameState);
+        Game game = new Game(adventure, interpreter, display, gameState);
+        game.run();
     }
 
 }

@@ -8,32 +8,34 @@ public class Game {
     private final CommandInterpreter interpreter;
     private final Display display;
 
-    public Game(Adventure adventure, CommandInterpreter interpreter, Display display) {
+    private GameState gameState;
+
+    public Game(Adventure adventure, CommandInterpreter interpreter, Display display, GameState gameState) {
         this.adventure = adventure;
         this.interpreter = interpreter;
         this.display = display;
+        this.gameState = gameState;
     }
 
-    public GameState run(GameState gameState) {
+    public GameState run() {
+        runOccurs();
         while (gameState.isRunning()) {
-            gameState = takeTurn(gameState, interpreter);
+            gameState = takeTurn(interpreter.nextCommand());
         }
         return gameState;
     }
 
-    public GameState takeTurn(GameState gameState, CommandInterpreter interpreter) {
-        runOccurs(gameState);
-        if (gameState.isRunning()) {
-            runActions(gameState, interpreter.nextCommand());
-        }
+    public GameState takeTurn(Command command) {
+        runActions(command);
+        runOccurs();
         return gameState;
     }
 
-    private void runOccurs(GameState gameState) {
+    private void runOccurs() {
         adventure.getOccurs().forEach(occur -> occur.run(gameState, display, Command.NONE));
     }
 
-    private void runActions(GameState gameState, Command command) {
+    private void runActions(Command command) {
         for (Action action : adventure.getActions())
             if (action.run(gameState, display, command)) return;
     }

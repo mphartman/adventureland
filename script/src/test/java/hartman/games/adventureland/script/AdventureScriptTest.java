@@ -64,9 +64,9 @@ public class AdventureScriptTest {
                 Adventure adventure = readAdventure(getClass().getResourceAsStream(String.format("/adventures/%s/adventure.txt", ident)));
                 Display display = new DefaultDisplay(pw);
                 CommandInterpreter interpreter = new TestCommandInterpreter(String.format("/adventures/%s/input.txt", ident), adventure.getVocabulary(), display);
-                Game game = new Game(adventure, interpreter, display);
                 GameState gameState = new GameState(adventure.getStartRoom(), adventure.getItems());
-                game.run(gameState);
+                Game game = new Game(adventure, interpreter, display, gameState);
+                game.run();
                 String expected = readToString(getClass().getResourceAsStream(String.format("/adventures/%s/transcript.txt", ident)));
                 String actual = out.toString();
                 assertEquals(expected, actual);
