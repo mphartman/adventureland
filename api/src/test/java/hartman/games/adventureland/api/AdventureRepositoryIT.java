@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class AdventureRepositoryIntegrationTest extends AbstractIntegrationTest {
+public class AdventureRepositoryIT extends AbstractIntegrationTest {
 
     @Autowired AdventureRepository repository;
 

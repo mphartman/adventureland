@@ -8,7 +8,7 @@ import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TurnRepositoryIntegrationTest extends AbstractIntegrationTest {
+public class TurnRepositoryIT extends AbstractIntegrationTest {
 
     @Autowired TurnRepository repository;
     @Autowired GameRepository gameRepository;
