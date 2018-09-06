@@ -128,11 +128,19 @@ public class GameState implements Serializable {
     /**
      * Places the item in the current room.
      */
-    public void drop(Item item) {
-        items.stream()
+    public Room drop(Item item) {
+        return drop(item, getCurrentRoom());
+    }
+
+    /**
+     * Places ITEM in ROOM.
+     */
+    public Room drop(Item item, Room room) {
+        return items.stream()
                 .filter(i -> i.matches(item))
                 .findFirst()
-                .ifPresent(i -> i.drop(currentRoom));
+                .map(i -> i.drop(room))
+                .orElse(Room.NOWHERE);
     }
 
     /**
@@ -151,6 +159,23 @@ public class GameState implements Serializable {
     public boolean exists(Item item) {
         return items.stream()
                 .anyMatch(i -> i.matches(item) && !i.isDestroyed());
+    }
+
+    /**
+     * Put ITEM1 in same room as ITEM2
+     */
+    public void putWith(Item item1, Item item2) {
+        items.stream()
+                .filter(i -> i.matches(item1))
+                .findFirst()
+                .ifPresent(i -> i.putWith(item2));
+    }
+
+    /**
+     * Exchange the location of ITEM1 with ITEM2.
+     */
+    public void swap(Item item1, Item item2) {
+        drop(item1, drop(item2, drop(item1, Room.NOWHERE)));
     }
 
     @Override

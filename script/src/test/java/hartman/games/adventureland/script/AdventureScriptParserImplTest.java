@@ -407,7 +407,7 @@ public class AdventureScriptParserImplTest {
         Adventure adventure = adventureScriptParsingRule.parse();
 
         Action action = adventure.getActions().iterator().next();
-        GameState gameState = new GameState(adventure.getStartRoom());
+        GameState gameState = new GameState(adventure.getStartRoom(), adventure.getItems());
         TestDisplay display = new TestDisplay();
 
         Item locked_door = getItemOrFail(adventure.getItems(), "locked_door");

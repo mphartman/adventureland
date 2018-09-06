@@ -99,7 +99,7 @@ public final class Results {
      * Exchanges the two specified items, so that each occupies the location previously occupied by the other.
      */
     public static Result swap(Item item1, Item item2) {
-        return (command, gameState, display) -> item1.drop(item2.drop(item1.drop(Room.NOWHERE)));
+        return (command, gameState, display) -> gameState.swap(item1, item2);
     }
 
     /**
@@ -113,14 +113,14 @@ public final class Results {
      * Put ITEM in ROOM.
      */
     public static Result put(Item item, Room room) {
-        return (command, gameState, display) -> item.drop(room);
+        return (command, gameState, display) -> gameState.drop(item, room);
     }
 
     /**
      * Put ITEM in current room.
      */
     public static Result putHere(Item item) {
-        return (command, gameState, display) -> item.drop(gameState.getCurrentRoom());
+        return (command, gameState, display) -> gameState.drop(item);
     }
 
     /**
@@ -141,7 +141,7 @@ public final class Results {
      * Puts the first-specified item into the same location as the second.
      */
     public static Result putWith(Item item1, Item item2) {
-        return (command, gameState, display) -> item1.putWith(item2);
+        return (command, gameState, display) -> gameState.putWith(item1, item2);
     }
 
     /**

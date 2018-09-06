@@ -10,6 +10,7 @@ import hartman.games.adventureland.engine.Word;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,6 +41,8 @@ import static hartman.games.adventureland.engine.core.TestWords.DROP;
 import static hartman.games.adventureland.engine.core.TestWords.GET;
 import static hartman.games.adventureland.engine.core.TestWords.GO;
 import static hartman.games.adventureland.engine.core.TestWords.UP;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singleton;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -180,7 +183,7 @@ public class ResultsTest {
         assertTrue(lockedChest.isHere(bedroom));
         assertTrue(openedChest.isHere(Room.NOWHERE));
 
-        GameState gameState = new GameState(bedroom);
+        GameState gameState = new GameState(bedroom, new HashSet<>(asList(lockedChest, openedChest)));
         Display noDisplay = display;
         swap(lockedChest, openedChest).execute(Command.NONE, gameState, noDisplay);
 
@@ -209,7 +212,7 @@ public class ResultsTest {
 
         assertFalse(fly.isHere(kitchen));
 
-        put(fly, kitchen).execute(Command.NONE, new GameState(kitchen), display);
+        put(fly, kitchen).execute(Command.NONE, new GameState(kitchen, singleton(fly)), display);
 
         assertTrue(fly.isHere(kitchen));
     }
@@ -274,7 +277,7 @@ public class ResultsTest {
         assertFalse(grenade.isHere(pants));
         assertTrue(phone.isHere(pants));
 
-        putWith(grenade, phone).execute(Command.NONE, new GameState(Room.NOWHERE), display);
+        putWith(grenade, phone).execute(Command.NONE, new GameState(Room.NOWHERE, new HashSet<>(asList(grenade, phone))), display);
 
         assertTrue(grenade.isHere(pants));
         assertTrue(phone.isHere(pants));
@@ -428,5 +431,17 @@ public class ResultsTest {
 
         print("Every programmer knows that {word:1}ing a {word:2} is like {string:term} + {counter:operand} is {flag:result}").execute(new Command(new Word("fly"), new Word("kite")), gameState, display);
         assertEquals("Every programmer knows that flying a kite is like x + 42 is true", display.toString());
+    }
+
+    @Test
+    public void putHereShouldPutItemInCurrentRoom() {
+        Item knife = Item.newItem("knife").build();
+        Room kitchen = new Room("kitchen", "A kitchen");
+
+        assertFalse(knife.isHere(kitchen));
+
+        Results.putHere(knife).execute(Command.NONE, new GameState(kitchen, singleton(knife)), display);
+
+        assertTrue(knife.isHere(kitchen));
     }
 }
