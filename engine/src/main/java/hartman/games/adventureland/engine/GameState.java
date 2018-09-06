@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.util.Collections.emptySet;
@@ -113,7 +114,6 @@ public class GameState implements Serializable {
         display.look(currentRoom, items.stream()
                 .filter(item -> item.isHere(currentRoom))
                 .collect(collectingAndThen(toList(), Collections::unmodifiableList)));
-
     }
 
     /**
@@ -136,39 +136,28 @@ public class GameState implements Serializable {
      * Places ITEM in ROOM.
      */
     public Room drop(Item item, Room room) {
-        return items.stream()
-                .filter(i -> i.matches(item))
-                .findFirst()
-                .map(i -> i.drop(room))
-                .orElse(Room.NOWHERE);
+        return find(item).map(i -> i.drop(room)).orElse(Room.NOWHERE);
     }
 
     /**
      * Removes item thus effectively destroying it from game.
      */
     public void destroy(Item item) {
-        items.stream()
-                .filter(i -> i.matches(item))
-                .findFirst()
-                .ifPresent(Item::destroy);
+        find(item).ifPresent(Item::destroy);
     }
 
     /**
      * True if ITEM is in the game and not destroyed.
      */
     public boolean exists(Item item) {
-        return items.stream()
-                .anyMatch(i -> i.matches(item) && !i.isDestroyed());
+        return items.stream().anyMatch(i -> i.matches(item) && !i.isDestroyed());
     }
 
     /**
      * Put ITEM1 in same room as ITEM2
      */
     public void putWith(Item item1, Item item2) {
-        items.stream()
-                .filter(i -> i.matches(item1))
-                .findFirst()
-                .ifPresent(i -> i.putWith(item2));
+        find(item1).ifPresent(i -> i.putWith(item2));
     }
 
     /**
@@ -176,6 +165,31 @@ public class GameState implements Serializable {
      */
     public void swap(Item item1, Item item2) {
         drop(item1, drop(item2, drop(item1, Room.NOWHERE)));
+    }
+
+    /**
+     * Return true if ITEM is carried.
+     */
+    public boolean carrying(Item item) {
+        return find(item).map(Item::isCarried).orElse(false);
+    }
+
+    /**
+     * Return true if ITEM is in ROOM.
+     */
+    public boolean inRoom(Item item, Room room) {
+        return find(item).map(i -> i.isHere(room)).orElse(false);
+    }
+
+    /**
+     * Return true if ITEM has moved from its original starting location.
+     */
+    public boolean hasMoved(Item item) {
+        return find(item).map(Item::hasMoved).orElse(false);
+    }
+
+    private Optional<Item> find(Item item) {
+        return items.stream().filter(i -> i.matches(item)).findFirst();
     }
 
     @Override

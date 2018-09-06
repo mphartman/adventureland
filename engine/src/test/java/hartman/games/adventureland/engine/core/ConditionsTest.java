@@ -8,6 +8,7 @@ import hartman.games.adventureland.engine.Room;
 import hartman.games.adventureland.engine.Word;
 import org.junit.Test;
 
+import java.util.HashSet;
 import java.util.stream.IntStream;
 
 import static hartman.games.adventureland.engine.core.Conditions.and;
@@ -29,6 +30,8 @@ import static hartman.games.adventureland.engine.core.TestWords.DOWN;
 import static hartman.games.adventureland.engine.core.TestWords.GO;
 import static hartman.games.adventureland.engine.core.TestWords.NORTH;
 import static hartman.games.adventureland.engine.core.TestWords.UP;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singleton;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -87,7 +90,7 @@ public class ConditionsTest {
     @Test
     public void itemCarriedShouldReturnTrueWhenPlayerInventoryHasItem() {
         Item torch = new Item.Builder().named("torch").describedAs("An unlit wooden torch dipped in pitch.").inInventory().build();
-        GameState gameState = new GameState(Room.NOWHERE);
+        GameState gameState = new GameState(Room.NOWHERE, singleton(torch));
         Command command = new Command(GO, Word.ANY);
         Condition itemCarried = carrying(torch);
         assertTrue(itemCarried.matches(command, gameState));
@@ -97,7 +100,7 @@ public class ConditionsTest {
     public void itemHereShouldReturnTrueWhenItemIsInRoom() {
         Room entryway = new Room("entryway", "A dark, narrow entry way into the house.");
         Item dog = new Item.Builder().named("dog").describedAs("A large, rapid dog growls at me.").in(entryway).build();
-        GameState gameState = new GameState(entryway);
+        GameState gameState = new GameState(entryway, singleton(dog));
         Command command = new Command(GO, Word.ANY);
         Condition itemHere = here(dog);
         assertTrue(itemHere.matches(command, gameState));
@@ -117,7 +120,7 @@ public class ConditionsTest {
     public void isPresentShouldReturnTrueWhenItemIsInRoom() {
         Room doghouse = new Room("doghouse", "A cozy, warm kennel.");
         Item dog = new Item.Builder().named("dog").describedAs("A small sleeps here.").in(doghouse).build();
-        GameState gameState = new GameState(doghouse);
+        GameState gameState = new GameState(doghouse, singleton(dog));
         Command command = new Command(GO, Word.ANY);
         Condition isPresent = present(dog);
         assertTrue(isPresent.matches(command, gameState));
@@ -126,7 +129,7 @@ public class ConditionsTest {
     @Test
     public void isPresentShouldReturnTrueWhenItemIsInInventory() {
         Item key = new Item.Builder().named("key").describedAs("A tarnished brass skeleton key.").inInventory().build();
-        GameState gameState = new GameState(Room.NOWHERE);
+        GameState gameState = new GameState(Room.NOWHERE, singleton(key));
         Command command = new Command(GO, Word.ANY);
         Condition isPresent = present(key);
         assertTrue(isPresent.matches(command, gameState));
@@ -180,14 +183,14 @@ public class ConditionsTest {
 
     @Test
     public void itemMovedShouldReturnTrueIfItemsCurrentLocationDoesNotMatchItsStartingLocation() {
-        Item item = new Item.Builder().named("chalice").describedAs("A jewel-encrusted golden chalice.").portable().build();
+        Item chalice = new Item.Builder().named("chalice").describedAs("A jewel-encrusted golden chalice.").portable().build();
         Command command = new Command(new Word("PICKUP"), new Word("chalice"));
-        GameState gameState = new GameState(Room.NOWHERE);
-        assertFalse(hasMoved(item).matches(command, gameState));
-        item.stow();
-        assertTrue(hasMoved(item).matches(command, gameState));
-        item.drop(Room.NOWHERE);
-        assertFalse(hasMoved(item).matches(command, gameState));
+        GameState gameState = new GameState(Room.NOWHERE, singleton(chalice));
+        assertFalse(hasMoved(chalice).matches(command, gameState));
+        chalice.stow();
+        assertTrue(hasMoved(chalice).matches(command, gameState));
+        chalice.drop(Room.NOWHERE);
+        assertFalse(hasMoved(chalice).matches(command, gameState));
     }
 
     @Test
@@ -195,9 +198,10 @@ public class ConditionsTest {
         Room bus = new Room("bus", "A city bus.");
         Item vomit = new Item.Builder().named("vomit").in(bus).build();
         Item driver = new Item.Builder().named("driver").build();
+        HashSet<Item> items = new HashSet<>(asList(vomit, driver));
 
-        assertTrue(there(vomit, bus).matches(Command.NONE, new GameState(bus)));
-        assertFalse(there(driver, bus).matches(Command.NONE, new GameState(bus)));
+        assertTrue(there(vomit, bus).matches(Command.NONE, new GameState(bus, items)));
+        assertFalse(there(driver, bus).matches(Command.NONE, new GameState(bus, items)));
     }
 
     @Test

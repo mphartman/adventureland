@@ -80,14 +80,14 @@ public final class Conditions {
      * True if the player is carrying ITEM in their inventory.
      */
     public static Condition carrying(Item item) {
-        return (command, gameState) -> item.isCarried();
+        return (command, gameState) -> gameState.carrying(item);
     }
 
     /**
      * True if ITEM is in the player's current room.
      */
     public static Condition here(Item item) {
-        return (command, gameState) -> item.isHere(gameState.getCurrentRoom());
+        return (command, gameState) -> gameState.inRoom(item, gameState.getCurrentRoom());
     }
 
     /**
@@ -120,14 +120,14 @@ public final class Conditions {
      * True if ITEM has moved from its original starting location.
      */
     public static Condition hasMoved(Item item) {
-        return (command, gameState) -> item.hasMoved();
+        return (command, gameState) -> gameState.hasMoved(item);
     }
 
     /**
      * True if ITEM is in the ROOM
      */
     public static Condition there(Item item, Room room) {
-        return (command, gameState) -> item.isHere(room);
+        return (command, gameState) -> gameState.inRoom(item, room);
     }
 
     /**
