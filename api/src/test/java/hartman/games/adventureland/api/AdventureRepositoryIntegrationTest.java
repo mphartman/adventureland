@@ -23,6 +23,16 @@ public class AdventureRepositoryIntegrationTest extends AbstractIntegrationTest 
         assertThat(adventures).contains(adventure);
     }
 
+    @Test
+    public void savesGames() {
+        Adventure adventure = createAdventure();
+        Game game = new Game(adventure, "Michael");
+        adventure.getGames().add(game);
+        adventure = repository.save(adventure);
+
+        assertThat(repository.findById(adventure.getId())).hasValueSatisfying(a -> assertThat(a.getGames()).hasSize(1).contains(game));
+    }
+
     private Adventure createAdventure() {
         return new Adventure("Shenanigans", "Archie Hartman", LocalDate.now(), "1.0.0");
     }
