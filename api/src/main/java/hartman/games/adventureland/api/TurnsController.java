@@ -48,6 +48,7 @@ public class TurnsController {
     @PostMapping
     public ResponseEntity<Resource<Turn>> takeTurn(@PathVariable("gameId") long gameId, @RequestBody TurnDTO dto) {
         return gameRepository.findById(gameId)
+                .filter(game -> game.getStatus() != Game.Status.GAME_OVER)
                 .map(game -> gameService.takeTurn(game, dto.getCommand()))
                 .map(turn -> {
                     ControllerLinkBuilder link = linkTo(methodOn(TurnsController.class, turn.getGame().getAdventure().getId(), turn.getGame().getId()).findOne(turn.getId()));

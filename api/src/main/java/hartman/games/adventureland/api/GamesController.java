@@ -43,6 +43,7 @@ public class GamesController {
     @PostMapping
     public ResponseEntity<Object> startNewGame(@PathVariable("adventureId") long adventureId, @RequestBody GameDTO gameDto) {
         return adventureRepository.findById(adventureId)
+                .filter(adventure -> adventure.getScript() != null)
                 .map(adventure -> gameService.startNewGame(adventure, gameDto.getPlayer()))
                 .map(game -> linkTo(GameController.class, game.getAdventure().getId(), game.getId()))
                 .map(link -> ResponseEntity.created(link.toUri()).build())

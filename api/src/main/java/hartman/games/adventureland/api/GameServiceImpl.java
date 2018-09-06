@@ -55,8 +55,10 @@ public class GameServiceImpl implements GameService {
         return getAdventure(game)
                 .map(adventure -> takeTurnInGame(adventure, game, inputCommand))
                 .map(tuple -> {
-                    game.setStatus(Game.Status.RUNNING);
-                    gameRepository.save(game.update(tuple.getGameState()));
+                    GameState gameState = tuple.getGameState();
+                    game.setStatus(gameState.isRunning() ? Game.Status.RUNNING : Game.Status.GAME_OVER);
+                    game.update(gameState);
+                    gameRepository.save(game);
                     return turnRepository.save(tuple.getTurn());
                 })
                 .orElseThrow(IllegalStateException::new);
