@@ -17,6 +17,7 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -36,10 +37,25 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional
+    public Game startNewGame(hartman.games.adventureland.api.Adventure adventure, String playerName) {
+        Game game = new Game(adventure, playerName);
+        game.setStatus(Game.Status.READY);
+        game.setStartTime(LocalDateTime.now());
+        game = gameRepository.save(game);
+
+        // take initial "start" turn automatically so any introductory OCCURS can run
+        takeTurn(game, "");
+
+        return game;
+    }
+
+    @Override
+    @Transactional
     public Turn takeTurn(Game game, String inputCommand) {
         return getAdventure(game)
                 .map(adventure -> takeTurnInGame(adventure, game, inputCommand))
                 .map(tuple -> {
+                    game.setStatus(Game.Status.RUNNING);
                     gameRepository.save(game.update(tuple.getGameState()));
                     return turnRepository.save(tuple.getTurn());
                 })

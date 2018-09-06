@@ -175,6 +175,8 @@ public class AdventuresResourceWebIntegrationTest extends AbstractWebIntegration
     /**
      * Follow the adventure link.
      * Post to the games link
+     * Get link returned in Location header
+     * Return Game response
      */
     private MockHttpServletResponse createNewGame(MockHttpServletResponse response) throws Exception {
 
@@ -196,7 +198,7 @@ public class AdventuresResourceWebIntegrationTest extends AbstractWebIntegration
                         .content(data)
                         .contentType(MediaType.APPLICATION_JSON)).
                 andExpect(status().isCreated()).
-                andExpect(linkWithRelIsPresent(Link.REL_SELF)).
+                andExpect(content().string("")).
                 andReturn().getResponse();
 
         return mvc.perform(get(response.getHeader("Location"))).andReturn().getResponse();
@@ -213,7 +215,7 @@ public class AdventuresResourceWebIntegrationTest extends AbstractWebIntegration
                 andExpect(linkWithRelIsPresent(ADVENTURE_REL)).
                 andExpect(jsonPath("$.player", is("Michael"))).
                 andExpect(jsonPath("$.startTime").exists()).
-                andExpect(jsonPath("$.status", is("Ready"))).
+                andExpect(jsonPath("$.status", is("Running"))).
                 andReturn().getResponse();
     }
 

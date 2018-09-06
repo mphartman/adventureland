@@ -5,69 +5,48 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
-import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import static java.util.stream.Collectors.toList;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
-@RestController
+@RepositoryRestController
 @RequestMapping(path = "/adventures/{adventureId}/games")
 public class GamesController {
 
-    private GameRepository repository;
-    private AdventureRepository adventureRepository;
+    private final GameRepository gameRepository;
+    private final AdventureRepository adventureRepository;
+    private final GameService gameService;
 
     @Autowired
-    public GamesController(GameRepository repository, AdventureRepository adventureRepository) {
-        this.repository = repository;
+    public GamesController(GameRepository gameRepository, AdventureRepository adventureRepository, GameService gameService) {
+        this.gameRepository = gameRepository;
         this.adventureRepository = adventureRepository;
+        this.gameService = gameService;
     }
 
     @GetMapping
-    public ResponseEntity<Resources<Resource<Game>>> getGames(@PathVariable("adventureId") Long adventureId) {
-        List<Game> games = repository.findByAdventureId(adventureId);
-
-        List<Resource<Game>> resources = games.stream()
-                .map(game -> new Resource<>(game, linkTo(GameController.class, adventureId, game.getId()).withSelfRel()))
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(new Resources<>(resources));
+    public ResponseEntity<Resources<Resource<Game>>> findAllByAdventureId(@PathVariable("adventureId") long adventureId) {
+        return ResponseEntity.ok(new Resources<>(gameRepository.findByAdventureId(adventureId).stream()
+                .map(game -> new Resource<>(game))
+                .collect(toList())));
     }
 
     @PostMapping
-    public ResponseEntity<Resource<Game>> startNewGame(@PathVariable("adventureId") Long adventureId, @RequestBody GameDTO gameDto) {
-
-        Optional<Adventure> maybeAdventure = adventureRepository.findById(adventureId);
-        if (!maybeAdventure.isPresent()) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        Adventure adventure = maybeAdventure.get();
-
-        Game game = new Game(adventure, gameDto.getPlayer());
-        game.setStatus(Game.Status.READY);
-        game.setStartTime(LocalDateTime.now());
-        game = repository.save(game);
-
-        ControllerLinkBuilder selfLink = linkTo(GameController.class, adventure.getId(), game.getId());
-        Resource<Game> resource = new Resource<>(game, selfLink.withSelfRel());
-        URI location = selfLink.toUri();
-
-        return ResponseEntity.created(location).body(resource);
+    public ResponseEntity<Object> startNewGame(@PathVariable("adventureId") long adventureId, @RequestBody GameDTO gameDto) {
+        return adventureRepository.findById(adventureId)
+                .map(adventure -> gameService.startNewGame(adventure, gameDto.getPlayer()))
+                .map(game -> linkTo(GameController.class, game.getAdventure().getId(), game.getId()))
+                .map(link -> ResponseEntity.created(link.toUri()).build())
+                .orElse(ResponseEntity.badRequest().build());
     }
 
     @Data
