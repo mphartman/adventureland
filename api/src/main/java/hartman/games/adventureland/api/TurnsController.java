@@ -5,21 +5,22 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import static java.util.stream.Collectors.toList;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-@RestController
+@RepositoryRestController
 @RequestMapping("/adventures/{adventureId}/games/{gameId}/turns")
 public class TurnsController {
 
@@ -37,33 +38,30 @@ public class TurnsController {
     @GetMapping
     public ResponseEntity<Resources<Resource<Turn>>> findAllByGameId(@PathVariable("gameId") long gameId) {
         if (gameRepository.existsById(gameId)) {
-            return ResponseEntity.ok(new Resources<>(turnRepository.findByGameId(gameId).stream().map(this::toResource).collect(toList())));
+            return ResponseEntity.ok(new Resources<>(turnRepository.findByGameId(gameId).stream()
+                    .map(turn -> new Resource<>(turn))
+                    .collect(toList())));
         }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.badRequest().build();
     }
 
     @PostMapping
     public ResponseEntity<Resource<Turn>> takeTurn(@PathVariable("gameId") long gameId, @RequestBody TurnDTO dto) {
         return gameRepository.findById(gameId)
                 .map(game -> gameService.takeTurn(game, dto.getCommand()))
-                .map(this::toResource)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.badRequest().build());
+                .map(turn -> {
+                    ControllerLinkBuilder link = linkTo(methodOn(TurnsController.class, turn.getGame().getAdventure().getId(), turn.getGame().getId()).findOne(turn.getId()));
+                    return ResponseEntity.created(link.toUri()).body(new Resource<>(turn));
+                })
+                .orElse(ResponseEntity.badRequest().build());
     }
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<Resource<Turn>> findOne(@PathVariable("id") long turnId) {
         return turnRepository.findById(turnId)
-                .map(this::toResource)
+                .map(turn -> new Resource<>(turn))
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
-    }
-
-    private Resource<Turn> toResource(Turn turn) {
-        Resource<Turn> resource = new Resource<>(turn);
-        resource.add(linkTo(methodOn(TurnsController.class, turn.getGame().getAdventure().getId(), turn.getGame().getId(), turn.getId()).findOne(turn.getId())).withSelfRel());
-        resource.add(linkTo(methodOn(GameController.class, turn.getGame().getId()).findOne(turn.getGame().getId())).withRel("game"));
-        return resource;
     }
 
     @Data

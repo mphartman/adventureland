@@ -236,7 +236,10 @@ public class AdventuresResourceWebIntegrationTest extends AbstractWebIntegration
                 post(taketurnLink.expand().getHref())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(data)).
-                andExpect(status().isOk()).
+                andExpect(status().isCreated()).
+                andExpect(jsonPath("$.command", is("look"))).
+                andExpect(jsonPath("$.timestamp").exists()).
+                andExpect(jsonPath("$.output").exists()).
                 andReturn().getResponse();
 
         return response;
