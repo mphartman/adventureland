@@ -22,7 +22,7 @@ public class GameController {
     @GetMapping
     public ResponseEntity<Resource<Game>> findOne(@PathVariable("id") long id) {
         return repository.findById(id)
-                .map(game -> new Resource<>(game))
+                .map(Resource<Game>::new)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

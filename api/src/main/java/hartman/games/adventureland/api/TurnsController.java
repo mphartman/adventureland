@@ -39,7 +39,7 @@ public class TurnsController {
     public ResponseEntity<Resources<Resource<Turn>>> findAllByGameId(@PathVariable("gameId") long gameId) {
         if (gameRepository.existsById(gameId)) {
             return ResponseEntity.ok(new Resources<>(turnRepository.findByGameId(gameId).stream()
-                    .map(turn -> new Resource<>(turn))
+                    .map(Resource<Turn>::new)
                     .collect(toList())));
         }
         return ResponseEntity.badRequest().build();
@@ -60,7 +60,7 @@ public class TurnsController {
     @GetMapping(path = "/{id}")
     public ResponseEntity<Resource<Turn>> findOne(@PathVariable("id") long turnId) {
         return turnRepository.findById(turnId)
-                .map(turn -> new Resource<>(turn))
+                .map(Resource<Turn>::new)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

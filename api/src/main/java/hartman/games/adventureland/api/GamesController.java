@@ -36,7 +36,7 @@ public class GamesController {
     @GetMapping
     public ResponseEntity<Resources<Resource<Game>>> findAllByAdventureId(@PathVariable("adventureId") long adventureId) {
         return ResponseEntity.ok(new Resources<>(gameRepository.findByAdventureId(adventureId).stream()
-                .map(game -> new Resource<>(game))
+                .map(Resource<Game>::new)
                 .collect(toList())));
     }
 
