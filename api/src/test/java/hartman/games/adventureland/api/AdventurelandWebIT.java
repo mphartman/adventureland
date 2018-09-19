@@ -31,6 +31,7 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
     private static final String ADVENTURE_REL = "adventure";
     private static final String GAME_REL = "game";
     private static final String TAKE_TURN_REL = "takeTurn";
+    private static final String TURNS_REL = "turns";
 
     @Test
     public void exposesAdventuresResourceViaRootResource() throws Exception {
@@ -213,6 +214,8 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
                 andExpect(status().isOk()).
                 andExpect(linkWithRelIsPresent(Link.REL_SELF)).
                 andExpect(linkWithRelIsPresent(ADVENTURE_REL)).
+                andExpect(linkWithRelIsPresent(TURNS_REL)).
+                andExpect(linkWithRelIsPresent(TAKE_TURN_REL)).
                 andExpect(jsonPath("$.player", is("Michael"))).
                 andExpect(jsonPath("$.startTime").exists()).
                 andExpect(jsonPath("$.status", is("Running"))).

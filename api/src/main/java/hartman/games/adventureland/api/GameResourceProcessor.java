@@ -26,6 +26,7 @@ public class GameResourceProcessor implements ResourceProcessor<Resource<Game>> 
 
         resource.add(linkTo(GameController.class, adventure.getId(), game.getId()).withSelfRel());
         resource.add(entityLinks.linkToSingleResource(adventure).withRel("adventure"));
+        resource.add(linkTo(methodOn(TurnsController.class, adventure.getId(), game.getId()).findAllByGameId(game.getId())).withRel("turns"));
 
         if (game.getStatus().equals(Game.Status.READY) || game.getStatus().equals(Game.Status.RUNNING)) {
             resource.add(linkTo(methodOn(TurnsController.class, adventure.getId(), game.getId()).takeTurn(game.getId(), null)).withRel("takeTurn"));
