@@ -28,3 +28,17 @@ A Turn is a single interaction between the player and a game.
 #### Saves
 
 A persisted state of a game which can be restored.
+
+## Running Local
+
+Install PostgreSQL:
+
+`brew install postgresql@10 `
+
+Start PostgreSQL:
+
+`pg_ctl -D /usr/local/var/postgres start`
+
+Run API application:
+
+`mvn spring-boot:run`

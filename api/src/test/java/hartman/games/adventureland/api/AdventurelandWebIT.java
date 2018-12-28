@@ -1,5 +1,6 @@
 package hartman.games.adventureland.api;
 
+import hartman.games.adventureland.api.security.WithMockToken;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
@@ -34,6 +35,7 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
     private static final String TURNS_REL = "turns";
 
     @Test
+    @WithMockToken
     public void exposesAdventuresResourceViaRootResource() throws Exception {
         mvc.perform(get("/")).
                 andDo(MockMvcResultHandlers.print()).
@@ -55,6 +57,7 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
      * Creates a new {@link Adventure}
      */
     @Test
+    @WithMockToken
     public void createNewAdventure() throws Exception {
         MockHttpServletResponse response = accessRootResource();
         response = createNewAdventure(response);
@@ -62,6 +65,7 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
     }
 
     @Test
+    @WithMockToken
     public void uploadAdventureScript() throws Exception {
         MockHttpServletResponse response = accessRootResource();
         response = createNewAdventure(response);
@@ -70,6 +74,7 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
     }
 
     @Test
+    @WithMockToken
     public void startNewGame() throws Exception {
         MockHttpServletResponse response = accessRootResource();
         response = createNewAdventure(response);
@@ -79,6 +84,7 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
     }
 
     @Test
+    @WithMockToken
     public void takeTurn() throws Exception {
         MockHttpServletResponse response = accessRootResource();
         response = createNewAdventure(response);
