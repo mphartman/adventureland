@@ -3,6 +3,6 @@ applications:
 - name: adventureland-api
   memory: 1G
   instances: 1
-  path: api/target/adventureland-api-0.1.0.jar
+  path: api/target/adventureland-api-0.1.1.jar
   services:
     - adventureland-sql
