@@ -15,13 +15,13 @@ cache:
   - "$HOME/.m2/repository"
   - "$HOME/.sonar/cache"
 deploy:
-  provider: cloudfoundry
-  api: https://api.run.pivotal.io
-  username: mphartman@me.com
-  password:
-    secure: wGV8kHnCFCtRWvO7a9YFWogI5FsJvLZHJdzT+3frOPQ+WSB/aMtMuYvcbTe9lQMWImY66RXMzpvR0lB5XOxzTArEmLfF3gKgOHhyiKbrZ3Jxhn2v+v1nKXa5puCtwTEPZH/T2VQScq/he9K85bg1CvZb5pyyP6+yorE7kE0cAeEhC9XdhaLzG3NN0A926doPiRNdP2n3R9dcmmECFMup3myKBs/MKa7LoVzvN0yiiuocZwYX5AunT4aIVXqUTW43g0Qst5yxX+gPkdENQXnQNS+kuySMeoeM9QlkS/GxeR3sZxbcPQjZW0vin/F7fr8dg7AJMz4G5pX8WTeir8u5SWZnYM32LMbjJQIFHbwq5JtIBP19hrx1tbvQaILrsAYHMFJDv80UQRi76t9wifBo4jDzLey8JYgCXE4Y9FdYcyaUKKui0LfrdySdx1BCSyLLtTUu82/H0EewHZgeoAbvnYNn0OnjYxXLb3pIrSlV+UY0tQLuny2O6+2WHtDmTwqu5YbnLC5fkdsuaa/0NcHaT7sgPZF+qcB0VuB/LFj1Qs0AAD52czN5GNZIm3Sj/FEhNYj+BZGgEDqf2Cu7Ak6wyAJvr4XnS+jUJjfcaB7MUK8GGEY+lajKHs9I5hT2yAZIGEV1z/Qn8K9ihrrSUNvA2jXJb0EOfWY8UDM06VoaDQI=
-  organization: waterdeep
-  space: development
+  provider: elasticbeanstalk
+  access_key_id: AKIA5AISIHAIKLQIXM44
+  secret_access_key:
+    secure: cwVA1pbHVDt2NXamJ3/0LRgzRVo9+KNnNFIu/bcnOrr7uD1Hpyaelf2WvTnRmbHsEBNIcfYMeR1fNKuOWbJ5JmeW1/jPb3KEBVKaoj6lWEGnBrS10CPhBX8SkimZmRoFQr5Uzd8LCCd88Os5tJhKBptvhDSpB3ulz/F7pS7AsZFM4O+L7ygN4WaDpyRH8ksRoXl7kS+GT5lCmCPfTiWSyExETjrCQfXJe/4DTCi+gWWuKcc0op1UUXW92tFCLfDV6qeu+0TwQS8iddgIx+nL862YkmvsL6uUvlicquCnYoROpJdiqKsoyZYGqslae6+pbWJPowR8VK7sL3yQ49s8cN3k5UG78ljis3Om3yVNTcYqKuGDB9G8oEAvShjP1X+lVL65SNT/x/g3M1IWVQmY7Cgfx4cOoqdqxM1zVFKYPX3jTisH8vw6OOLkw27kaQe+fY9vLRhgeshBqXzw8+sOw2r/81ItmniYNLAzQ1LDETaxAPA5H2bGd6d8B/CCAz5j0zCmUfFiImxDh3k8Dso+FquskLCzbJ8ft8AkaAbLpZEjYwhOr3bUyG+7AWJxALNbUuwHbtgP6hgZQQDjOYNyRrHANhIs/3Zeh6BFjAiqvGHqggvIwPyy3KWwnZi01HFmYhCrVZRsrVgrXoukFfobHhKaz8UwZyLC++AMVEZ4uIQ=
+  region: us-east-1
+  app: adventureland-api
+  env: dev
   on:
     repo: mphartman/adventureland
     branch: master
