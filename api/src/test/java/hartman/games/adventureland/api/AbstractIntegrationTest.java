@@ -17,6 +17,5 @@ import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTest
 @AutoConfigureTestDatabase(replace = Replace.NONE) // to disable use of in-memory database for JPA integration test
 @FlywayTest
 @AutoConfigureEmbeddedDatabase
-@SpringBootTest
 public abstract class AbstractIntegrationTest {
 }
