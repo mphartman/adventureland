@@ -21,8 +21,8 @@ deploy:
     secure: cwVA1pbHVDt2NXamJ3/0LRgzRVo9+KNnNFIu/bcnOrr7uD1Hpyaelf2WvTnRmbHsEBNIcfYMeR1fNKuOWbJ5JmeW1/jPb3KEBVKaoj6lWEGnBrS10CPhBX8SkimZmRoFQr5Uzd8LCCd88Os5tJhKBptvhDSpB3ulz/F7pS7AsZFM4O+L7ygN4WaDpyRH8ksRoXl7kS+GT5lCmCPfTiWSyExETjrCQfXJe/4DTCi+gWWuKcc0op1UUXW92tFCLfDV6qeu+0TwQS8iddgIx+nL862YkmvsL6uUvlicquCnYoROpJdiqKsoyZYGqslae6+pbWJPowR8VK7sL3yQ49s8cN3k5UG78ljis3Om3yVNTcYqKuGDB9G8oEAvShjP1X+lVL65SNT/x/g3M1IWVQmY7Cgfx4cOoqdqxM1zVFKYPX3jTisH8vw6OOLkw27kaQe+fY9vLRhgeshBqXzw8+sOw2r/81ItmniYNLAzQ1LDETaxAPA5H2bGd6d8B/CCAz5j0zCmUfFiImxDh3k8Dso+FquskLCzbJ8ft8AkaAbLpZEjYwhOr3bUyG+7AWJxALNbUuwHbtgP6hgZQQDjOYNyRrHANhIs/3Zeh6BFjAiqvGHqggvIwPyy3KWwnZi01HFmYhCrVZRsrVgrXoukFfobHhKaz8UwZyLC++AMVEZ4uIQ=
   region: us-east-1
   app: adventureland-api
-  env: dev
-  bucket_name: "adventureland-us-east-1-893928355856"
+  env: adventureland-api-dev
+  bucket_name: "elasticbeanstalk-us-east-1-893928355856"
   on:
     repo: mphartman/adventureland
     branch: master
