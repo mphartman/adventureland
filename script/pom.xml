@@ -5,7 +5,7 @@
 
 	<groupId>hartman.games</groupId>
 	<artifactId>adventureland-script</artifactId>
-	<version>0.1.0</version>
+	<version>0.1.1</version>
 	<packaging>jar</packaging>
 
 	<name>adventureland-script</name>
@@ -27,7 +27,7 @@
 		<dependency>
 			<groupId>org.antlr</groupId>
 			<artifactId>antlr4-runtime</artifactId>
-			<version>4.7.1</version>
+			<version>4.7.2</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -42,7 +42,7 @@
 			<plugin>
 				<groupId>org.antlr</groupId>
 				<artifactId>antlr4-maven-plugin</artifactId>
-				<version>4.7.1</version>
+				<version>4.7.2</version>
                 <configuration>
                     <listener>false</listener>
                     <visitor>true</visitor>

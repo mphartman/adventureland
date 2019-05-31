@@ -14,18 +14,13 @@ public class WithMockTokenSecurityContextFactory implements WithSecurityContextF
     @Override
     public SecurityContext createSecurityContext(WithMockToken tokenAnnotation) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-        String token = null;
-        try {
-            token = JWT.create()
-                    .withIssuer("foobar")
-                    .withAudience("baz")
-                    .withClaim("GivenName", "Johnny")
-                    .withClaim("Surname", "Rocket")
-                    .withClaim("Email", "johnny@user.com")
-                    .sign(Algorithm.HMAC256("secret"));
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
+        String token = JWT.create()
+                .withIssuer("foobar")
+                .withAudience("baz")
+                .withClaim("GivenName", "Johnny")
+                .withClaim("Surname", "Rocket")
+                .withClaim("Email", "johnny@user.com")
+                .sign(Algorithm.HMAC256("secret"));
         Authentication auth = new MockAuthenticationJsonWebToken(token, tokenAnnotation.isAuthenticated());
         context.setAuthentication(auth);
         return context;
