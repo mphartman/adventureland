@@ -22,6 +22,7 @@ deploy:
   region: us-east-1
   app: adventureland-api
   env: dev
+  bucket_name: "adventureland-us-east-1-893928355856"
   on:
     repo: mphartman/adventureland
     branch: master
