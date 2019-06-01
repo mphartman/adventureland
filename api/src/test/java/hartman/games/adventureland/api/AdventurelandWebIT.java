@@ -105,7 +105,7 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
 
         Link adventuresLink = getDiscovererFor(source).findLinkWithRel(ADVENTURES_REL, content);
 
-        ClassPathResource resource = new ClassPathResource("adventure.json");
+        ClassPathResource resource = new ClassPathResource("data/adventure.json");
         byte[] data = Files.readAllBytes(resource.getFile().toPath());
 
         MockHttpServletResponse response =
@@ -153,8 +153,8 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
         Link uploadLink = getDiscovererFor(response)
                 .findLinkWithRel(UPLOAD_REL, response.getContentAsString());
 
-        ClassPathResource resource = new ClassPathResource("adventure.txt");
-        MockMultipartFile mockMultipartFile = new MockMultipartFile("file", "adventure.txt", "text/plain", resource.getInputStream());
+        ClassPathResource resource = new ClassPathResource("data/adventure.txt");
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("file", "data/adventure.txt", "text/plain", resource.getInputStream());
 
         MockHttpServletResponse result = mvc
                 .perform(
@@ -195,7 +195,7 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
                 andExpect(linkWithRelIsPresent(GAMES_REL)).
                 andReturn().getResponse();
 
-        ClassPathResource resource = new ClassPathResource("game.json");
+        ClassPathResource resource = new ClassPathResource("data/game.json");
         byte[] data = Files.readAllBytes(resource.getFile().toPath());
 
         Link gamesLink = getDiscovererFor(response).findLinkWithRel(GAMES_REL, response.getContentAsString());
@@ -238,7 +238,7 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
 
         Link taketurnLink = getDiscovererFor(response).findLinkWithRel(TAKE_TURN_REL, response.getContentAsString());
 
-        ClassPathResource resource = new ClassPathResource("turn.json");
+        ClassPathResource resource = new ClassPathResource("data/turn.json");
         byte[] data = Files.readAllBytes(resource.getFile().toPath());
 
         response = mvc.perform(
