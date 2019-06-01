@@ -1,0 +1,26 @@
+branch-defaults:
+  default:
+    environment: adventureland-api-dev
+    group_suffix: null
+  master:
+    environment: adventureland-api-dev
+deploy:
+  artifact: api/target/adventureland-api-0.1.1.jar
+environment-defaults:
+  adventureland-api-dev:
+    branch: null
+    repository: null
+global:
+  application_name: adventureland-api
+  branch: null
+  default_ec2_keyname: aws-eb2
+  default_platform: Java 8
+  default_region: us-east-1
+  include_git_submodules: true
+  instance_profile: null
+  platform_name: null
+  platform_version: null
+  profile: eb-cli
+  repository: null
+  sc: git
+  workspace_type: Application

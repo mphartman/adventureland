@@ -1,0 +1,24 @@
+server:
+  port: 5000
+
+spring:
+  main:
+    banner-mode: 'off'
+  datasource:
+    url: 'jdbc:mysql://${RDS_HOSTNAME:localhost}:${RDS_PORT:3306}/${RDS_DB_NAME:ebdb}'
+    username: ${RDS_USERNAME:root}
+    password: ${RDS_PASSWORD:}
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+  data:
+    rest:
+      enable-enum-translation: true
+  jackson:
+    mapper:
+      infer-property-mutators: false
+
+auth0:
+  apiAudience: https://games.pinktapir.io/adventureland
+  issuer: https://pinktapir.auth0.com/

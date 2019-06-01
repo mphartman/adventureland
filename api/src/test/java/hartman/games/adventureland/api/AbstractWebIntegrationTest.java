@@ -1,6 +1,5 @@
 package hartman.games.adventureland.api;
 
-import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import org.flywaydb.test.annotation.FlywayTest;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -33,7 +32,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // to disable use of in-memory database for JPA integration test
 @FlywayTest
-@AutoConfigureEmbeddedDatabase
 @SpringBootTest
 public abstract class AbstractWebIntegrationTest {
 
