@@ -3,9 +3,9 @@ branch-defaults:
     environment: adventureland-api-dev
     group_suffix: null
   master:
-    environment: adventureland-api-dev
+    environment: null
 deploy:
-  artifact: api/target/adventureland-api-0.1.1.jar
+  artifact: api/target/adventureland-api.zip
 environment-defaults:
   adventureland-api-dev:
     branch: null
@@ -17,10 +17,6 @@ global:
   default_platform: Java 8
   default_region: us-east-1
   include_git_submodules: true
-  instance_profile: null
-  platform_name: null
-  platform_version: null
-  profile: eb-cli
-  repository: null
+  profile: null
   sc: git
   workspace_type: Application

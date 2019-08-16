@@ -1,0 +1,31 @@
+AWSConfigurationTemplateVersion: 1.1.0.0
+Platform:
+  PlatformArn: arn:aws:elasticbeanstalk:us-east-1::platform/Java 8 running on 64bit Amazon Linux/2.8.3
+OptionSettings:
+  aws:elasticbeanstalk:cloudwatch:logs:
+    RetentionInDays: '3'
+    DeleteOnTerminate: true
+    StreamLogs: true
+  aws:elasticbeanstalk:environment:
+    ServiceRole: aws-elasticbeanstalk-service-role
+    EnvironmentType: SingleInstance
+  aws:elasticbeanstalk:healthreporting:system:
+    SystemType: enhanced
+  aws:autoscaling:launchconfiguration:
+    IamInstanceProfile: aws-elasticbeanstalk-ec2-role
+    InstanceType: t2.small
+  aws:rds:dbinstance:
+    DBEngine: mysql
+    DBPassword: eNErvANiALityPhOLdivERAI
+    DBDeletionPolicy: Snapshot
+  AWSEBAutoScalingLaunchConfiguration.aws:autoscaling:launchconfiguration:
+    EC2KeyName: aws-eb2
+EnvironmentTier:
+  Type: Standard
+  Name: WebServer
+Extensions:
+  RDS.EBConsoleSnippet:
+    Order: null
+    SourceLocation: https://s3.amazonaws.com/elasticbeanstalk-env-resources-us-east-1/eb_snippets/rds/rds.json
+CName: adventureland-api-dev
+EnvironmentName: adventureland-api-dev
