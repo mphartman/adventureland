@@ -5,8 +5,8 @@ import hartman.games.adventureland.engine.Item;
 import hartman.games.adventureland.engine.Room;
 import hartman.games.adventureland.engine.Word;
 
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.function.IntSupplier;
+import java.util.function.Predicate;
 
 import static java.util.Arrays.stream;
 
@@ -109,11 +109,11 @@ public final class Conditions {
     /**
      * A condition which returns true based on a desired probability and the result of the given supplier function.
      */
-    public static Condition random(Integer probability, Supplier<Integer> d100) {
+    public static Condition random(Integer probability, IntSupplier d100) {
         if (probability < 0 || probability > 100) {
             throw new IllegalArgumentException("Invalid value. Probability must be between 0 and 100 inclusive.");
         }
-        return (command, gameState) -> probability - d100.get() > 0;
+        return (command, gameState) -> probability - d100.getAsInt() > 0;
     }
 
     /**
@@ -147,8 +147,8 @@ public final class Conditions {
     /**
      * Returns result of evaluating value of counter using given compare function.
      */
-    public static Condition compareCounter(String name, Function<Integer, Boolean> compare) {
-        return ((command, gameState) -> compare.apply(gameState.getCounter(name)));
+    public static Condition compareCounter(String name, Predicate<Integer> compare) {
+        return ((command, gameState) -> compare.test(gameState.getCounter(name)));
     }
 
     /**
