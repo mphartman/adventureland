@@ -79,6 +79,8 @@ OptionSettings:
     RetentionInDays: '3'
     HealthStreamingEnabled: true
     DeleteOnTerminate: true
+  aws:elasticbeanstalk:xray:
+    XRayEnabled: 'true'
 EnvironmentTier:
   Type: Standard
   Name: WebServer
