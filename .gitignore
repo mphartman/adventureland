@@ -24,3 +24,6 @@ target
 /dist/
 /nbdist/
 /.nb-gradle/
+
+### Elastic Beanstalk ###
+.elasticbeanstalk/logs/
