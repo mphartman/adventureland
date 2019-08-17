@@ -1,6 +1,5 @@
 package hartman.games.adventureland.api;
 
-import com.amazonaws.xray.spring.aop.XRayEnabled;
 import hartman.games.adventureland.engine.Adventure;
 import hartman.games.adventureland.engine.CommandInterpreter;
 import hartman.games.adventureland.engine.GameState;
@@ -23,7 +22,6 @@ import java.util.Optional;
 import java.util.Scanner;
 
 @Service
-@XRayEnabled
 public class GameServiceImpl implements GameService {
 
     private final AdventureScriptParser parser;

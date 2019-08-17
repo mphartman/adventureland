@@ -80,7 +80,7 @@ OptionSettings:
     HealthStreamingEnabled: true
     DeleteOnTerminate: true
   aws:elasticbeanstalk:xray:
-    XRayEnabled: 'true'
+    XRayEnabled: 'false'
 EnvironmentTier:
   Type: Standard
   Name: WebServer
