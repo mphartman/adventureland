@@ -9,7 +9,6 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import java.nio.file.Files;
 
@@ -18,6 +17,8 @@ import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -38,20 +39,12 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
     @WithMockToken
     public void exposesAdventuresResourceViaRootResource() throws Exception {
         mvc.perform(get("/")).
-                andDo(MockMvcResultHandlers.print()).
+                andDo(print()).
                 andExpect(status().isOk()).
                 andExpect(content().contentTypeCompatibleWith(MediaTypes.HAL_JSON)).
                 andExpect(jsonPath("$._links.adventures.href", notNullValue())).
                 andExpect(jsonPath("$._links.games.href").doesNotExist());
     }
-
-    private MockHttpServletResponse accessRootResource() throws Exception {
-        return mvc.perform(get("/")). //
-                andExpect(status().isOk()). //
-                andExpect(linkWithRelIsPresent(ADVENTURES_REL)). //
-                andReturn().getResponse();
-    }
-
 
     /**
      * Creates a new {@link Adventure}
@@ -64,34 +57,15 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
         verifyAdventure(response);
     }
 
-    @Test
-    @WithMockToken
-    public void uploadAdventureScript() throws Exception {
-        MockHttpServletResponse response = accessRootResource();
-        response = createNewAdventure(response);
-        response = uploadAdventureScript(response);
-        verifyScript(response);
-    }
-
-    @Test
-    @WithMockToken
-    public void startNewGame() throws Exception {
-        MockHttpServletResponse response = accessRootResource();
-        response = createNewAdventure(response);
-        response = uploadAdventureScript(response);
-        response = createNewGame(response);
-        verifyGame(response);
-    }
-
-    @Test
-    @WithMockToken
-    public void takeTurn() throws Exception {
-        MockHttpServletResponse response = accessRootResource();
-        response = createNewAdventure(response);
-        response = uploadAdventureScript(response);
-        response = createNewGame(response);
-        response = postNewTurn(response);
-        verifyTurn(response);
+    /**
+     * Returns the response from the root.
+     */
+    private MockHttpServletResponse accessRootResource() throws Exception {
+        return mvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(linkWithRelIsPresent(ADVENTURES_REL))
+                .andReturn()
+                .getResponse();
     }
 
     /**
@@ -120,7 +94,6 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
         return mvc.perform(get(response.getHeader("Location"))).andReturn().getResponse();
     }
 
-
     /**
      * Follows the {@code adventure} link and asserts response has the self, games, start and upload links.
      */
@@ -129,7 +102,7 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
         Link adventureLink = getDiscovererFor(response).findLinkWithRel(ADVENTURE_REL, response.getContentAsString());
 
         mvc.perform(get(adventureLink.expand().getHref())).
-                andDo(MockMvcResultHandlers.print()).
+                andDo(print()).
                 andExpect(status().isOk()).
                 andExpect(linkWithRelIsPresent(Link.REL_SELF)).
                 andExpect(linkWithRelIsPresent(GAMES_REL)).
@@ -140,8 +113,77 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
                 andExpect(jsonPath("$.publishedDate", is("2018-08-31"))).
                 andExpect(jsonPath("$.version", is("0.0.1"))).
                 andExpect(jsonPath("$.script").doesNotExist()).
-                andExpect(jsonPath("$.games").doesNotExist()).
-                andReturn().getResponse();
+                andExpect(jsonPath("$.games").doesNotExist());
+    }
+
+    /**
+     * Update an existing {@link Adventure}
+     */
+    @Test
+    @WithMockToken
+    public void updateExistingAdventure() throws Exception {
+        MockHttpServletResponse response = accessRootResource();
+        response = createNewAdventure(response);
+        response = updateAdventure(response);
+        verifyUpdatedAdventure(response);
+    }
+
+    /**
+     * - Follows adventure link to retrieve Adventure resource
+     * - Does a PUT
+     * - Verifies we receive a {@code 204 No Content} and a {@code Location} header.
+     * - Follows the Location header to retrieve the updated {@link Adventure}.
+     */
+    private MockHttpServletResponse updateAdventure(MockHttpServletResponse source) throws Exception {
+
+        String content = source.getContentAsString();
+
+        Link adventureLink = getDiscovererFor(source).findLinkWithRel(ADVENTURE_REL, content);
+
+        byte[] data = Files.readAllBytes(new ClassPathResource("data/adventure_updated.json").getFile().toPath());
+
+        MockHttpServletResponse response =
+                mvc.perform(
+                        put(adventureLink.expand().getHref())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(data)).
+                        andDo(print()).
+                        andExpect(status().isNoContent()).
+                        andExpect(header().string("Location", is(Matchers.notNullValue()))).
+                        andReturn().getResponse();
+
+        return mvc.perform(get(response.getHeader("Location"))).andReturn().getResponse();
+    }
+
+    /**
+     * Follows the {@code adventure} link and asserts response has the self, games, start and upload links.
+     */
+    private void verifyUpdatedAdventure(MockHttpServletResponse response) throws Exception {
+
+        Link adventureLink = getDiscovererFor(response).findLinkWithRel(ADVENTURE_REL, response.getContentAsString());
+
+        mvc.perform(get(adventureLink.expand().getHref())).
+                andDo(print()).
+                andExpect(status().isOk()).
+                andExpect(linkWithRelIsPresent(Link.REL_SELF)).
+                andExpect(linkWithRelIsPresent(GAMES_REL)).
+                andExpect(linkWithRelIsNotPresent(START_REL)).
+                andExpect(linkWithRelIsPresent(UPLOAD_REL)).
+                andExpect(jsonPath("$.title", is("Archie's Okay Escape"))).
+                andExpect(jsonPath("$.author", is("PinkTapir"))).
+                andExpect(jsonPath("$.publishedDate", is("2019-08-17"))).
+                andExpect(jsonPath("$.version", is("1.0.0"))).
+                andExpect(jsonPath("$.script").doesNotExist()).
+                andExpect(jsonPath("$.games").doesNotExist());
+    }
+
+    @Test
+    @WithMockToken
+    public void uploadAdventureScript() throws Exception {
+        MockHttpServletResponse response = accessRootResource();
+        response = createNewAdventure(response);
+        response = uploadAdventureScript(response);
+        verifyScript(response);
     }
 
     /**
@@ -167,16 +209,30 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
         return mvc.perform(get(result.getHeader("Location"))).andReturn().getResponse();
     }
 
+    /**
+     * - Follows the self link of a AdventureScript resource
+     * - Verifies the AdventureScript resource body is as expected
+     */
     private void verifyScript(MockHttpServletResponse response) throws Exception {
 
         Link selfLink = getDiscovererFor(response).findLinkWithRel(Link.REL_SELF, response.getContentAsString());
 
         mvc.perform(get(selfLink.expand().getHref())).
-                andDo(MockMvcResultHandlers.print()).
+                andDo(print()).
                 andExpect(status().isOk()).
                 andExpect(linkWithRelIsPresent(Link.REL_SELF)).
                 andExpect(linkWithRelIsPresent(ADVENTURE_REL)).
                 andReturn().getResponse();
+    }
+
+    @Test
+    @WithMockToken
+    public void startNewGame() throws Exception {
+        MockHttpServletResponse response = accessRootResource();
+        response = createNewAdventure(response);
+        response = uploadAdventureScript(response);
+        response = createNewGame(response);
+        verifyGame(response);
     }
 
     /**
@@ -216,7 +272,7 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
         Link selfLink = getDiscovererFor(response).findLinkWithRel(Link.REL_SELF, response.getContentAsString());
 
         mvc.perform(get(selfLink.expand().getHref())).
-                andDo(MockMvcResultHandlers.print()).
+                andDo(print()).
                 andExpect(status().isOk()).
                 andExpect(linkWithRelIsPresent(Link.REL_SELF)).
                 andExpect(linkWithRelIsPresent(ADVENTURE_REL)).
@@ -226,6 +282,17 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
                 andExpect(jsonPath("$.startTime").exists()).
                 andExpect(jsonPath("$.status", is("Running"))).
                 andReturn().getResponse();
+    }
+
+    @Test
+    @WithMockToken
+    public void takeTurn() throws Exception {
+        MockHttpServletResponse response = accessRootResource();
+        response = createNewAdventure(response);
+        response = uploadAdventureScript(response);
+        response = createNewGame(response);
+        response = postNewTurn(response);
+        verifyTurn(response);
     }
 
     private MockHttpServletResponse postNewTurn(MockHttpServletResponse source) throws Exception {
@@ -259,7 +326,7 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
         Link selfLink = getDiscovererFor(response).findLinkWithRel(Link.REL_SELF, response.getContentAsString());
 
         mvc.perform(get(selfLink.expand().getHref())).
-                andDo(MockMvcResultHandlers.print()).
+                andDo(print()).
                 andExpect(status().isOk()).
                 andExpect(linkWithRelIsPresent(Link.REL_SELF)).
                 andExpect(linkWithRelIsPresent(GAME_REL)).
