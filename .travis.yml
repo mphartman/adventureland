@@ -23,6 +23,8 @@ deploy:
   app: adventureland-api
   env: adventureland-api-dev
   bucket_name: "elasticbeanstalk-us-east-1-893928355856"
+  zip_file: api/target/adventureland-api.zip
+  skip_cleanup: true
   on:
     repo: mphartman/adventureland
     branch: master
