@@ -3,7 +3,7 @@ branch-defaults:
     environment: adventureland-api-dev
     group_suffix: null
   master:
-    environment: null
+    environment: adventureland-api-dev
 deploy:
   artifact: api/target/adventureland-api.zip
 environment-defaults:
