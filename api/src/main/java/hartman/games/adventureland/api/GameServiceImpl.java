@@ -1,5 +1,6 @@
 package hartman.games.adventureland.api;
 
+import com.amazonaws.xray.spring.aop.XRayEnabled;
 import hartman.games.adventureland.engine.Adventure;
 import hartman.games.adventureland.engine.CommandInterpreter;
 import hartman.games.adventureland.engine.GameState;
@@ -12,16 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Scanner;
 
 @Service
+@XRayEnabled
 public class GameServiceImpl implements GameService {
 
     private final AdventureScriptParser parser;
