@@ -9,17 +9,17 @@ OptionSettings:
   aws:elasticbeanstalk:environment:
     ServiceRole: aws-elasticbeanstalk-service-role
     EnvironmentType: SingleInstance
+    LoadBalancerType: classic
   aws:elasticbeanstalk:healthreporting:system:
     SystemType: enhanced
   aws:autoscaling:launchconfiguration:
     IamInstanceProfile: aws-elasticbeanstalk-ec2-role
     InstanceType: t2.small
+    EC2KeyName: aws-eb
   aws:rds:dbinstance:
     DBEngine: mysql
     DBPassword: eNErvANiALityPhOLdivERAI
     DBDeletionPolicy: Snapshot
-  AWSEBAutoScalingLaunchConfiguration.aws:autoscaling:launchconfiguration:
-    EC2KeyName: aws-eb2
 EnvironmentTier:
   Type: Standard
   Name: WebServer
