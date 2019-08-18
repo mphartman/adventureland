@@ -2,14 +2,17 @@ package hartman.games.adventureland.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import org.springframework.hateoas.Identifiable;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
@@ -21,14 +24,14 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "turn")
 @Data
-@RequiredArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-@EqualsAndHashCode(callSuper = true)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Turn extends AbstractEntity {
-
-    private @JsonIgnore @NonNull @ManyToOne(optional = false) Game game;
-    private @OrderColumn LocalDateTime timestamp = LocalDateTime.now();
-    private @NonNull String command;
-    private @NonNull String output;
+public class Turn  implements Identifiable<Long> {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @JsonIgnore Long id;
+    @NonNull @ManyToOne(optional = false) @JsonIgnore Game game;
+    @OrderColumn @Builder.Default LocalDateTime timestamp = LocalDateTime.now();
+    @NonNull String command;
+    @NonNull String output;
 }

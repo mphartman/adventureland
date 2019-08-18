@@ -20,7 +20,7 @@ public class TurnRepositoryIT extends AbstractIntegrationTest {
 
         Adventure adventure = adventureRepository.save(newAdventure());
         Game game = gameRepository.save(Game.builder().adventure(adventure).player("Player One").build());
-        Turn turn = repository.save(new Turn(game, "help", "Help is on the way"));
+        Turn turn = repository.save(Turn.builder().game(game).command("help").output("Help is on the way").build());
 
         Iterable<Turn> turns = repository.findAll();
 
@@ -45,9 +45,9 @@ public class TurnRepositoryIT extends AbstractIntegrationTest {
         Game game2 = gameRepository.save(Game.builder().adventure(adventure).player("Player Two").build());
         Game game3 = gameRepository.save(Game.builder().adventure(adventure).player("Player Three").build());
 
-        Turn turn11 = repository.save(new Turn(game1, "help", "Help is on the way"));
-        Turn turn21 = repository.save(new Turn(game2, "help", "Help is on the way"));
-        Turn turn22 = repository.save(new Turn(game2, "look", "There are shadows all around."));
+        Turn turn11 = repository.save(Turn.builder().game(game1).command("help").output("Help is on the way").build());
+        Turn turn21 = repository.save(Turn.builder().game(game2).command("help").output("Help is on the way").build());
+        Turn turn22 = repository.save(Turn.builder().game(game2).command("look").output("There are shadows all around.").build());
 
         assertThat(repository.findByGameId(game1.getId())).hasSize(1).contains(turn11);
         assertThat(repository.findByGameId(game2.getId())).hasSize(2).contains(turn21, turn22);
@@ -60,7 +60,7 @@ public class TurnRepositoryIT extends AbstractIntegrationTest {
         Game game = gameRepository.save(Game.builder().adventure(adventure).player("Player One").build());
         // create a string made up of 1024 copies of string "*"
         final String largeOutput = String.join("", Collections.nCopies(1024, "*"));
-        Turn turn = repository.save(new Turn(game, "help", largeOutput));
+        Turn turn = repository.save(Turn.builder().game(game).command("help").output(largeOutput).build());
 
         assertThat(repository.findById(turn.getId())).isNotEmpty().hasValueSatisfying(t -> assertThat(t.getOutput()).isEqualTo(largeOutput));
     }

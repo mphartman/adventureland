@@ -5,7 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
@@ -25,18 +26,13 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 @RepositoryRestController
 @RequestMapping("/adventures/{adventureId}/games/{gameId}/turns")
 @CrossOrigin
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 public class TurnsController {
 
-    private final GameService gameService;
-    private final GameRepository gameRepository;
-    private final TurnRepository turnRepository;
-
-    @Autowired
-    public TurnsController(GameService gameService, GameRepository gameRepository, TurnRepository turnRepository) {
-        this.gameService = gameService;
-        this.gameRepository = gameRepository;
-        this.turnRepository = turnRepository;
-    }
+    GameService gameService;
+    GameRepository gameRepository;
+    TurnRepository turnRepository;
 
     @GetMapping
     public ResponseEntity<Resources<Resource<Turn>>> findAllByGameId(@PathVariable("gameId") long gameId) {

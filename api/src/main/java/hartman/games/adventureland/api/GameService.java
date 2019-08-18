@@ -76,7 +76,7 @@ public class GameService {
         GameState gameState = game.load().orElse(new GameState(adventure.getStartRoom(), adventure.getItems()));
         hartman.games.adventureland.engine.Game engineGame = new hartman.games.adventureland.engine.Game(adventure, interpreter, display, gameState);
         gameState = engineGame.takeTurn(interpreter.nextCommand());
-        Turn turn = new Turn(game, inputCommand, displayOut.toString());
+        Turn turn = Turn.builder().game(game).command(inputCommand).output(displayOut.toString()).build();
         return new GameStateTurnTuple(gameState, turn);
     }
 
