@@ -1,15 +1,17 @@
 package hartman.games.adventureland.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import org.springframework.hateoas.Identifiable;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
@@ -21,13 +23,12 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "script")
 @Data
+@Builder
 @AllArgsConstructor
-@RequiredArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AdventureScript extends AbstractEntity {
-
-    private @OneToOne(optional = false) @MapsId @NonNull Adventure adventure;
-    private @Lob String script;
+public class AdventureScript  implements Identifiable<Long> {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) Long id;
+    @OneToOne(optional = false) @MapsId @NonNull Adventure adventure;
+    @Lob String script;
 }

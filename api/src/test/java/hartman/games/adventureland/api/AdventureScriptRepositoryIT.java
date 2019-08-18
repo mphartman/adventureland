@@ -14,42 +14,50 @@ public class AdventureScriptRepositoryIT extends AbstractIntegrationTest {
 
     @Test
     public void createsScript() {
-        Adventure adventure = adventureRepository.save(Adventure
+        Adventure adventure = saveNewAdventure();
+
+        long before = adventureScriptRepository.count();
+
+        AdventureScript script = AdventureScript
+                .builder()
+                .adventure(adventure)
+                .script("room forest \"I'm in a forest.\"")
+                .build();
+        adventureScriptRepository.save(script);
+
+        Iterable<AdventureScript> scripts = adventureScriptRepository.findAll();
+        assertThat(scripts).hasSize((int) (before + 1));
+        assertThat(scripts).contains(script);
+    }
+
+    private Adventure saveNewAdventure() {
+        return adventureRepository.save(Adventure
                 .builder()
                 .title("Test Adventure")
                 .author("Archie")
                 .publishedDate(LocalDate.now())
                 .version("0.0.1")
                 .build());
-
-        Long before = adventureScriptRepository.count();
-
-        AdventureScript script = new AdventureScript(adventure, "room forest \"I'm in a forest.\"");
-        adventureScriptRepository.save(script);
-
-        Iterable<AdventureScript> scripts = adventureScriptRepository.findAll();
-
-        assertThat(scripts).hasSize(before.intValue() + 1);
-        assertThat(scripts).contains(script);
     }
 
     @Test
     public void deletesScript() {
-        Adventure adventure = adventureRepository.save(Adventure
+        Adventure adventure = saveNewAdventure();
+
+        AdventureScript script = AdventureScript
                 .builder()
-                .title("Test Adventure")
-                .author("Archie")
-                .publishedDate(LocalDate.now())
-                .version("0.0.1")
-                .build());
-
-        Long before = adventureScriptRepository.count();
-
-        AdventureScript script = new AdventureScript(adventure, "room forest \"I'm in a forest.\"");
+                .adventure(adventure)
+                .script("room forest \"I'm in a forest.\"")
+                .build();
         script = adventureScriptRepository.save(script);
+
+        long count = adventureScriptRepository.count();
 
         adventureScriptRepository.delete(script);
 
-        assertThat(adventureRepository.findById(adventure.getId())).isNotEmpty();
+        Iterable<AdventureScript> scripts = adventureScriptRepository.findAll();
+        assertThat(scripts).hasSize((int) (count - 1));
+        assertThat(scripts).doesNotContain(script);
+        assertThat(adventureScriptRepository.findById(script.getId())).isEmpty();
     }
 }

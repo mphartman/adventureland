@@ -1,6 +1,8 @@
 package hartman.games.adventureland.api;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.ResponseEntity;
@@ -23,16 +25,12 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 @RepositoryRestController
 @RequestMapping(path = "/adventures/{id}/upload")
 @CrossOrigin
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 public class AdventureScriptController {
 
-    private final AdventureRepository adventureRepository;
-    private final AdventureScriptRepository adventureScriptRepository;
-
-    @Autowired
-    public AdventureScriptController(AdventureRepository adventureRepository, AdventureScriptRepository adventureScriptRepository) {
-        this.adventureRepository = adventureRepository;
-        this.adventureScriptRepository = adventureScriptRepository;
-    }
+    AdventureRepository adventureRepository;
+    AdventureScriptRepository adventureScriptRepository;
 
     @GetMapping
     public ResponseEntity<Resource<AdventureScript>> findOneByAdventureId(@PathVariable("id") long adventureId) {
@@ -49,7 +47,7 @@ public class AdventureScriptController {
         String scriptText = fileToString(file);
 
         return adventureRepository.findById(adventureId)
-                .map(adventure -> adventureScriptRepository.findByAdventureId(adventure.getId()).orElse(new AdventureScript(adventure, scriptText)))
+                .map(adventure -> adventureScriptRepository.findByAdventureId(adventure.getId()).orElse(AdventureScript.builder().adventure(adventure).script(scriptText).build()))
                 .map(script -> update(script, scriptText))
                 .map(script -> linkTo(AdventureScriptController.class, script.getAdventure().getId()))
                 .map(builder -> ResponseEntity.created(builder.toUri()).build())
