@@ -1,9 +1,9 @@
 create TABLE adventure (
     id bigint AUTO_INCREMENT PRIMARY KEY,
-    author varchar(50),
-    published_date date,
-    title varchar(100),
-    version varchar(50)
+    author varchar(50) NOT NULL,
+    published_date date NOT NULL,
+    title varchar(100) NOT NULL,
+    version varchar(50) NOT NULL
 );
 
 create TABLE game (

@@ -6,8 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import org.springframework.hateoas.Identifiable;
+import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,6 +16,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,12 +32,13 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Validated
 public class Adventure implements Identifiable<Long> {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) Long id;
-    @NonNull String title;
-    @NonNull String author;
-    @NonNull LocalDate publishedDate;
-    @NonNull String version;
+    @NotBlank String title;
+    @NotBlank String author;
+    @NotNull LocalDate publishedDate;
+    @NotBlank String version;
     @JsonIgnore @OneToMany(mappedBy = "adventure", orphanRemoval = true) @Builder.Default List<Game> games = new ArrayList<>();
     @JsonIgnore @OneToOne(mappedBy = "adventure", orphanRemoval = true) AdventureScript script;
 }
