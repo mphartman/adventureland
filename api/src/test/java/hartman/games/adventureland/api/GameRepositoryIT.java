@@ -14,7 +14,13 @@ public class GameRepositoryIT extends AbstractIntegrationTest {
 
     @Test
     public void createsNewGame() {
-        Adventure adventure = adventureRepository.save(new Adventure("Test Adventure", "Archie", LocalDate.now(), "0.0.1"));
+        Adventure adventure = adventureRepository.save(Adventure
+                .builder()
+                .title("Test Adventure")
+                .author("Archie")
+                .publishedDate(LocalDate.now())
+                .version("0.0.1")
+                .build());
 
         Long before = gameRepository.count();
 
@@ -29,8 +35,20 @@ public class GameRepositoryIT extends AbstractIntegrationTest {
 
     @Test
     public void findsGamesByAdventureId() {
-        Adventure adventure1 = adventureRepository.save(new Adventure("Test Adventure 1", "Archie", LocalDate.now(), "0.1.1"));
-        Adventure adventure2 = adventureRepository.save(new Adventure("Test Adventure 2", "Archie", LocalDate.now(), "0.2.1"));
+        Adventure adventure1 = adventureRepository.save(Adventure
+                .builder()
+                .title("Test Adventure 1")
+                .author("Archie")
+                .publishedDate(LocalDate.now())
+                .version("1.0.0")
+                .build());
+        Adventure adventure2 = adventureRepository.save(Adventure
+                .builder()
+                .title("Test Adventure 2")
+                .author("Jerry")
+                .publishedDate(LocalDate.now())
+                .version("1.0.0")
+                .build());
 
         Game game11 = gameRepository.save(new Game(adventure1, "Player One"));
         Game game12 = gameRepository.save(new Game(adventure1, "Player Two"));

@@ -14,7 +14,13 @@ public class AdventureScriptRepositoryIT extends AbstractIntegrationTest {
 
     @Test
     public void createsScript() {
-        Adventure adventure = adventureRepository.save(new Adventure("Test Adventure", "Archie", LocalDate.now(), "0.0.1"));
+        Adventure adventure = adventureRepository.save(Adventure
+                .builder()
+                .title("Test Adventure")
+                .author("Archie")
+                .publishedDate(LocalDate.now())
+                .version("0.0.1")
+                .build());
 
         Long before = adventureScriptRepository.count();
 
@@ -29,7 +35,13 @@ public class AdventureScriptRepositoryIT extends AbstractIntegrationTest {
 
     @Test
     public void deletesScript() {
-        Adventure adventure = adventureRepository.save(new Adventure("Test Adventure", "Archie", LocalDate.now(), "0.0.1"));
+        Adventure adventure = adventureRepository.save(Adventure
+                .builder()
+                .title("Test Adventure")
+                .author("Archie")
+                .publishedDate(LocalDate.now())
+                .version("0.0.1")
+                .build());
 
         Long before = adventureScriptRepository.count();
 

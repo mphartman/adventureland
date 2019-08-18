@@ -34,6 +34,12 @@ public class AdventureRepositoryIT extends AbstractIntegrationTest {
     }
 
     private Adventure createAdventure() {
-        return new Adventure("Shenanigans", "Archie Hartman", LocalDate.now(), "1.0.0");
+        return Adventure
+                .builder()
+                .title("Shenanigans")
+                .author("Archie Hartman")
+                .publishedDate(LocalDate.now())
+                .version("1.0.0")
+                .build();
     }
 }

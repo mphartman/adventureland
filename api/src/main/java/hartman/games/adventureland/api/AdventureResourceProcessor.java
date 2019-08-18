@@ -1,6 +1,8 @@
 package hartman.games.adventureland.api;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceProcessor;
@@ -8,6 +10,8 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.stereotype.Component;
 
 @Component
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 public class AdventureResourceProcessor implements ResourceProcessor<Resource<Adventure>> {
 
     private static final String GAMES = "/games";
@@ -15,12 +19,7 @@ public class AdventureResourceProcessor implements ResourceProcessor<Resource<Ad
     private static final String START_REL = "start";
     private static final String UPLOAD_REL = "upload";
 
-    private final RepositoryEntityLinks entityLinks;
-
-    @Autowired
-    public AdventureResourceProcessor(RepositoryEntityLinks entityLinks) {
-        this.entityLinks = entityLinks;
-    }
+    RepositoryEntityLinks entityLinks;
 
     @Override
     public Resource<Adventure> process(Resource<Adventure> resource) {

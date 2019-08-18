@@ -18,7 +18,7 @@ public class TurnRepositoryIT extends AbstractIntegrationTest {
     public void createsNewTurn() {
         Long before = repository.count();
 
-        Adventure adventure = adventureRepository.save(new Adventure("Test Adventure", "Tester", LocalDate.now(), "1.0.0"));
+        Adventure adventure = adventureRepository.save(newAdventure());
         Game game = gameRepository.save(new Game(adventure, "Player One"));
         Turn turn = repository.save(new Turn(game, "help", "Help is on the way"));
 
@@ -28,9 +28,19 @@ public class TurnRepositoryIT extends AbstractIntegrationTest {
         assertThat(turns).contains(turn);
     }
 
+    private Adventure newAdventure() {
+        return Adventure
+                .builder()
+                .title("Test Adventure")
+                .author("Tester")
+                .publishedDate(LocalDate.now())
+                .version("1.0.0")
+                .build();
+    }
+
     @Test
     public void findsTurnsByGameId() {
-        Adventure adventure = adventureRepository.save(new Adventure("Test Adventure", "Tester", LocalDate.now(), "1.0.0"));
+        Adventure adventure = adventureRepository.save(newAdventure());
         Game game1 = gameRepository.save(new Game(adventure, "Player One"));
         Game game2 = gameRepository.save(new Game(adventure, "Player Two"));
         Game game3 = gameRepository.save(new Game(adventure, "Player Three"));
@@ -46,7 +56,7 @@ public class TurnRepositoryIT extends AbstractIntegrationTest {
 
     @Test
     public void savesLargeAmountOfOutputText() {
-        Adventure adventure = adventureRepository.save(new Adventure("Test Adventure", "Tester", LocalDate.now(), "1.0.0"));
+        Adventure adventure = adventureRepository.save(newAdventure());
         Game game = gameRepository.save(new Game(adventure, "Player One"));
         // create a string made up of 1024 copies of string "*"
         final String largeOutput = String.join("", Collections.nCopies(1024, "*"));

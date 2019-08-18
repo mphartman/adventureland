@@ -2,11 +2,11 @@ package hartman.games.adventureland.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.Identifiable;
 
 import javax.persistence.Entity;
@@ -26,16 +26,16 @@ import java.util.List;
 @Entity
 @Table(name = "adventure")
 @Data
-@RequiredArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Adventure implements Identifiable<Long> {
-
-    private @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @JsonIgnore Long id;
-    private @NonNull String title;
-    private @NonNull String author;
-    private @NonNull LocalDate publishedDate;
-    private @NonNull String version;
-    private @JsonIgnore @OneToMany(mappedBy = "adventure", orphanRemoval = true) List<Game> games = new ArrayList<>();
-    private @JsonIgnore @OneToOne(mappedBy = "adventure", orphanRemoval = true) AdventureScript script;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) Long id;
+    @NonNull String title;
+    @NonNull String author;
+    @NonNull LocalDate publishedDate;
+    @NonNull String version;
+    @JsonIgnore @OneToMany(mappedBy = "adventure", orphanRemoval = true) @Builder.Default List<Game> games = new ArrayList<>();
+    @JsonIgnore @OneToOne(mappedBy = "adventure", orphanRemoval = true) AdventureScript script;
 }
