@@ -639,8 +639,8 @@ public class AdventureScriptParserImpl implements AdventureScriptParser {
 
         @Override
         public Action.Condition visitConditionCounterEquals(ConditionCounterEqualsContext ctx) {
-            Integer number = Integer.parseInt(ctx.Number().getText());
-            return Conditions.compareCounter(ctx.word().getText(), val -> val.equals(number));
+            int number = Integer.parseInt(ctx.Number().getText());
+            return Conditions.compareCounter(ctx.word().getText(), val -> val == number);
         }
 
         @Override
