@@ -5,8 +5,8 @@ import hartman.games.adventureland.engine.Item;
 import hartman.games.adventureland.engine.Room;
 import hartman.games.adventureland.engine.Word;
 
+import java.util.function.IntPredicate;
 import java.util.function.IntSupplier;
-import java.util.function.Predicate;
 
 import static java.util.Arrays.stream;
 
@@ -147,7 +147,7 @@ public final class Conditions {
     /**
      * Returns result of evaluating value of counter using given compare function.
      */
-    public static Condition compareCounter(String name, Predicate<Integer> compare) {
+    public static Condition compareCounter(String name, IntPredicate compare) {
         return ((command, gameState) -> compare.test(gameState.getCounter(name)));
     }
 
