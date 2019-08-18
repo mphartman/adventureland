@@ -38,7 +38,7 @@ public class GameServiceImpl implements GameService {
     @Override
     @Transactional
     public Game startNewGame(hartman.games.adventureland.api.Adventure adventure, String playerName) {
-        Game game = new Game(adventure, playerName);
+        Game game = Game.builder().adventure(adventure).player(playerName).build();
         game.setStatus(Game.Status.READY);
         game.setStartTime(LocalDateTime.now());
         game = gameRepository.save(game);

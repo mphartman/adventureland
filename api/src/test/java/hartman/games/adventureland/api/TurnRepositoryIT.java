@@ -19,7 +19,7 @@ public class TurnRepositoryIT extends AbstractIntegrationTest {
         Long before = repository.count();
 
         Adventure adventure = adventureRepository.save(newAdventure());
-        Game game = gameRepository.save(new Game(adventure, "Player One"));
+        Game game = gameRepository.save(Game.builder().adventure(adventure).player("Player One").build());
         Turn turn = repository.save(new Turn(game, "help", "Help is on the way"));
 
         Iterable<Turn> turns = repository.findAll();
@@ -41,9 +41,9 @@ public class TurnRepositoryIT extends AbstractIntegrationTest {
     @Test
     public void findsTurnsByGameId() {
         Adventure adventure = adventureRepository.save(newAdventure());
-        Game game1 = gameRepository.save(new Game(adventure, "Player One"));
-        Game game2 = gameRepository.save(new Game(adventure, "Player Two"));
-        Game game3 = gameRepository.save(new Game(adventure, "Player Three"));
+        Game game1 = gameRepository.save(Game.builder().adventure(adventure).player("Player One").build());
+        Game game2 = gameRepository.save(Game.builder().adventure(adventure).player("Player Two").build());
+        Game game3 = gameRepository.save(Game.builder().adventure(adventure).player("Player Three").build());
 
         Turn turn11 = repository.save(new Turn(game1, "help", "Help is on the way"));
         Turn turn21 = repository.save(new Turn(game2, "help", "Help is on the way"));
@@ -57,7 +57,7 @@ public class TurnRepositoryIT extends AbstractIntegrationTest {
     @Test
     public void savesLargeAmountOfOutputText() {
         Adventure adventure = adventureRepository.save(newAdventure());
-        Game game = gameRepository.save(new Game(adventure, "Player One"));
+        Game game = gameRepository.save(Game.builder().adventure(adventure).player("Player One").build());
         // create a string made up of 1024 copies of string "*"
         final String largeOutput = String.join("", Collections.nCopies(1024, "*"));
         Turn turn = repository.save(new Turn(game, "help", largeOutput));

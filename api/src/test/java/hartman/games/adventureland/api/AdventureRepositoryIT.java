@@ -26,7 +26,7 @@ public class AdventureRepositoryIT extends AbstractIntegrationTest {
     @Test
     public void savesGames() {
         Adventure adventure = createAdventure();
-        Game game = new Game(adventure, "Michael");
+        Game game = Game.builder().adventure(adventure).player("Michael").build();
         adventure.getGames().add(game);
         adventure = repository.save(adventure);
 
