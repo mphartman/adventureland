@@ -2,6 +2,7 @@ package hartman.games.adventureland.api;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +51,7 @@ public class TurnsController {
     @PostMapping
     public ResponseEntity<Resource<Turn>> takeTurn(@PathVariable("gameId") long gameId, @RequestBody TurnDTO dto) {
         return gameRepository.findById(gameId)
-                .filter(game -> game.getStatus() != Game.Status.GAME_OVER)
+                .filter(Game::isNotGameOver)
                 .map(game -> gameService.takeTurn(game, dto.getCommand()))
                 .map(turn -> {
                     ControllerLinkBuilder link = linkTo(methodOn(TurnsController.class, turn.getGame().getAdventure().getId(), turn.getGame().getId()).findOne(turn.getId()));
@@ -68,9 +69,10 @@ public class TurnsController {
     }
 
     @Data
+    @Builder
     @AllArgsConstructor
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class TurnDTO {
-        private String command;
+        String command;
     }
 }

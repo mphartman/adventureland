@@ -1,6 +1,8 @@
 package hartman.games.adventureland.api;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.ResponseEntity;
@@ -12,14 +14,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RepositoryRestController
 @RequestMapping("/adventures/{adventureId}/games/{id}")
 @CrossOrigin
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 public class GameController {
 
-    private GameRepository repository;
-
-    @Autowired
-    public GameController(GameRepository repository) {
-        this.repository = repository;
-    }
+    GameRepository repository;
 
     @GetMapping
     public ResponseEntity<Resource<Game>> findOne(@PathVariable("id") long id) {

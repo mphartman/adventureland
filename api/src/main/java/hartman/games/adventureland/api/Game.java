@@ -61,6 +61,18 @@ public class Game implements Identifiable<Long> {
         GAME_OVER
     }
 
+    public boolean isRunning() {
+        return Status.RUNNING.equals(status);
+    }
+
+    public boolean isReady() {
+        return Status.READY.equals(status);
+    }
+
+    public boolean isNotGameOver() {
+        return Status.GAME_OVER != status;
+    }
+
     public Optional<GameState> load() {
         if (getCurrentState() == null) {
             return Optional.empty();
