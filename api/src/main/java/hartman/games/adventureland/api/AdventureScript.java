@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import org.springframework.hateoas.Identifiable;
+import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,6 +16,8 @@ import javax.persistence.Lob;
 import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * The text of the adventure.
@@ -27,8 +29,9 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Validated
 public class AdventureScript  implements Identifiable<Long> {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) Long id;
-    @OneToOne(optional = false) @MapsId @NonNull Adventure adventure;
-    @Lob String script;
+    @OneToOne(optional = false) @MapsId @NotNull Adventure adventure;
+    @NotBlank @Lob String script;
 }

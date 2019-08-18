@@ -15,9 +15,13 @@ create TABLE game (
     adventure_id bigint REFERENCES adventure
 );
 
-create TABLE script (
-    adventure_id bigint PRIMARY KEY REFERENCES adventure,
-    script text
+CREATE TABLE script (
+    adventure_id bigint NOT NULL,
+    script text NOT NULL,
+    PRIMARY KEY (adventure_id),
+    FOREIGN KEY (adventure_id)
+        REFERENCES adventure(id)
+        ON DELETE CASCADE
 );
 
 create TABLE turn (
