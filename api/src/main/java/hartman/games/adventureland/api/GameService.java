@@ -52,12 +52,9 @@ public class GameService {
     public Turn takeTurn(Game game, String inputCommand) {
         return getAdventure(game)
                 .map(adventure -> takeTurnInGame(adventure, game, inputCommand))
-                .map(tuple -> {
-                    GameState gameState = tuple.getGameState();
-                    game.setStatus(gameState.isRunning() ? Game.Status.RUNNING : Game.Status.GAME_OVER);
-                    game.update(gameState);
-                    gameRepository.save(game);
-                    return turnRepository.save(tuple.getTurn());
+                .map(pair -> {
+                    gameRepository.save(game.update(pair.getGameState()));
+                    return turnRepository.save(pair.getTurn());
                 })
                 .orElseThrow(IllegalStateException::new);
     }
@@ -69,15 +66,15 @@ public class GameService {
                 .map(this::parse);
     }
 
-    private GameStateTurnTuple takeTurnInGame(hartman.games.adventureland.engine.Adventure adventure, Game game, String inputCommand) {
+    private GameStateTurnPair takeTurnInGame(hartman.games.adventureland.engine.Adventure adventure, Game game, String inputCommand) {
         CommandInterpreter interpreter = new StringCommandInterpreter(inputCommand, adventure.getVocabulary());
         StringWriter displayOut = new StringWriter();
         DefaultDisplay display = new DefaultDisplay(new PrintWriter(displayOut));
-        GameState gameState = game.load().orElse(new GameState(adventure.getStartRoom(), adventure.getItems()));
+        GameState gameState = game.currentGameState().orElse(new GameState(adventure.getStartRoom(), adventure.getItems()));
         hartman.games.adventureland.engine.Game engineGame = new hartman.games.adventureland.engine.Game(adventure, interpreter, display, gameState);
         gameState = engineGame.takeTurn(interpreter.nextCommand());
         Turn turn = Turn.builder().game(game).command(inputCommand).output(displayOut.toString()).build();
-        return new GameStateTurnTuple(gameState, turn);
+        return new GameStateTurnPair(gameState, turn);
     }
 
     private hartman.games.adventureland.engine.Adventure parse(Reader reader) {
@@ -95,7 +92,7 @@ public class GameService {
     }
 
     @Value
-    private static class GameStateTurnTuple {
+    private static class GameStateTurnPair {
         private final GameState gameState;
         private final Turn turn;
     }

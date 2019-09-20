@@ -73,7 +73,7 @@ public class Game implements Identifiable<Long> {
         return Status.GAME_OVER != status;
     }
 
-    public Optional<GameState> load() {
+    public Optional<GameState> currentGameState() {
         if (getCurrentState() == null) {
             return Optional.empty();
         }
@@ -88,6 +88,7 @@ public class Game implements Identifiable<Long> {
     }
 
     public Game update(GameState gameState) {
+        setStatus(gameState.isRunning() ? Game.Status.RUNNING : Game.Status.GAME_OVER);
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(baos);
