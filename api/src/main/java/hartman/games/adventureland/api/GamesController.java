@@ -4,7 +4,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
@@ -21,19 +22,14 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 @RepositoryRestController
 @RequestMapping(path = "/adventures/{adventureId}/games")
-@CrossOrigin(exposedHeaders = { "Location" })
+@CrossOrigin(exposedHeaders = {"Location"})
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 public class GamesController {
 
-    private final GameRepository gameRepository;
-    private final AdventureRepository adventureRepository;
-    private final GameService gameService;
-
-    @Autowired
-    public GamesController(GameRepository gameRepository, AdventureRepository adventureRepository, GameService gameService) {
-        this.gameRepository = gameRepository;
-        this.adventureRepository = adventureRepository;
-        this.gameService = gameService;
-    }
+    GameRepository gameRepository;
+    AdventureRepository adventureRepository;
+    GameService gameService;
 
     @GetMapping
     public ResponseEntity<Resources<Resource<Game>>> findAllByAdventureId(@PathVariable("adventureId") long adventureId) {
