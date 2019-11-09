@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.springframework.hateoas.Identifiable;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -28,7 +27,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Turn  implements Identifiable<Long> {
+public class Turn {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @JsonIgnore Long id;
     @NonNull @ManyToOne(optional = false) @JsonIgnore Game game;
     @OrderColumn @Builder.Default LocalDateTime timestamp = LocalDateTime.now();

@@ -1,25 +1,25 @@
 package hartman.games.adventureland.api;
 
 import org.flywaydb.test.annotation.FlywayTest;
-import org.junit.Before;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.hateoas.LinkDiscoverer;
-import org.springframework.hateoas.LinkDiscoverers;
+import org.springframework.hateoas.client.LinkDiscoverer;
+import org.springframework.hateoas.client.LinkDiscoverers;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.Assert;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Locale;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,7 +28,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * 
  * @author https://github.com/olivergierke/spring-restbucks
  */
-@RunWith(SpringRunner.class)
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // to disable use of in-memory database for JPA integration test
 @FlywayTest
@@ -40,7 +39,7 @@ public abstract class AbstractWebIntegrationTest {
 
 	protected MockMvc mvc;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 
 		mvc = MockMvcBuilders.webAppContextSetup(context).//
@@ -70,7 +69,14 @@ public abstract class AbstractWebIntegrationTest {
 	}
 
 	protected LinkDiscoverer getDiscovererFor(MockHttpServletResponse response) {
-		return links.getLinkDiscovererFor(response.getContentType());
+		Assert.notNull(response.getContentType(), "Response.getContentType cannot be null");
+		Optional<LinkDiscoverer> linkDiscovererFor = links.getLinkDiscovererFor(response.getContentType());
+		if (linkDiscovererFor.isPresent()) {
+			return linkDiscovererFor.get();
+		}
+		else {
+			throw new IllegalArgumentException("No LinkDiscoverer found for " + response.getContentType());
+		}
 	}
 
 	private class LinkWithRelMatcher implements ResultMatcher {
@@ -92,9 +98,11 @@ public abstract class AbstractWebIntegrationTest {
 
 			MockHttpServletResponse response = result.getResponse();
 			String content = response.getContentAsString();
-			LinkDiscoverer discoverer = links.getLinkDiscovererFor(response.getContentType());
+			assertThat(response.getContentType()).isNotNull();
+			Optional<LinkDiscoverer> discoverer = links.getLinkDiscovererFor(response.getContentType());
 
-			assertThat(discoverer.findLinkWithRel(rel, content)).matches(it -> present == (it != null));
+			assertThat(discoverer).isPresent();
+			assertThat(discoverer.get().findLinkWithRel(rel, content)).matches(it -> present == (it != null && it.isPresent()));
 		}
 	}
 }

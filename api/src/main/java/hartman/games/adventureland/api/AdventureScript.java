@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.hateoas.Identifiable;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.Entity;
@@ -30,7 +29,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Validated
-public class AdventureScript  implements Identifiable<Long> {
+public class AdventureScript {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) Long id;
     @OneToOne(optional = false) @MapsId @NotNull Adventure adventure;
     @NotBlank @Lob String script;

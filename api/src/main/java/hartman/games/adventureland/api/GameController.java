@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
-import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,9 +21,9 @@ public class GameController {
     GameRepository repository;
 
     @GetMapping
-    public ResponseEntity<Resource<Game>> findOne(@PathVariable("id") long id) {
+    public ResponseEntity<EntityModel<Game>> findOne(@PathVariable("id") long id) {
         return repository.findById(id)
-                .map(Resource<Game>::new)
+                .map(EntityModel<Game>::new)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

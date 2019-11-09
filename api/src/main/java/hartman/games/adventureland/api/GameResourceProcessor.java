@@ -4,17 +4,17 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.ResourceProcessor;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.RepresentationModelProcessor;
 import org.springframework.stereotype.Component;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
-public class GameResourceProcessor implements ResourceProcessor<Resource<Game>> {
+public class GameResourceProcessor implements RepresentationModelProcessor<EntityModel<Game>> {
 
     private static final String ADVENTURE_REL = "adventure";
     private static final String TURNS_REL = "turns";
@@ -23,14 +23,14 @@ public class GameResourceProcessor implements ResourceProcessor<Resource<Game>> 
     RepositoryEntityLinks entityLinks;
 
     @Override
-    public Resource<Game> process(Resource<Game> resource) {
+    public EntityModel<Game> process(EntityModel<Game> resource) {
         Game game = resource.getContent();
         Long gameId = game.getId();
         Adventure adventure = game.getAdventure();
         Long adventureId = adventure.getId();
 
         resource.add(linkTo(GameController.class, adventureId, gameId).withSelfRel());
-        resource.add(entityLinks.linkToSingleResource(adventure).withRel(ADVENTURE_REL));
+        resource.add(entityLinks.linkToItemResource(adventure, Adventure::getId).withRel(ADVENTURE_REL));
         resource.add(linkTo(methodOn(TurnsController.class, adventureId, gameId).findAllByGameId(gameId)).withRel(TURNS_REL));
 
         if (game.isReady() || game.isRunning()) {

@@ -2,8 +2,9 @@ package hartman.games.adventureland.api;
 
 import hartman.games.adventureland.api.security.WithMockToken;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
@@ -77,7 +78,7 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
 
         String content = source.getContentAsString();
 
-        Link adventuresLink = getDiscovererFor(source).findLinkWithRel(ADVENTURES_REL, content);
+        Link adventuresLink = getDiscovererFor(source).findLinkWithRel(ADVENTURES_REL, content).orElseThrow(AssertionError::new);
 
         ClassPathResource resource = new ClassPathResource("data/adventure.json");
         byte[] data = Files.readAllBytes(resource.getFile().toPath());
@@ -99,12 +100,12 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
      */
     private void verifyAdventure(MockHttpServletResponse response) throws Exception {
 
-        Link adventureLink = getDiscovererFor(response).findLinkWithRel(ADVENTURE_REL, response.getContentAsString());
+        Link adventureLink = getDiscovererFor(response).findLinkWithRel(ADVENTURE_REL, response.getContentAsString()).orElseThrow(AssertionError::new);
 
         mvc.perform(get(adventureLink.expand().getHref())).
                 andDo(print()).
                 andExpect(status().isOk()).
-                andExpect(linkWithRelIsPresent(Link.REL_SELF)).
+                andExpect(linkWithRelIsPresent(IanaLinkRelations.SELF.value())).
                 andExpect(linkWithRelIsPresent(GAMES_REL)).
                 andExpect(linkWithRelIsNotPresent(START_REL)).
                 andExpect(linkWithRelIsPresent(UPLOAD_REL)).
@@ -138,7 +139,7 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
 
         String content = source.getContentAsString();
 
-        Link adventureLink = getDiscovererFor(source).findLinkWithRel(ADVENTURE_REL, content);
+        Link adventureLink = getDiscovererFor(source).findLinkWithRel(ADVENTURE_REL, content).orElseThrow(AssertionError::new);
 
         byte[] data = Files.readAllBytes(new ClassPathResource("data/adventure_updated.json").getFile().toPath());
 
@@ -160,12 +161,12 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
      */
     private void verifyUpdatedAdventure(MockHttpServletResponse response) throws Exception {
 
-        Link adventureLink = getDiscovererFor(response).findLinkWithRel(ADVENTURE_REL, response.getContentAsString());
+        Link adventureLink = getDiscovererFor(response).findLinkWithRel(ADVENTURE_REL, response.getContentAsString()).orElseThrow(AssertionError::new);
 
         mvc.perform(get(adventureLink.expand().getHref())).
                 andDo(print()).
                 andExpect(status().isOk()).
-                andExpect(linkWithRelIsPresent(Link.REL_SELF)).
+                andExpect(linkWithRelIsPresent(IanaLinkRelations.SELF.value())).
                 andExpect(linkWithRelIsPresent(GAMES_REL)).
                 andExpect(linkWithRelIsNotPresent(START_REL)).
                 andExpect(linkWithRelIsPresent(UPLOAD_REL)).
@@ -192,8 +193,7 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
      */
     private MockHttpServletResponse uploadAdventureScript(MockHttpServletResponse response) throws Exception {
 
-        Link uploadLink = getDiscovererFor(response)
-                .findLinkWithRel(UPLOAD_REL, response.getContentAsString());
+        Link uploadLink = getDiscovererFor(response).findLinkWithRel(UPLOAD_REL, response.getContentAsString()).orElseThrow(AssertionError::new);
 
         ClassPathResource resource = new ClassPathResource("data/adventure.txt");
         MockMultipartFile mockMultipartFile = new MockMultipartFile("file", "data/adventure.txt", "text/plain", resource.getInputStream());
@@ -215,12 +215,12 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
      */
     private void verifyScript(MockHttpServletResponse response) throws Exception {
 
-        Link selfLink = getDiscovererFor(response).findLinkWithRel(Link.REL_SELF, response.getContentAsString());
+        Link selfLink = getDiscovererFor(response).findLinkWithRel(IanaLinkRelations.SELF.value(), response.getContentAsString()).orElseThrow(AssertionError::new);;
 
         mvc.perform(get(selfLink.expand().getHref())).
                 andDo(print()).
                 andExpect(status().isOk()).
-                andExpect(linkWithRelIsPresent(Link.REL_SELF)).
+                andExpect(linkWithRelIsPresent(IanaLinkRelations.SELF.value())).
                 andExpect(linkWithRelIsPresent(ADVENTURE_REL)).
                 andReturn().getResponse();
     }
@@ -243,18 +243,18 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
      */
     private MockHttpServletResponse createNewGame(MockHttpServletResponse response) throws Exception {
 
-        Link adventureLink = getDiscovererFor(response).findLinkWithRel(ADVENTURE_REL, response.getContentAsString());
+        Link adventureLink = getDiscovererFor(response).findLinkWithRel(ADVENTURE_REL, response.getContentAsString()).orElseThrow(AssertionError::new);
 
         response = mvc.perform(get(adventureLink.expand().getHref())).
                 andExpect(status().isOk()).
-                andExpect(linkWithRelIsPresent(Link.REL_SELF)).
+                andExpect(linkWithRelIsPresent(IanaLinkRelations.SELF.value())).
                 andExpect(linkWithRelIsPresent(GAMES_REL)).
                 andReturn().getResponse();
 
         ClassPathResource resource = new ClassPathResource("data/game.json");
         byte[] data = Files.readAllBytes(resource.getFile().toPath());
 
-        Link gamesLink = getDiscovererFor(response).findLinkWithRel(GAMES_REL, response.getContentAsString());
+        Link gamesLink = getDiscovererFor(response).findLinkWithRel(GAMES_REL, response.getContentAsString()).orElseThrow(AssertionError::new);
 
         response = mvc.perform(
                 post(gamesLink.expand().getHref())
@@ -269,12 +269,12 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
 
     private void verifyGame(MockHttpServletResponse response) throws Exception {
 
-        Link selfLink = getDiscovererFor(response).findLinkWithRel(Link.REL_SELF, response.getContentAsString());
+        Link selfLink = getDiscovererFor(response).findLinkWithRel(IanaLinkRelations.SELF.value(), response.getContentAsString()).orElseThrow(AssertionError::new);
 
         mvc.perform(get(selfLink.expand().getHref())).
                 andDo(print()).
                 andExpect(status().isOk()).
-                andExpect(linkWithRelIsPresent(Link.REL_SELF)).
+                andExpect(linkWithRelIsPresent(IanaLinkRelations.SELF.value())).
                 andExpect(linkWithRelIsPresent(ADVENTURE_REL)).
                 andExpect(linkWithRelIsPresent(TURNS_REL)).
                 andExpect(linkWithRelIsPresent(TAKE_TURN_REL)).
@@ -297,13 +297,13 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
 
     private MockHttpServletResponse postNewTurn(MockHttpServletResponse source) throws Exception {
 
-        Link gameLink = getDiscovererFor(source).findLinkWithRel(Link.REL_SELF, source.getContentAsString());
+        Link gameLink = getDiscovererFor(source).findLinkWithRel(IanaLinkRelations.SELF.value(), source.getContentAsString()).orElseThrow(AssertionError::new);
 
         MockHttpServletResponse response = mvc.perform(get(gameLink.expand().getHref()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
 
-        Link taketurnLink = getDiscovererFor(response).findLinkWithRel(TAKE_TURN_REL, response.getContentAsString());
+        Link taketurnLink = getDiscovererFor(response).findLinkWithRel(TAKE_TURN_REL, response.getContentAsString()).orElseThrow(AssertionError::new);
 
         ClassPathResource resource = new ClassPathResource("data/turn.json");
         byte[] data = Files.readAllBytes(resource.getFile().toPath());
@@ -323,12 +323,12 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
 
     private void verifyTurn(MockHttpServletResponse response) throws Exception {
 
-        Link selfLink = getDiscovererFor(response).findLinkWithRel(Link.REL_SELF, response.getContentAsString());
+        Link selfLink = getDiscovererFor(response).findLinkWithRel(IanaLinkRelations.SELF.value(), response.getContentAsString()).orElseThrow(AssertionError::new);
 
         mvc.perform(get(selfLink.expand().getHref())).
                 andDo(print()).
                 andExpect(status().isOk()).
-                andExpect(linkWithRelIsPresent(Link.REL_SELF)).
+                andExpect(linkWithRelIsPresent(IanaLinkRelations.SELF.value())).
                 andExpect(linkWithRelIsPresent(GAME_REL)).
                 andExpect(jsonPath("$.command", is("look"))).
                 andExpect(jsonPath("$.timestamp").exists()).

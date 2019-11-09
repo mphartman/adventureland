@@ -1,19 +1,19 @@
 package hartman.games.adventureland.api;
 
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.ResourceProcessor;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.RepresentationModelProcessor;
 import org.springframework.stereotype.Component;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
-public class TurnResourceProcessor implements ResourceProcessor<Resource<Turn>> {
+public class TurnResourceProcessor implements RepresentationModelProcessor<EntityModel<Turn>> {
 
     private static final String GAME_REL = "game";
 
     @Override
-    public Resource<Turn> process(Resource<Turn> resource) {
+    public EntityModel<Turn> process(EntityModel<Turn> resource) {
         Turn turn = resource.getContent();
         Game game = turn.getGame();
         resource.add(linkTo(methodOn(TurnsController.class, game.getAdventure().getId(), game.getId(), turn.getId()).findOne(turn.getId())).withSelfRel());

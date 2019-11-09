@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
-import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +20,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @RepositoryRestController
 @RequestMapping(path = "/adventures/{id}/upload")
@@ -33,10 +33,10 @@ public class AdventureScriptController {
     AdventureScriptRepository adventureScriptRepository;
 
     @GetMapping
-    public ResponseEntity<Resource<AdventureScript>> findOneByAdventureId(@PathVariable("id") long adventureId) {
+    public ResponseEntity<EntityModel<AdventureScript>> findOneByAdventureId(@PathVariable("id") long adventureId) {
         return adventureRepository.findById(adventureId)
                 .flatMap(adventure -> adventureScriptRepository.findByAdventureId(adventure.getId()))
-                .map(Resource<AdventureScript>::new)
+                .map(EntityModel<AdventureScript>::new)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.Resources;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import static java.util.stream.Collectors.toList;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @RepositoryRestController
 @RequestMapping(path = "/adventures/{adventureId}/games")
@@ -32,9 +32,9 @@ public class GamesController {
     GameService gameService;
 
     @GetMapping
-    public ResponseEntity<Resources<Resource<Game>>> findAllByAdventureId(@PathVariable("adventureId") long adventureId) {
-        return ResponseEntity.ok(new Resources<>(gameRepository.findByAdventureId(adventureId).stream()
-                .map(Resource<Game>::new)
+    public ResponseEntity<CollectionModel<EntityModel<Game>>> findAllByAdventureId(@PathVariable("adventureId") long adventureId) {
+        return ResponseEntity.ok(new CollectionModel<>(gameRepository.findByAdventureId(adventureId).stream()
+                .map(EntityModel<Game>::new)
                 .collect(toList())));
     }
 

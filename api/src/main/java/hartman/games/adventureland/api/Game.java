@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.springframework.hateoas.Identifiable;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -37,7 +36,7 @@ import java.util.Optional;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Game implements Identifiable<Long> {
+public class Game {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) Long id;
     @NonNull @ManyToOne(optional = false) Adventure adventure;
     @NonNull String player;

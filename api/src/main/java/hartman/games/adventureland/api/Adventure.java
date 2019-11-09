@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.hateoas.Identifiable;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.Entity;
@@ -33,7 +32,7 @@ import java.util.List;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Validated
-public class Adventure implements Identifiable<Long> {
+public class Adventure {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) Long id;
     @NotBlank String title;
     @NotBlank String author;
