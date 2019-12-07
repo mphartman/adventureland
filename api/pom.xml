@@ -61,7 +61,7 @@
         <dependency>
             <groupId>com.auth0</groupId>
             <artifactId>auth0-spring-security-api</artifactId>
-            <version>1.2.1</version>
+            <version>1.2.6</version>
         </dependency>
 
         <!-- JDK 8 DateTime support for Jackson -->
@@ -101,7 +101,7 @@
         <dependency>
             <groupId>org.flywaydb.flyway-test-extensions</groupId>
             <artifactId>flyway-spring5-test</artifactId>
-            <version>5.2.4</version>
+            <version>6.0.0</version>
             <scope>test</scope>
         </dependency>
 
