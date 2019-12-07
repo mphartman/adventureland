@@ -281,6 +281,9 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
                 andExpect(jsonPath("$.player", is("Michael"))).
                 andExpect(jsonPath("$.startTime").exists()).
                 andExpect(jsonPath("$.status", is("Running"))).
+                andExpect(jsonPath("$.running").doesNotExist()).
+                andExpect(jsonPath("$.notGameOver").doesNotExist()).
+                andExpect(jsonPath("$.ready").doesNotExist()).
                 andReturn().getResponse();
     }
 

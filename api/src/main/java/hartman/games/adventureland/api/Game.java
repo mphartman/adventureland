@@ -60,14 +60,17 @@ public class Game {
         GAME_OVER
     }
 
+    @JsonIgnore
     public boolean isRunning() {
         return Status.RUNNING.equals(status);
     }
 
+    @JsonIgnore
     public boolean isReady() {
         return Status.READY.equals(status);
     }
 
+    @JsonIgnore
     public boolean isNotGameOver() {
         return Status.GAME_OVER != status;
     }
