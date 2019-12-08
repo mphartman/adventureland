@@ -7,9 +7,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -19,7 +23,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import static java.util.stream.Collectors.toList;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -33,13 +36,14 @@ public class TurnsController {
     GameService gameService;
     GameRepository gameRepository;
     TurnRepository turnRepository;
+    PagedResourcesAssembler<Turn> assembler;
 
     @GetMapping
-    public ResponseEntity<CollectionModel<EntityModel<Turn>>> findAllByGameId(@PathVariable("gameId") long gameId) {
+    public ResponseEntity<PagedModel<EntityModel<Turn>>> findAllByGameId(@PathVariable("gameId") long gameId, @PageableDefault(size = 20) Pageable pageable) {
         if (gameRepository.existsById(gameId)) {
-            return ResponseEntity.ok(new CollectionModel<>(turnRepository.findByGameId(gameId).stream()
-                    .map(EntityModel<Turn>::new)
-                    .collect(toList())));
+            Page<Turn> page = turnRepository.findAllByGameId(gameId, pageable);
+            PagedModel<EntityModel<Turn>> pagedModel = assembler.toModel(page);
+            return ResponseEntity.ok(pagedModel);
         }
         return ResponseEntity.badRequest().build();
     }

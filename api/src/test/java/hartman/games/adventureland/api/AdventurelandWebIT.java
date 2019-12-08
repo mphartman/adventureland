@@ -339,4 +339,39 @@ public class AdventurelandWebIT extends AbstractWebIntegrationTest {
                 andReturn().getResponse();
     }
 
+    @Test
+    @WithMockToken
+    void getAllGameTurns() throws Exception {
+        MockHttpServletResponse response = accessRootResource();
+        response = createNewAdventure(response);
+        response = uploadAdventureScript(response);
+        response = createNewGame(response);
+        response = postNewTurn(response);
+        verifyPaginatedTurns(response);
+    }
+
+    private void verifyPaginatedTurns(MockHttpServletResponse response) throws Exception {
+
+        Link gameLink = getDiscovererFor(response).findLinkWithRel(GAME_REL, response.getContentAsString()).orElseThrow(AssertionError::new);
+
+        MockHttpServletResponse gameResponse = mvc.perform(get(gameLink.expand().getHref()))
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+
+        Link turnsLink = getDiscovererFor(gameResponse).findLinkWithRel(TURNS_REL, gameResponse.getContentAsString()).orElseThrow(AssertionError::new);
+
+        mvc.perform(get(turnsLink.expand().getHref()).param("size", "1"))
+                .andExpect(status().isOk())
+                .andExpect(linkWithRelIsPresent(IanaLinkRelations.SELF.value()))
+                .andExpect(jsonPath("$.page.size", is(1)))
+                .andExpect(jsonPath("$.page.totalElements", is(2)))
+                .andExpect(jsonPath("$.page.totalPages", is(2)))
+                .andExpect(jsonPath("$.page.number", is(0)))
+                .andExpect(jsonPath("$._links.first").exists())
+                .andExpect(jsonPath("$._links.self").exists())
+                .andExpect(jsonPath("$._links.next").exists())
+                .andExpect(jsonPath("$._links.last").exists())
+                .andReturn().getResponse();
+
+    }
 }
