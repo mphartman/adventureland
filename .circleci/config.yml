@@ -54,11 +54,3 @@ jobs:
           paths:
             - ~/.m2
           key: v1-dependencies-{{ checksum "pom.xml" }}
-
-      - sonarcloud/scan
-
-workflows:
-  main:
-    jobs:
-      - build:
-          context: sonarcloud
