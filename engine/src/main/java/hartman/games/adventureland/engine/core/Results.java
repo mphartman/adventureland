@@ -6,7 +6,7 @@ import hartman.games.adventureland.engine.Item;
 import hartman.games.adventureland.engine.Room;
 import hartman.games.adventureland.engine.Word;
 
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,7 +43,7 @@ public final class Results {
     private static Pattern flagPlaceholderPattern = Pattern.compile("\\{flag:(.+?)\\}");
     private static Pattern stringPlaceholderPattern = Pattern.compile("\\{string:(.+?)\\}");
 
-    private static String resolvePlaceholder(String s, Pattern pattern, Function<String, String> resolver) {
+    private static String resolvePlaceholder(String s, Pattern pattern, UnaryOperator<String> resolver) {
         Matcher matcher = pattern.matcher(s);
         StringBuilder builder = new StringBuilder();
         int i = 0;

@@ -46,7 +46,8 @@ public class AdventureScriptParserImplTest {
     @Test
     @AdventureScriptResource("/scripts/003adventure.txt")
     public void validRoomNames() {
-        adventureScriptParsingRule.parse();
+        Adventure adventure = adventureScriptParsingRule.parse();
+        assertEquals("b", adventure.getStartRoom().getName());
     }
 
     @Test
