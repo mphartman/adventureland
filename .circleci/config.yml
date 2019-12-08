@@ -35,7 +35,7 @@ jobs:
             - v1-dependencies-
 
       # run tests!
-      - run: mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent verify package sonar:sonar
+      - run: mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent verify package
 
       - run:
           name: Save test results
@@ -54,5 +54,3 @@ jobs:
           paths:
             - ~/.m2
           key: v1-dependencies-{{ checksum "pom.xml" }}
-
-      - sonarcloud/scan
