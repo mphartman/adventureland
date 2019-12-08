@@ -5,7 +5,7 @@
 version: 2.1
 
 orbs:
-  sonarcloud: sonarsource/sonarcloud@1.0.0
+  sonarcloud: sonarsource/sonarcloud@1.0.1
 
 jobs:
   build:
@@ -56,3 +56,9 @@ jobs:
           key: v1-dependencies-{{ checksum "pom.xml" }}
 
       - sonarcloud/scan
+
+workflows:
+  main:
+    jobs:
+      - build:
+          context: sonarcloud
