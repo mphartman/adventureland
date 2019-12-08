@@ -35,7 +35,7 @@ jobs:
             - v1-dependencies-
 
       # run tests!
-      - run: mvn integration-test
+      - run: mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent verify package sonar:sonar
 
       - run:
           name: Save test results
